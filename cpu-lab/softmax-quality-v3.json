@@ -1,0 +1,252 @@
+{
+  "benchmark": "VoxConverse development 3 x 60s smoke subset",
+  "reference": {
+    "source": "https://huggingface.co/datasets/diarizers-community/voxconverse",
+    "revision": "3acfa1b45ca4b7419aee999d67d94c617f9c9d47",
+    "parquetSha256": "f36c54412f0ac9cfe7ec2682e27f70f3e3df63d8e2b8f288d4f62341a595917d",
+    "split": "dev",
+    "selection": "First three rows of dev-00000-of-00005, first 60 seconds, chosen before candidate evaluation.",
+    "license": "CC BY 4.0; VoxConverse, Chung et al. 2020; HF packaging by diarizers-community."
+  },
+  "protocol": "pyannote.metrics optimal speaker permutation, overlap included, UEM=cut interval, macro averages over three cuts; each variant scored once after deterministic repeat parity checks.",
+  "scores": [
+    {
+      "variant": "48",
+      "cases": [
+        {
+          "case": "vox-rcxzg-60s",
+          "scores": {
+            "0.0": {
+              "missed detection": 0.020000000000003126,
+              "false alarm": 0.799999999999998,
+              "total": 59.080000000000005,
+              "confusion": 0.0,
+              "correct": 59.06,
+              "diarization error rate": 0.013879485443466505
+            },
+            "0.25": {
+              "missed detection": 0.0,
+              "false alarm": 0.46999999999999886,
+              "total": 58.330000000000005,
+              "confusion": 0.0,
+              "correct": 58.330000000000005,
+              "diarization error rate": 0.008057603291616644
+            }
+          },
+          "segments": 20
+        },
+        {
+          "case": "vox-fsaal-60s",
+          "scores": {
+            "0.0": {
+              "missed detection": 0.14000000000000323,
+              "false alarm": 2.2400000000000015,
+              "total": 54.44,
+              "confusion": 0.10000000000000009,
+              "correct": 54.199999999999996,
+              "diarization error rate": 0.045554739162380696
+            },
+            "0.25": {
+              "missed detection": 0.0,
+              "false alarm": 1.2900000000000027,
+              "total": 52.69,
+              "confusion": 0.0,
+              "correct": 52.69,
+              "diarization error rate": 0.024482824065287585
+            }
+          },
+          "segments": 20
+        },
+        {
+          "case": "vox-vmaiq-60s",
+          "scores": {
+            "0.0": {
+              "missed detection": 3.719999999999999,
+              "false alarm": 1.2399999999999922,
+              "total": 62.36000000000001,
+              "confusion": 0.9599999999999937,
+              "correct": 57.68000000000001,
+              "diarization error rate": 0.09493264913406005
+            },
+            "0.25": {
+              "missed detection": 3.4299999999999997,
+              "false alarm": 0.5099999999999998,
+              "total": 59.28000000000001,
+              "confusion": 0.37499999999999645,
+              "correct": 55.47500000000001,
+              "diarization error rate": 0.0727901484480431
+            }
+          },
+          "segments": 17
+        }
+      ],
+      "macroDER": {
+        "0.0": 0.051455624579969085,
+        "0.25": 0.035110191934982445
+      }
+    },
+    {
+      "variant": "baseline",
+      "cases": [
+        {
+          "case": "vox-rcxzg-60s",
+          "scores": {
+            "0.0": {
+              "missed detection": 0.020000000000003126,
+              "false alarm": 0.799999999999998,
+              "total": 59.080000000000005,
+              "confusion": 0.0,
+              "correct": 59.06,
+              "diarization error rate": 0.013879485443466505
+            },
+            "0.25": {
+              "missed detection": 0.0,
+              "false alarm": 0.46999999999999886,
+              "total": 58.330000000000005,
+              "confusion": 0.0,
+              "correct": 58.330000000000005,
+              "diarization error rate": 0.008057603291616644
+            }
+          },
+          "segments": 20
+        },
+        {
+          "case": "vox-fsaal-60s",
+          "scores": {
+            "0.0": {
+              "missed detection": 0.14000000000000323,
+              "false alarm": 2.2400000000000015,
+              "total": 54.44,
+              "confusion": 0.10000000000000009,
+              "correct": 54.199999999999996,
+              "diarization error rate": 0.045554739162380696
+            },
+            "0.25": {
+              "missed detection": 0.0,
+              "false alarm": 1.2900000000000027,
+              "total": 52.69,
+              "confusion": 0.0,
+              "correct": 52.69,
+              "diarization error rate": 0.024482824065287585
+            }
+          },
+          "segments": 20
+        },
+        {
+          "case": "vox-vmaiq-60s",
+          "scores": {
+            "0.0": {
+              "missed detection": 3.719999999999999,
+              "false alarm": 1.2399999999999922,
+              "total": 62.36000000000001,
+              "confusion": 0.9599999999999937,
+              "correct": 57.68000000000001,
+              "diarization error rate": 0.09493264913406005
+            },
+            "0.25": {
+              "missed detection": 3.4299999999999997,
+              "false alarm": 0.5099999999999998,
+              "total": 59.28000000000001,
+              "confusion": 0.37499999999999645,
+              "correct": 55.47500000000001,
+              "diarization error rate": 0.0727901484480431
+            }
+          },
+          "segments": 17
+        }
+      ],
+      "macroDER": {
+        "0.0": 0.051455624579969085,
+        "0.25": 0.035110191934982445
+      }
+    },
+    {
+      "variant": "cache-reference",
+      "cases": [
+        {
+          "case": "vox-rcxzg-60s",
+          "scores": {
+            "0.0": {
+              "missed detection": 0.020000000000003126,
+              "false alarm": 0.799999999999998,
+              "total": 59.080000000000005,
+              "confusion": 0.0,
+              "correct": 59.06,
+              "diarization error rate": 0.013879485443466505
+            },
+            "0.25": {
+              "missed detection": 0.0,
+              "false alarm": 0.46999999999999886,
+              "total": 58.330000000000005,
+              "confusion": 0.0,
+              "correct": 58.330000000000005,
+              "diarization error rate": 0.008057603291616644
+            }
+          },
+          "segments": 20
+        },
+        {
+          "case": "vox-fsaal-60s",
+          "scores": {
+            "0.0": {
+              "missed detection": 0.14000000000000323,
+              "false alarm": 2.2400000000000015,
+              "total": 54.44,
+              "confusion": 0.10000000000000009,
+              "correct": 54.199999999999996,
+              "diarization error rate": 0.045554739162380696
+            },
+            "0.25": {
+              "missed detection": 0.0,
+              "false alarm": 1.2900000000000027,
+              "total": 52.69,
+              "confusion": 0.0,
+              "correct": 52.69,
+              "diarization error rate": 0.024482824065287585
+            }
+          },
+          "segments": 20
+        },
+        {
+          "case": "vox-vmaiq-60s",
+          "scores": {
+            "0.0": {
+              "missed detection": 3.719999999999999,
+              "false alarm": 1.2399999999999922,
+              "total": 62.36000000000001,
+              "confusion": 0.9599999999999937,
+              "correct": 57.68000000000001,
+              "diarization error rate": 0.09493264913406005
+            },
+            "0.25": {
+              "missed detection": 3.4299999999999997,
+              "false alarm": 0.5099999999999998,
+              "total": 59.28000000000001,
+              "confusion": 0.37499999999999645,
+              "correct": 55.47500000000001,
+              "diarization error rate": 0.0727901484480431
+            }
+          },
+          "segments": 17
+        }
+      ],
+      "macroDER": {
+        "0.0": 0.051455624579969085,
+        "0.25": 0.035110191934982445
+      }
+    }
+  ],
+  "qualityGate": {
+    "passed": true,
+    "allowedDERIncrease": 0.0,
+    "numericalTolerance": 1e-12,
+    "failures": []
+  },
+  "repeatParityEvidence": {
+    "reportSha256": "31279b47dc777604ed43bf7b41aa4b38cb10285fc37e8725c99cb738c0726225",
+    "runs": 63,
+    "repeatsPerCaseVariant": 3,
+    "allRawOutputHashesVerified": true,
+    "allThreeVariantOutputsIdentical": true
+  }
+}

@@ -325,3 +325,71 @@ It is host-specific, not a general-purpose installer. Never commit its generated
 or `data/` directory. API tests can run with `PYTHONPATH=cpu-lab python -m pytest
 cpu-lab/test_moss_api.py` after installing pytest. The client needs NumPy, soundfile
 and SciPy for audio conversion; the API and latency harness use the Python standard library.
+
+
+### Parallel decode softmax research
+
+`MTD_CPU_OPT=32` assigns independent attention heads across CPU workers for unmasked,
+single-token decoding. The pinned ggml implementation partitions by query row, leaving
+all heads on one worker in this shape. Our custom op retains the same scaling, maximum,
+vector exponential/sum primitive, double reciprocal and float normalization. It reads
+the head dimension from the query tensor, avoiding mutable or borrowed callback state.
+Prefill and GPU softmax keep the reference path. `MTD_CPU_OPT=48` combines this with the
+validated transposed value cache (16 + 32). This uses ggml's private CPU vector header
+from the pinned submodule, so revalidate after any ggml upgrade.
+
+The native `test_cpu_softmax` compares raw float bits against the eager CPU operation
+at 1 and 16 threads, nine key lengths, three head/batch shapes and large or infinite
+logits. All 54 tested shapes matched exactly. The final confirmation ran 63 matched
+fresh-process measurements (seven 60-second cases, three variants, three repeats),
+plus a three-way 120-second stress check. All complete raw outputs, words, speaker
+markers, timestamps, token counts and EOS stops matched. Source, model, binary and
+library hashes stayed unchanged, and no concurrent MOSS inference was observed.
+
+| Input | Production | Validated cache (16) | Cache + parallel softmax (48) | Speedup over cache |
+|---|---:|---:|---:|---:|
+| English meeting, 60 s | 21.81 s | 14.54 s | 13.89 s | 1.047x |
+| German dinner, 60 s | 16.50 s | 12.09 s | 11.64 s | 1.039x |
+| VoxConverse rcxzg, 60 s | 19.65 s | 13.54 s | 12.89 s | 1.050x |
+| VoxConverse fsaal, 60 s | 19.40 s | 13.44 s | 12.89 s | 1.043x |
+| VoxConverse vmaiq, 60 s | 17.30 s | 12.44 s | 11.94 s | 1.042x |
+| English meeting, 120 s (one run each) | 78.52 s | 34.08 s | 31.53 s | 1.081x |
+
+Q8, 16 pinned physical-core workers on Xeon Gold 5416S, alternating variant order,
+warm filesystem cache, wall time including model load, shared host. Silence and
+actual empty speech were essentially unchanged. Peak RSS was 1,702,100 KiB at 60 s
+and 2,083,376 KiB at 120 s; the incremental softmax change added under 0.1% relative
+to the transposed-cache candidate. The transposed cache itself uses about 5–8% more
+memory than production. These small paired samples are measured gains, not a
+statistical confidence claim or full-corpus throughput claim.
+
+The human-reference three-clip VoxConverse smoke subset had identical per-case DER
+for all three variants: macro 5.1456% at zero collar and 3.5110% at 250 ms collar,
+including overlap and optimal speaker permutation. There are no human WER references
+in this subset. Full raw-text parity covers transcription regression relative to
+production. See `cpu-lab/softmax-confirm-v3.json`, `softmax-long-v3.json` and
+`softmax-quality-v3.json` for reproducible hashes, measurements and quality evidence.
+The quality report records the final 63-run parity evidence used to validate its
+scored outputs. Regression-gate unit tests pass all 12 cases.
+
+The updated paired harness accepts `cache-reference` as a fixed binary at
+`--reference-root`. It has a separate gate against that candidate, since beating the
+older production binary alone does not prove a new improvement. Model, audio and
+baseline paths are configurable, and before/after artifact hashes reject mutated
+source or binaries. Run the three-way comparison, for example:
+
+```bash
+python3 cpu-lab/moss_cpu_regression.py --root /home/stan/hw-moss-softmax-v1 \
+  --variants baseline cache-reference 48 --pin-physical --repeats 3 --name confirm
+```
+
+A separate fused eager-attention experiment retained exact dot and full-row softmax
+arithmetic and passed 48 native float-bit tests. Its warm kernel timings improved, but
+full model inference was substantially slower than the validated cache candidate.
+It was rejected and removed from the active source. The archived patch preserves that
+research, including its numerical test, without selecting it for normal inference.
+
+The rejected patch `cpu-lab/eager-fused-candidate-v2.patch` applies to a fresh fork
+checkout at `0f60f5361dc0e2fe4787d7a8aa4369853eddf530`; use opt bitmask 80
+(16 + 64) only to reproduce that failed experiment in an isolated build. Its
+per-case median slowdowns versus the validated cache were 43–60%.

@@ -41,6 +41,7 @@ set(MT_SRC
   src/tokenizer.cpp
   src/audio_span.cpp
   src/qwen3.cpp
+  src/cpu_softmax.cpp
   src/qwen3_decoder.cpp
   src/generate.cpp
   src/audio_encoder.cpp
@@ -56,6 +57,7 @@ else()
   add_library(moss-transcribe STATIC ${MT_SRC})
 endif()
 target_include_directories(moss-transcribe PUBLIC include PRIVATE src third_party)
+target_include_directories(moss-transcribe PRIVATE third_party/ggml/src)
 target_link_libraries(moss-transcribe PUBLIC ggml)
 
 if(MT_BUILD_CLI)
