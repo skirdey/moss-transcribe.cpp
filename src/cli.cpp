@@ -1,6 +1,7 @@
 #include <chrono>
 #include "moss_transcribe.h"
 #include "model_loader.hpp"
+#include "cpu_profile.hpp"
 #include "transcribe.hpp"
 #include "subtitle.hpp"
 
@@ -54,6 +55,7 @@ static int cmd_transcribe(int argc, char** argv) {
                      format.c_str());
         return 2;
     }
+    mt::cpu_profile_reset();
     auto bench_start = std::chrono::steady_clock::now();
     mt::ModelLoader m;
     if (!m.load(gguf)) { std::fprintf(stderr, "load failed\n"); return 1; }
@@ -65,6 +67,7 @@ static int cmd_transcribe(int argc, char** argv) {
     auto bench_loaded = std::chrono::steady_clock::now();
     std::string text = mt::transcribe_wav(m, wav, max_new);
     auto bench_end = std::chrono::steady_clock::now();
+    mt::cpu_profile_print();
     std::fprintf(stderr, "BENCH_TIMING load=%.6f inference=%.6f\n",
         std::chrono::duration<double>(bench_loaded-bench_start).count(),
         std::chrono::duration<double>(bench_end-bench_loaded).count());

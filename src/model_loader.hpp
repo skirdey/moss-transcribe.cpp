@@ -77,6 +77,8 @@ private:
     ggml_backend_buffer_t     promote_buffer_ = nullptr;  // owns promoted weight data
     std::vector<std::string>  tensor_names_;
     std::unordered_map<std::string, struct ggml_tensor*> tensor_by_name_;
+    struct ggml_context*      packed_ctx_ = nullptr;
+    ggml_backend_buffer_t     packed_buffer_ = nullptr;
     Config                    cfg_{};
 };
 

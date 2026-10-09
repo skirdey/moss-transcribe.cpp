@@ -2,6 +2,7 @@
 #include <cstdlib>
 
 #include "backend.hpp"
+#include "cpu_profile.hpp"
 #include "ggml_extend.hpp"
 #include "common.hpp"   // MT_LOGE
 
@@ -89,6 +90,8 @@ void Qwen3Decoder::reset() {
 
 bool Qwen3Decoder::run(const std::vector<float>& embeds, int T,
                        std::vector<float>* out_hidden) {
+    CpuPhaseScope phase(T > 1 ? CpuPhase::Prefill : CpuPhase::Decode);
+    CpuTimer build_timer;
     const int L    = hp_.n_layers;
     const int H    = hp_.hidden;
     const int past = past_len_;
@@ -144,6 +147,7 @@ bool Qwen3Decoder::run(const std::vector<float>& embeds, int T,
         }
     };
 
+    cpu_profile_record(CpuStage::Build, build_timer.seconds());
     if (!compute_graph_with_inputs(gf, set_inputs)) return false;
 
     past_len_ = kv;
@@ -165,6 +169,8 @@ std::vector<float> Qwen3Decoder::decode_one(const std::vector<float>& embed) {
 }
 
 std::vector<float> Qwen3Decoder::logits_from_hidden(const std::vector<float>& hidden_row) {
+    CpuPhaseScope phase(CpuPhase::Logits);
+    CpuTimer build_timer;
     std::vector<float> out;
     const int H = hp_.hidden;
     if ((int)hidden_row.size() < H || !token_embd_) return out;
@@ -187,6 +193,7 @@ std::vector<float> Qwen3Decoder::logits_from_hidden(const std::vector<float>& hi
     auto set_inputs = [&]() {
         ggml_backend_tensor_set(hin, hidden_row.data(), 0, (size_t)H * sizeof(float));
     };
+    cpu_profile_record(CpuStage::Build, build_timer.seconds());
     if (!compute_graph_with_inputs(gf, set_inputs)) return out;
 
     read_tensor_f32(logits, &out);

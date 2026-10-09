@@ -1,6 +1,7 @@
 #include "audio_adaptor.hpp"
 
 #include "backend.hpp"
+#include "cpu_profile.hpp"
 #include "common.hpp"
 #include "ggml_extend.hpp"
 
@@ -37,6 +38,8 @@ AudioAdaptor::AudioAdaptor(ModelLoader& m) {
 
 void AudioAdaptor::apply(const std::vector<float>& enc, int T, int D,
                          std::vector<float>& out, int& N, int& H) const {
+    CpuPhaseScope phase(CpuPhase::Adaptor);
+    CpuTimer build_timer;
     const int Ttrim = (T / merge_) * merge_;
     N = Ttrim / merge_;
     H = hidden_;
@@ -75,6 +78,7 @@ void AudioAdaptor::apply(const std::vector<float>& enc, int T, int D,
     ggml_set_output(cur);
     ggml_build_forward_expand(gf, cur);
 
+    cpu_profile_record(CpuStage::Build, build_timer.seconds());
     const bool ok = compute_graph_with_inputs(gf, [&]() {
         ggml_backend_tensor_set(enc_in, enc.data(),
                                 0, (size_t)D * (size_t)T * sizeof(float));

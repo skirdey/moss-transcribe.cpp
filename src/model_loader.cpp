@@ -1,8 +1,10 @@
 #include "model_loader.hpp"
 #include "backend.hpp"
 #include "common.hpp"
+#include "ggml-cpu.h"
 
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <vector>
 
@@ -11,6 +13,8 @@ namespace mt {
 ModelLoader::ModelLoader() = default;
 
 ModelLoader::~ModelLoader() {
+    if (packed_buffer_) ggml_backend_buffer_free(packed_buffer_);
+    if (packed_ctx_) ggml_free(packed_ctx_);
     if (promote_buffer_) ggml_backend_buffer_free(promote_buffer_);
     if (promote_ctx_)    ggml_free(promote_ctx_);
     if (backend_buffer_) ggml_backend_buffer_free(backend_buffer_);
@@ -65,6 +69,43 @@ bool ModelLoader::load(const std::string& path) {
         }
     }
 
+    // Research-only bit 1024: preserve Q8 codes/scales while routing supported
+    // encoder projection matrices through ggml's AMX/VNNI packed buffer. The arithmetic
+    // may differ from the eager dot kernel; this is NOT a validated default.
+    // Keep ordinary copies for embedding lookup, fallback and byte auditing.
+    std::unordered_map<std::string, ggml_tensor*> packed;
+    const char* cpu_opt = std::getenv("MTD_CPU_OPT");
+    if (n > 0 && cpu_opt && (std::atoi(cpu_opt) & 1024) && ggml_backend_is_cpu(mt::backend())) {
+        auto dev = ggml_backend_get_device(mt::backend());
+        auto reg = ggml_backend_dev_backend_reg(dev);
+        auto get_extra = reinterpret_cast<ggml_backend_dev_get_extra_bufts_t>(
+            ggml_backend_reg_get_proc_address(reg, "ggml_backend_dev_get_extra_bufts"));
+        ggml_backend_buffer_type_t buft = nullptr;
+        if (get_extra) for (auto* p = get_extra(dev); p && *p; ++p)
+            if (std::strcmp(ggml_backend_buft_name(*p), "AMX") == 0) buft = *p;
+        if (!buft) {
+            MT_LOGE("packed Q8 research requested but AMX buffer is unavailable");
+            return false;
+        }
+        ggml_init_params pp{ggml_tensor_overhead() * (size_t)(n + 1) + 1024, nullptr, true};
+        packed_ctx_ = ggml_init(pp);
+        if (!packed_ctx_) return false;
+        for (const auto& name : tensor_names_) {
+            auto* t = ggml_get_tensor(ctx_, name.c_str());
+            if (t->type != GGML_TYPE_Q8_0 || t->ne[2] != 1 || t->ne[3] != 1 ||
+                t->ne[0] % 32 || t->ne[1] % 32 || name.rfind("enc.blk.", 0) != 0) continue;
+            auto* copy = ggml_dup_tensor(packed_ctx_, t);
+            ggml_set_name(copy, name.c_str());
+            packed.emplace(name, copy);
+        }
+        if (!packed.empty()) {
+            packed_buffer_ = ggml_backend_alloc_ctx_tensors_from_buft(packed_ctx_, buft);
+            if (!packed_buffer_) return false;
+            MT_LOGI("CPU_ENCODER_PACKED_Q8 tensors=%zu buffer=%s bytes=%zu", packed.size(),
+                    ggml_backend_buft_name(buft), ggml_backend_buffer_get_size(packed_buffer_));
+        }
+    }
+
     // Parse the mtd.* metadata block (independent of tensor data).
     read_config();
 
@@ -102,6 +143,11 @@ bool ModelLoader::load(const std::string& path) {
             return false;
         }
         ggml_backend_tensor_set(t, stage.data(), 0, sz);
+        const auto it = packed.find(name);
+        if (it != packed.end()) {
+            ggml_backend_tensor_set(it->second, stage.data(), 0, sz);
+            tensor_by_name_[name] = it->second;
+        }
     }
     std::fclose(fp);
 
