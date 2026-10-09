@@ -31,6 +31,7 @@ def main():
     p.add_argument('--threads', type=int, default=16)
     p.add_argument('--name', default='final-smoke')
     p.add_argument('--timeout', type=float, default=300)
+    p.add_argument('--trace-tokens', action='store_true', help='Write actual greedy token IDs to private stderr logs for replay audits')
     args = p.parse_args()
     if args.threads < 1 or args.timeout <= 0 or not re.fullmatch(r'[A-Za-z0-9_-]+', args.name) or not all(re.fullmatch(r'[A-Za-z0-9_-]+', c) for c in args.cases):
         p.error('Invalid thread count, timeout or case name')
@@ -58,11 +59,11 @@ def main():
     if len(selected) != args.threads: raise ValueError('Insufficient allowed physical cores')
     env = {**os.environ,'MTD_DEVICE':'cpu','MTD_THREADS':str(args.threads),'OMP_NUM_THREADS':str(args.threads),
            'OMP_PROC_BIND':'spread','OMP_PLACES':','.join('{'+str(c)+'}' for c in selected),
-           'MTD_CPU_OPT':str(args.opt),'MTD_PROFILE':'1','MTD_LOOP_GUARD':'1','MTD_REPETITION_PENALTY':'1.0','LD_LIBRARY_PATH':''}
+           'MTD_CPU_OPT':str(args.opt),'MTD_PROFILE':'1','MTD_TRACE_TOKENS':'1' if args.trace_tokens else '0','MTD_LOOP_GUARD':'1','MTD_REPETITION_PENALTY':'1.0','LD_LIBRARY_PATH':''}
     report = {'protocol':'Final-build output/EOS smoke only. Fresh processes, primed model filesystem cache, pinned physical cores, shared host. Diagnostic wall time; no matched latency gate or new corpus accuracy claim.',
               'referenceReportSha256':digest(args.reference_report),'modelSha256':digest(args.model),'binarySha256':digest(binary),
               'sourceCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root/'source',text=True).strip(),
-              'opt':args.opt,'threads':args.threads,'physicalCoreAffinity':selected,'artifacts':artifacts,'runs':[]}
+              'opt':args.opt,'threads':args.threads,'tokenTracing':args.trace_tokens,'physicalCoreAffinity':selected,'artifacts':artifacts,'runs':[]}
     for case in args.cases:
         expected = [r for r in baseline if r['case'] == case]
         if not expected or any(not r['complete'] or r.get('concurrentMoss') for r in expected): raise ValueError('Incomplete or competing reference')

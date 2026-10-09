@@ -43,7 +43,7 @@ def run_environment(base, affinity, opt, threads, lib, profile=False, passive=Fa
     # A named default is reproducible even if the invoking shell tuned libgomp.
     for key in ("OMP_WAIT_POLICY", "GOMP_SPINCOUNT", "OMP_DYNAMIC", "OMP_THREAD_LIMIT"):
         env.pop(key, None)
-    env.update({"MTD_PROFILE": "1" if profile else "0", "MTD_TRACE_TOKENS": "0", "MTD_DEVICE": "cpu",
+    env.update({"MTD_PROFILE": "1" if profile else "0", "MTD_DEVICE": "cpu",
                 "MTD_THREADS": str(threads), "OMP_NUM_THREADS": str(threads),
                 "OMP_DYNAMIC": "FALSE", "MTD_CPU_OPT": opt,
                 "MTD_LOOP_GUARD": "1", "MTD_REPETITION_PENALTY": "1.0",
