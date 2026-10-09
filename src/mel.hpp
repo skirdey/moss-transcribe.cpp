@@ -9,12 +9,13 @@ namespace mt {
 // Whisper-compatible mel: periodic Hann window, center STFT (reflect-pad by
 // n_fft/2), power spectrum, mel-filterbank projection, log10, then per-chunk
 // normalization ((max-8 floor), (v+4)/4). Bit 2048 parallelizes the legacy
-// DFT; bit 4096 selects a numerically different FFT (research only).
+// DFT. The explicit experimental_fft argument exists for research probes;
+// normal transcription never selects the numerically different FFT.
 class WhisperMel {
 public:
     explicit WhisperMel(const ModelLoader& m);
     void compute(const std::vector<float>& samples, std::vector<float>& out,
-                 int& n_mels, int& n_frames) const;
+                 int& n_mels, int& n_frames, bool experimental_fft = false) const;
 private:
     struct FrameJob;
     static void compute_frames(ggml_tensor* dst, const ggml_tensor* shape,

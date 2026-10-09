@@ -124,7 +124,7 @@ void WhisperMel::compute_frames(ggml_tensor* dst, const ggml_tensor*,
 }
 
 void WhisperMel::compute(const std::vector<float>& samples, std::vector<float>& out,
-                         int& n_mels, int& n_frames) const {
+                         int& n_mels, int& n_frames, bool experimental_fft) const {
     CpuPhaseScope phase(CpuPhase::Mel);
     n_mels = n_mels_;
     n_frames = nb_max_frames_;
@@ -144,7 +144,7 @@ void WhisperMel::compute(const std::vector<float>& samples, std::vector<float>& 
     const char* env = std::getenv("MTD_CPU_OPT");
     const int opt = env ? std::atoi(env) : 0;
     bool parallel_done = false;
-    if ((opt & (2048 | 4096)) && ggml_backend_is_cpu(mt::backend())) {
+    if (((opt & 2048) || experimental_fft) && ggml_backend_is_cpu(mt::backend())) {
         CpuTimer build_timer;
         // The first custom-op input supplies the output shape only. The second
         // owns reflected samples; workers write disjoint frame columns.
@@ -153,7 +153,7 @@ void WhisperMel::compute(const std::vector<float>& samples, std::vector<float>& 
             auto* shape = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, n_frames, n_mels_);
             auto* input = ggml_new_tensor_1d(ctx, GGML_TYPE_F32, x.size());
             ggml_set_input(input);
-            FrameJob job{this, n_frames, (opt & 4096) != 0};
+            FrameJob job{this, n_frames, experimental_fft};
             auto* result = ggml_map_custom2(ctx, shape, input, compute_frames, GGML_N_TASKS_MAX, &job);
             ggml_set_output(result);
             auto* graph = ggml_new_graph_custom(ctx, 8, false);
