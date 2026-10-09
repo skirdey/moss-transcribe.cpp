@@ -13,6 +13,16 @@ class RegressionGateTest(unittest.TestCase):
     def test_identical_faster_output_passes(self):
         self.assertTrue(evaluate([self.row(),self.row("4",wallSeconds=18.)])["passed"])
 
+    def test_faster_than_production_can_still_regress_validated_cache(self):
+        rows = [self.row(),self.row("cache-reference",wallSeconds=10.),self.row("80",wallSeconds=18.)]
+        self.assertTrue(evaluate(rows)["passed"])
+        cache_rows = [row for row in rows if row["variant"] != "baseline"]
+        self.assertFalse(evaluate(cache_rows,baseline="cache-reference")["passed"])
+
+    def test_new_candidate_must_match_validated_cache_output(self):
+        rows = [self.row("cache-reference",wallSeconds=10.),self.row("80",wallSeconds=9.,outputSha256="different")]
+        self.assertFalse(evaluate(rows,baseline="cache-reference")["passed"])
+
     def test_text_speaker_or_timestamp_change_rejected(self):
         self.assertFalse(evaluate([self.row(),self.row("4",outputSha256="changed")])["passed"])
 

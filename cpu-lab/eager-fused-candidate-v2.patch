@@ -1,0 +1,392 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 78bcd97..c115df4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,6 +41,8 @@ set(MT_SRC
+   src/tokenizer.cpp
+   src/audio_span.cpp
+   src/qwen3.cpp
++  src/cpu_softmax.cpp
++  src/cpu_attention.cpp
+   src/qwen3_decoder.cpp
+   src/generate.cpp
+   src/audio_encoder.cpp
+@@ -56,6 +58,7 @@ else()
+   add_library(moss-transcribe STATIC ${MT_SRC})
+ endif()
+ target_include_directories(moss-transcribe PUBLIC include PRIVATE src third_party)
++target_include_directories(moss-transcribe PRIVATE third_party/ggml/src)
+ target_link_libraries(moss-transcribe PUBLIC ggml)
+ 
+ if(MT_BUILD_CLI)
+diff --git a/src/cpu_attention.cpp b/src/cpu_attention.cpp
+new file mode 100644
+index 0000000..f7798c8
+--- /dev/null
++++ b/src/cpu_attention.cpp
+@@ -0,0 +1,56 @@
++#include "cpu_attention.hpp"
++#include "ggml-cpu/vec.h"
++
++#include <cmath>
++#include <vector>
++
++namespace mt {
++namespace {
++void eager_decode_attention(ggml_tensor* dst, const ggml_tensor* q,
++                            const ggml_tensor* k, const ggml_tensor* v,
++                            int ith, int nth, void*) {
++    GGML_ASSERT(q->type == GGML_TYPE_F32 && k->type == GGML_TYPE_F32 && v->type == GGML_TYPE_F32);
++    GGML_ASSERT(q->ne[1] == 1 && q->ne[0] == k->ne[0] && k->ne[1] == v->ne[0]);
++    GGML_ASSERT(q->ne[0] == v->ne[1] && k->ne[2] == v->ne[2] && k->ne[3] == v->ne[3]);
++    GGML_ASSERT(q->ne[2] % k->ne[2] == 0 && q->ne[3] % k->ne[3] == 0);
++    GGML_ASSERT(q->nb[0] == sizeof(float) && k->nb[0] == sizeof(float) && v->nb[0] == sizeof(float));
++    GGML_ASSERT(ggml_is_contiguous(dst));
++    const int dim = static_cast<int>(q->ne[0]);
++    const int keys = static_cast<int>(k->ne[1]);
++    const float scale = 1.0f/std::sqrt(static_cast<float>(dim));
++    thread_local std::vector<float> scores, weights;
++    scores.resize(keys); weights.resize(keys);
++    const int64_t head_ratio = q->ne[2]/k->ne[2];
++    const int64_t batch_ratio = q->ne[3]/k->ne[3];
++    for (int64_t row = ith; row < q->ne[2]*q->ne[3]; row += nth) {
++        const int64_t head = row%q->ne[2], batch = row/q->ne[2];
++        const int64_t kh = head/head_ratio, kb = batch/batch_ratio;
++        const float* query = reinterpret_cast<const float*>(static_cast<const char*>(q->data) + head*q->nb[2] + batch*q->nb[3]);
++        const char* key_base = static_cast<const char*>(k->data) + kh*k->nb[2] + kb*k->nb[3];
++        const char* value_base = static_cast<const char*>(v->data) + kh*v->nb[2] + kb*v->nb[3];
++        float* out = reinterpret_cast<float*>(static_cast<char*>(dst->data) + head*dst->nb[2] + batch*dst->nb[3]);
++        for (int j = 0; j < keys; ++j) {
++            const float* key = reinterpret_cast<const float*>(key_base + j*k->nb[1]);
++            ggml_vec_dot_f32(dim, &scores[j], 0, key, 0, query, 0, 1);
++        }
++        // This is the eager reference's full-row normalization, not online softmax.
++        ggml_vec_scale_f32(keys, scores.data(), scale);
++        float max = -INFINITY;
++        ggml_vec_max_f32(keys, &max, scores.data());
++        ggml_float sum = ggml_vec_soft_max_f32(keys, weights.data(), scores.data(), max);
++        GGML_ASSERT(sum > 0.0);
++        sum = 1.0/sum;
++        ggml_vec_scale_f32(keys, weights.data(), sum);
++        for (int d = 0; d < dim; ++d) {
++            const float* values = reinterpret_cast<const float*>(value_base + d*v->nb[1]);
++            ggml_vec_dot_f32(keys, &out[d], 0, values, 0, weights.data(), 0, 1);
++        }
++    }
++}
++}
++
++ggml_tensor* cpu_decode_attention(ggml_context* ctx, ggml_tensor* q,
++                                  ggml_tensor* k, ggml_tensor* transposed_v) {
++    return ggml_map_custom3(ctx, q, k, transposed_v, eager_decode_attention, GGML_N_TASKS_MAX, nullptr);
++}
++}
+diff --git a/src/cpu_attention.hpp b/src/cpu_attention.hpp
+new file mode 100644
+index 0000000..e4989da
+--- /dev/null
++++ b/src/cpu_attention.hpp
+@@ -0,0 +1,9 @@
++#pragma once
++#include "ggml.h"
++
++namespace mt {
++// Single-token F32 GQA, using eager dot/softmax/dot reduction order.
++// q,k: [head_dim, tokens, heads, batch]; v: [keys, head_dim, kv_heads, batch].
++ggml_tensor* cpu_decode_attention(ggml_context* ctx, ggml_tensor* q,
++                                  ggml_tensor* k, ggml_tensor* transposed_v);
++}
+diff --git a/src/cpu_softmax.cpp b/src/cpu_softmax.cpp
+new file mode 100644
+index 0000000..88d4464
+--- /dev/null
++++ b/src/cpu_softmax.cpp
+@@ -0,0 +1,44 @@
++#include "cpu_softmax.hpp"
++#include "ggml-cpu/vec.h" // Exact primitives from the pinned ggml CPU backend.
++
++#include <cmath>
++#include <vector>
++
++namespace mt {
++namespace {
++void parallel_decode_softmax(ggml_tensor* dst, const ggml_tensor* scores,
++                             const ggml_tensor* q, int ith, int nth, void*) {
++    GGML_ASSERT(scores->type == GGML_TYPE_F32 && dst->type == GGML_TYPE_F32);
++    GGML_ASSERT(scores->ne[1] == 1 && q->ne[1] == 1);
++    GGML_ASSERT(scores->nb[0] == sizeof(float) && ggml_is_contiguous(dst));
++    const int n = static_cast<int>(scores->ne[0]);
++    const float scale = 1.0f / std::sqrt(static_cast<float>(q->ne[0]));
++    // Reuse per-worker scratch, avoiding per-layer allocations after growth.
++    thread_local std::vector<float> scratch;
++    scratch.resize(n);
++    const int64_t rows = scores->ne[2] * scores->ne[3];
++    for (int64_t row = ith; row < rows; row += nth) {
++        const int64_t head = row % scores->ne[2];
++        const int64_t batch = row / scores->ne[2];
++        const float* src = reinterpret_cast<const float*>(
++            static_cast<const char*>(scores->data) + head * scores->nb[2] + batch * scores->nb[3]);
++        float* out = reinterpret_cast<float*>(
++            static_cast<char*>(dst->data) + head * dst->nb[2] + batch * dst->nb[3]);
++        // Preserve the eager reference sequence, including its double sum and
++        // float conversion for the reciprocal. Only independent rows move.
++        ggml_vec_cpy_f32(n, scratch.data(), src);
++        ggml_vec_scale_f32(n, scratch.data(), scale);
++        float max = -INFINITY;
++        ggml_vec_max_f32(n, &max, scratch.data());
++        ggml_float sum = ggml_vec_soft_max_f32(n, out, scratch.data(), max);
++        GGML_ASSERT(sum > 0.0);
++        sum = 1.0 / sum;
++        ggml_vec_scale_f32(n, out, sum);
++    }
++}
++}
++
++ggml_tensor* cpu_decode_softmax(ggml_context* ctx, ggml_tensor* scores, ggml_tensor* q) {
++    return ggml_map_custom2(ctx, scores, q, parallel_decode_softmax, GGML_N_TASKS_MAX, nullptr);
++}
++}
+diff --git a/src/cpu_softmax.hpp b/src/cpu_softmax.hpp
+new file mode 100644
+index 0000000..9f72e31
+--- /dev/null
++++ b/src/cpu_softmax.hpp
+@@ -0,0 +1,8 @@
++#pragma once
++#include "ggml.h"
++
++namespace mt {
++// CPU single-query softmax with independent heads assigned across workers.
++// q provides the head dimension; no borrowed userdata or mutable scale state.
++ggml_tensor* cpu_decode_softmax(ggml_context* ctx, ggml_tensor* scores, ggml_tensor* q);
++}
+diff --git a/src/qwen3.cpp b/src/qwen3.cpp
+index cb61dee..1bca40e 100644
+--- a/src/qwen3.cpp
++++ b/src/qwen3.cpp
+@@ -1,5 +1,8 @@
+ #include "qwen3.hpp"
+ #include "backend.hpp"
++#include "cpu_softmax.hpp"
++#include "cpu_attention.hpp"
++#include "ggml-cpu.h"
+ 
+ #include <cmath>
+ #include <cstdlib>
+@@ -152,10 +155,19 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor*
+         // growing V-cache transpose/copy on every token in every layer.
+         o = ggml_flash_attn_ext(ctx, q_p, k_p, v_p, nullptr, scale, 0.0f, 0.0f);
+         ggml_flash_attn_ext_set_prec(o, GGML_PREC_F32);
++    } else if (cpu_opt && (std::atoi(cpu_opt) & 64) && transposed_v && n_tokens == 1 && !mask
++               && ggml_backend_is_cpu(backend())) {
++        // Fuse eager single-query attention while retaining each dot product
++        // and full-row softmax primitive, including their reduction order.
++        o = cpu_decode_attention(ctx, q_p, k_p, v_used);
++        o = ggml_permute(ctx, o, 0, 2, 1, 3);
+     } else {
+     struct ggml_tensor* scores = ggml_mul_mat(ctx, k_p, q_p);
+     ggml_mul_mat_set_prec(scores, GGML_PREC_F32);
+-    struct ggml_tensor* attn = ggml_soft_max_ext(ctx, scores, mask, scale, /*max_bias=*/0.0f);
++    struct ggml_tensor* attn = cpu_opt && (std::atoi(cpu_opt) & 32) && n_tokens == 1 && !mask
++        && ggml_backend_is_cpu(backend())
++        ? cpu_decode_softmax(ctx, scores, q_p)
++        : ggml_soft_max_ext(ctx, scores, mask, scale, /*max_bias=*/0.0f);
+ 
+     struct ggml_tensor* v_t = transposed_v ? v_used
+         : maybe_cont(ctx, ggml_transpose(ctx, v_p));  // [seq_kv, hd, n_kv, b]
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 4460a7c..2390db7 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -9,6 +9,8 @@ macro(mt_add_test name)
+ endmacro()
+ 
+ mt_add_test(test_audio_io)
++mt_add_test(test_cpu_softmax)
++mt_add_test(test_cpu_attention)
+ 
+ mt_add_test(test_mel)
+ set_tests_properties(test_mel PROPERTIES LABELS "model")
+diff --git a/tests/test_cpu_attention.cpp b/tests/test_cpu_attention.cpp
+new file mode 100644
+index 0000000..940b52b
+--- /dev/null
++++ b/tests/test_cpu_attention.cpp
+@@ -0,0 +1,87 @@
++// Bitwise GQA parity against eager attention with the validated transposed V cache.
++#include "cpu_attention.hpp"
++#include "ggml-cpu.h"
++#include "ggml-backend.h"
++#include "ggml-alloc.h"
++#include <algorithm>
++#include <chrono>
++#include <cmath>
++#include <cstdio>
++#include <cstring>
++#include <random>
++#include <vector>
++
++int main() {
++    auto backend = ggml_backend_cpu_init();
++    bool passed = true;
++    for (int threads : {1,16}) {
++    ggml_backend_cpu_set_n_threads(backend,threads);
++    for (int length : {1,2,7,31,256,1024,2048,4095}) {
++    for (int shape = 0; shape < 3; ++shape) {
++        const int dim = shape == 0 ? 128 : shape == 1 ? 96 : 64;
++        const int heads = shape == 0 ? 16 : shape == 1 ? 12 : 4;
++        const int kv_heads = shape == 0 ? 8 : shape == 1 ? 3 : 1;
++        const int batches = shape == 1 ? 2 : 1;
++        const int kv_batches = 1, capacity = length + 17;
++        ggml_init_params params{2*1024*1024,nullptr,true};
++        auto ctx = ggml_init(params);
++        auto q = ggml_new_tensor_4d(ctx,GGML_TYPE_F32,dim,heads,1,batches);
++        auto kc = ggml_new_tensor_4d(ctx,GGML_TYPE_F32,dim,kv_heads,capacity,kv_batches);
++        auto vc = ggml_new_tensor_4d(ctx,GGML_TYPE_F32,capacity,dim,kv_heads,kv_batches);
++        ggml_set_input(q); ggml_set_input(kc); ggml_set_input(vc);
++        auto k = ggml_view_4d(ctx,kc,dim,kv_heads,length,kv_batches,kc->nb[1],kc->nb[2],kc->nb[3],0);
++        auto v = ggml_view_4d(ctx,vc,length,dim,kv_heads,kv_batches,vc->nb[1],vc->nb[2],vc->nb[3],0);
++        auto qp = ggml_permute(ctx,q,0,2,1,3);
++        auto kp = ggml_permute(ctx,k,0,2,1,3);
++        auto scores = ggml_mul_mat(ctx,kp,qp);
++        ggml_mul_mat_set_prec(scores,GGML_PREC_F32);
++        auto weights = ggml_soft_max_ext(ctx,scores,nullptr,1.f/std::sqrt(float(dim)),0.f);
++        auto reference = ggml_mul_mat(ctx,v,weights);
++        auto fused = mt::cpu_decode_attention(ctx,qp,kp,v);
++        ggml_set_output(reference); ggml_set_output(fused);
++        auto graph = ggml_new_graph(ctx);
++        ggml_build_forward_expand(graph,reference); ggml_build_forward_expand(graph,fused);
++        auto alloc = ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
++        if (!ggml_gallocr_alloc_graph(alloc,graph)) return 2;
++        std::mt19937 random(42); std::normal_distribution<float> values(0,1);
++        for (auto tensor : {q,kc,vc}) {
++            std::vector<float> data(ggml_nelements(tensor));
++            for (auto& x : data) x = values(random);
++            ggml_backend_tensor_set(tensor,data.data(),0,data.size()*sizeof(float));
++        }
++        if (ggml_backend_graph_compute(backend,graph) != GGML_STATUS_SUCCESS) return 2;
++        std::vector<float> a(ggml_nelements(reference)),b(a.size());
++        ggml_backend_tensor_get(reference,a.data(),0,a.size()*sizeof(float));
++        ggml_backend_tensor_get(fused,b.data(),0,b.size()*sizeof(float));
++        int different = 0; float max_abs = 0;
++        for (size_t i = 0; i < a.size(); ++i) {
++            different += std::memcmp(&a[i],&b[i],sizeof(float)) != 0;
++            max_abs = std::max(max_abs,std::fabs(a[i]-b[i]));
++            passed &= std::isfinite(a[i]) && std::isfinite(b[i]);
++        }
++        passed &= different == 0;
++        double rt = 0, ft = 0;
++        if (threads == 16 && shape == 0 && (length == 1 || length == 31 || length == 256 || length == 1024 || length == 2048)) {
++            auto rg = ggml_new_graph(ctx); ggml_build_forward_expand(rg,reference);
++            auto fg = ggml_new_graph(ctx); ggml_build_forward_expand(fg,fused);
++            std::vector<double> rtimes,ftimes;
++            for (int round = 0; round < 6; ++round) for (int step = 0; step < 2; ++step) {
++                bool opt = (round+step)%2;
++                auto begin = std::chrono::steady_clock::now();
++                for (int i = 0; i < 100; ++i)
++                    if (ggml_backend_graph_compute(backend,opt?fg:rg) != GGML_STATUS_SUCCESS) return 2;
++                double us = std::chrono::duration<double>(std::chrono::steady_clock::now()-begin).count()*1e4;
++                if (round) (opt?ftimes:rtimes).push_back(us);
++            }
++            std::sort(rtimes.begin(),rtimes.end()); std::sort(ftimes.begin(),ftimes.end());
++            rt=rtimes[2];ft=ftimes[2];
++        }
++        std::printf("{\"threads\":%d,\"kvLength\":%d,\"heads\":%d,\"kvHeads\":%d,\"batches\":%d,\"headDim\":%d,\"bitwiseDifferent\":%d,\"maxAbsError\":%.9g,\"referenceUs\":%.3f,\"fusedUs\":%.3f,\"speedup\":%.4f}\n",
++                    threads,length,heads,kv_heads,batches,dim,different,max_abs,rt,ft,ft?rt/ft:0);
++        ggml_gallocr_free(alloc); ggml_free(ctx);
++    }
++    }
++    }
++    ggml_backend_free(backend);
++    return passed?0:1;
++}
+diff --git a/tests/test_cpu_softmax.cpp b/tests/test_cpu_softmax.cpp
+new file mode 100644
+index 0000000..b793a80
+--- /dev/null
++++ b/tests/test_cpu_softmax.cpp
+@@ -0,0 +1,84 @@
++// Numerical parity and paired kernel timings against pinned eager CPU softmax.
++#include "cpu_softmax.hpp"
++#include "ggml-cpu.h"
++#include "ggml-backend.h"
++#include "ggml-alloc.h"
++#include <algorithm>
++#include <chrono>
++#include <cmath>
++#include <cstdio>
++#include <cstring>
++#include <random>
++#include <vector>
++
++int main() {
++    auto backend = ggml_backend_cpu_init();
++    bool passed = true;
++    for (int threads : {1, 16}) {
++    ggml_backend_cpu_set_n_threads(backend, threads);
++    for (int length : {1, 2, 7, 31, 256, 1024, 2048, 4095, 4096}) {
++    for (int shape = 0; shape < 3; ++shape) {
++        const int heads = shape == 0 ? 1 : shape == 1 ? 16 : 17;
++        const int batches = shape == 2 ? 2 : 1;
++        const int dim = shape == 2 ? 96 : 128;
++        ggml_init_params params{2*1024*1024, nullptr, true};
++        auto ctx = ggml_init(params);
++        auto scores = ggml_new_tensor_4d(ctx, GGML_TYPE_F32, length, 1, heads, batches);
++        auto q = ggml_new_tensor_4d(ctx, GGML_TYPE_F32, dim, 1, heads, batches);
++        ggml_set_input(scores); ggml_set_input(q);
++        auto reference = ggml_soft_max_ext(ctx, scores, nullptr, 1.0f/std::sqrt(float(dim)), 0.0f);
++        auto parallel = mt::cpu_decode_softmax(ctx, scores, q);
++        ggml_set_output(reference); ggml_set_output(parallel);
++        auto graph = ggml_new_graph(ctx);
++        ggml_build_forward_expand(graph, reference); ggml_build_forward_expand(graph, parallel);
++        auto alloc = ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
++        if (!ggml_gallocr_alloc_graph(alloc, graph)) return 2;
++        std::mt19937 random(42); std::normal_distribution<float> values(0, 12);
++        std::vector<float> data(ggml_nelements(scores));
++        for (auto& x : data) x = values(random);
++        // Overflow/underflow-sensitive rows and vector tails, without an all -inf row.
++        if (length > 1) {
++            for (int row = 0; row < heads*batches; ++row) {
++                if (row%3 == 0) data[row*length] = 10000.0f;
++                if (row%3 == 1) data[row*length] = -INFINITY;
++                if (row%3 == 2) data[row*length] = -10000.0f;
++            }
++        }
++        ggml_backend_tensor_set(scores, data.data(), 0, data.size()*sizeof(float));
++        ggml_backend_tensor_memset(q, 0, 0, ggml_nbytes(q));
++        if (ggml_backend_graph_compute(backend, graph) != GGML_STATUS_SUCCESS) return 2;
++        std::vector<float> a(data.size()), b(data.size());
++        ggml_backend_tensor_get(reference, a.data(), 0, a.size()*sizeof(float));
++        ggml_backend_tensor_get(parallel, b.data(), 0, b.size()*sizeof(float));
++        int different = 0; float max_abs = 0;
++        for (size_t i = 0; i < a.size(); ++i) {
++            different += std::memcmp(&a[i], &b[i], sizeof(float)) != 0;
++            max_abs = std::max(max_abs, std::fabs(a[i]-b[i]));
++            passed &= std::isfinite(a[i]) && std::isfinite(b[i]);
++        }
++        passed &= different == 0;
++        double rt = 0, ft = 0;
++        if (threads == 16 && heads == 16 && (length == 1 || length == 31 || length == 256 || length == 1024 || length == 2048)) {
++            auto rg = ggml_new_graph(ctx); ggml_build_forward_expand(rg, reference);
++            auto fg = ggml_new_graph(ctx); ggml_build_forward_expand(fg, parallel);
++            std::vector<double> rtimes, ftimes;
++            for (int round = 0; round < 6; ++round) for (int step = 0; step < 2; ++step) {
++                bool opt = (round+step)%2;
++                auto begin = std::chrono::steady_clock::now();
++                for (int i = 0; i < 100; ++i)
++                    if (ggml_backend_graph_compute(backend, opt ? fg : rg) != GGML_STATUS_SUCCESS) return 2;
++                double us = std::chrono::duration<double>(std::chrono::steady_clock::now()-begin).count()*1e4;
++                if (round) (opt ? ftimes : rtimes).push_back(us);
++            }
++            std::sort(rtimes.begin(), rtimes.end()); std::sort(ftimes.begin(), ftimes.end());
++            rt = rtimes[2]; ft = ftimes[2];
++        }
++        std::printf("{\"threads\":%d,\"kvLength\":%d,\"heads\":%d,\"batches\":%d,\"headDim\":%d,\"bitwiseDifferent\":%d,\"maxAbsError\":%.9g,\"referenceUs\":%.3f,\"parallelUs\":%.3f,\"speedup\":%.4f}\n",
++                    threads,length,heads,batches,dim,different,max_abs,rt,ft,ft ? rt/ft : 0);
++        ggml_gallocr_free(alloc); ggml_free(ctx);
++    }
++    }
++    }
++    ggml_backend_free(backend);
++    return passed ? 0 : 1;
++}

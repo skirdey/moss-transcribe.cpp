@@ -70,23 +70,47 @@ def main():
     p.add_argument("--skip-warmup", action="store_true", help="For a follow-on stress check after the same binaries/model were warmed in a preceding suite")
     p.add_argument("--pin-physical", action="store_true", help="Bind one OpenMP worker to each physical core, avoiding sibling/core collisions")
     p.add_argument("--timeout",type=float,default=300.)
+    p.add_argument("--reference-root",type=Path,default=Path("/home/stan/hw-moss-cache-layout"),help="Fixed validated transposed-cache build; variant cache-reference uses bit 16")
+    p.add_argument("--model",type=Path,default=Path("/home/stan/hw-audio-bench/models/moss-transcribe-q8_0.gguf"))
+    p.add_argument("--audio-dir",type=Path,default=Path("/home/stan/hw-audio-bench/audio"))
+    p.add_argument("--baseline",type=Path,default=Path("/home/stan/hw-moss-api/bin/moss-transcribe"))
+    p.add_argument("--baseline-lib-dir",default="/home/stan/hw-moss-api/lib")
+    p.add_argument("--threads",type=int,default=16)
     args = p.parse_args()
-    if args.repeats < 1 or "baseline" not in args.variants or len(args.variants) < 2:
+    if args.repeats < 1 or args.threads < 1 or "baseline" not in args.variants or len(args.variants) < 2:
         p.error("Need at least one repeat, baseline, and a candidate")
     root = args.root.resolve()
     results = root / args.name
     results.mkdir(parents=True, exist_ok=True)
-    model = Path("/home/stan/hw-audio-bench/models/moss-transcribe-q8_0.gguf")
-    baseline = Path("/home/stan/hw-moss-api/bin/moss-transcribe")
+    model, baseline = args.model.resolve(), args.baseline.resolve()
+    reference = args.reference_root.resolve() / "build/moss-transcribe"
+    def configuration(variant):
+        if variant == "baseline":
+            return baseline, "0", args.baseline_lib_dir
+        if variant == "cache-reference":
+            return reference, "16", ""
+        if not variant.isdecimal():
+            raise ValueError(f"Unknown variant: {variant}")
+        return candidate, variant, ""
     candidate = root / "build/moss-transcribe"
     report_path = results / "report.json"
     if report_path.exists():
         raise ValueError("Use a new --name; never mix measurements from different sessions")
-    report = {"protocol": "Sequential fresh processes, 16 threads, Q8, alternating variant order each round, warm filesystem cache. Production auto processing paused; API stays available. Wall includes load. Shared host; no hardware counter support.",
+    report = {"protocol": f"Sequential fresh processes, {args.threads} threads, pinned model, alternating variant order each round, warm filesystem cache. Production auto processing paused; API stays available. Wall includes load. Shared host; no hardware counter support.",
               "modelSha256": digest(model), "binarySha256": {"baseline": digest(baseline), "candidate": digest(candidate)},
               "libraries": {str(path): digest(path) for path in sorted((root / "build").rglob("*.so"))},
               "sourceCommit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root / "source", text=True).strip(),
               "cpu": subprocess.check_output(["lscpu"], text=True), "runs": []}
+    report["harnessSha256"] = digest(Path(__file__))
+    report["threads"] = args.threads
+    report["sourceSha256"] = {str(path.relative_to(root / "source")):digest(path)
+                              for path in sorted((root / "source/src").glob("*")) if path.is_file()}
+    report["sourceSha256"]["CMakeLists.txt"] = digest(root / "source/CMakeLists.txt")
+    if "cache-reference" in args.variants:
+        report["binarySha256"]["cache-reference"] = digest(reference)
+        report["referenceRoot"] = str(args.reference_root.resolve())
+        report["referenceLibraries"] = {str(path):digest(path) for path in sorted((args.reference_root / "build").rglob("*.so"))}
+    report["productionLibraries"] = {str(path):digest(path) for path in sorted(Path(args.baseline_lib_dir).glob("*.so"))}
     report["warmupDiscarded"] = not args.skip_warmup
     if args.skip_warmup:
         report["protocol"] = report["protocol"].replace("discarded warmups", "warmups skipped for this follow-on suite after priming in preceding pilot")
@@ -100,28 +124,28 @@ def main():
             cpu,core,socket = map(int,line.split(","))
             if cpu in os.sched_getaffinity(0):
                 cores.setdefault((socket,core),cpu)
-        selected_cores = list(cores.values())[:16]
-        if len(selected_cores) < 16:
-            raise ValueError("This 16-thread benchmark requires 16 allowed physical cores")
+        selected_cores = list(cores.values())[:args.threads]
+        if len(selected_cores) < args.threads:
+            raise ValueError("Not enough allowed physical cores for the requested thread count")
         affinity = {"OMP_PROC_BIND":"spread","OMP_PLACES":",".join("{"+str(cpu)+"}" for cpu in selected_cores)}
         report["physicalCoreAffinity"] = selected_cores
     report["timeoutSeconds"] = args.timeout
     # One discarded warmup for each binary, with full inference.
-    audio0 = Path("/home/stan/hw-audio-bench/audio") / (args.cases[0] + ".wav")
-    for binary, opt, lib in ([] if args.skip_warmup else [(baseline,"0","/home/stan/hw-moss-api/lib"), (candidate,"0","")]):
+    audio0 = args.audio_dir / (args.cases[0] + ".wav")
+    for binary, opt, lib in ([] if args.skip_warmup else [configuration(v) for v in args.variants]):
         subprocess.run([str(binary), "transcribe", str(model), str(audio0), "--max-new", "4096"],
-                       env={**os.environ,**affinity,"MTD_DEVICE":"cpu","MTD_THREADS":"16","OMP_NUM_THREADS":"16","MTD_CPU_OPT":opt,"MTD_LOOP_GUARD":"1","MTD_REPETITION_PENALTY":"1.0","LD_LIBRARY_PATH":lib},
+                       env={**os.environ,**affinity,"MTD_DEVICE":"cpu","MTD_THREADS":str(args.threads),"OMP_NUM_THREADS":str(args.threads),"MTD_CPU_OPT":opt,"MTD_LOOP_GUARD":"1","MTD_REPETITION_PENALTY":"1.0","LD_LIBRARY_PATH":lib},
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=args.timeout)
     for repeat in range(args.repeats):
         for case in args.cases:
-            audio = Path("/home/stan/hw-audio-bench/audio") / (case + ".wav")
+            audio = args.audio_dir / (case + ".wav")
             with wave.open(str(audio)) as w:
                 duration = w.getnframes() / w.getframerate()
             variants = args.variants if repeat % 2 == 0 else list(reversed(args.variants))
             for variant in variants:
                 key = f"{case}-{variant}-{repeat}"
-                binary = baseline if variant == "baseline" else candidate
-                env = {**os.environ,**affinity,"MTD_DEVICE":"cpu","MTD_THREADS":"16","OMP_NUM_THREADS":"16","MTD_CPU_OPT":"0" if variant == "baseline" else variant,"MTD_LOOP_GUARD":"1","MTD_REPETITION_PENALTY":"1.0","LD_LIBRARY_PATH":"/home/stan/hw-moss-api/lib" if variant == "baseline" else ""}
+                binary, opt, lib = configuration(variant)
+                env = {**os.environ,**affinity,"MTD_DEVICE":"cpu","MTD_THREADS":str(args.threads),"OMP_NUM_THREADS":str(args.threads),"MTD_CPU_OPT":opt,"MTD_LOOP_GUARD":"1","MTD_REPETITION_PENALTY":"1.0","LD_LIBRARY_PATH":lib}
                 raw, log, timer = [results / (key + ext) for ext in (".txt", ".log", ".time")]
                 cmd = ["/usr/bin/time", "-f", "%M", "-o", str(timer), str(binary), "transcribe", str(model), str(audio), "--max-new", "4096"]
                 start = time.perf_counter()
@@ -158,10 +182,20 @@ def main():
                 report["runs"].append(row)
                 report_path.write_text(json.dumps(report,indent=2))
                 print(json.dumps(row),flush=True)
+    artifact_hashes = {str(model):report["modelSha256"], str(baseline):report["binarySha256"]["baseline"],
+                       str(candidate):report["binarySha256"]["candidate"], **report["libraries"], **report["productionLibraries"]}
+    if "cache-reference" in args.variants:
+        artifact_hashes.update({str(reference):report["binarySha256"]["cache-reference"], **report["referenceLibraries"]})
+    artifact_hashes.update({str(root / "source" / name):value for name,value in report["sourceSha256"].items()})
+    changed = [path for path,value in artifact_hashes.items() if digest(path) != value]
+    report["artifactGate"] = {"passed":not changed,"changed":changed}
     report["gate"] = evaluate(report["runs"])
+    if "cache-reference" in args.variants:
+        compared = [r for r in report["runs"] if r["variant"] != "baseline"]
+        report["cacheReferenceGate"] = evaluate(compared, baseline="cache-reference")
     report_path.write_text(json.dumps(report,indent=2))
     print(json.dumps(report["gate"],indent=2))
-    return 0 if report["gate"]["passed"] else 1
+    return 0 if report["artifactGate"]["passed"] and report["gate"]["passed"] and report.get("cacheReferenceGate",{"passed":True})["passed"] else 1
 
 
 if __name__ == "__main__":
