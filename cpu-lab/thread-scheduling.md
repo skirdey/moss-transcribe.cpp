@@ -122,6 +122,32 @@ python3 cpu-lab/moss_cpu_regression.py --root /path/to/fresh-frozen-root \
   --name phase-thread-pilot-v1
 ```
 
+The completed [`phase-thread-pilot-v1.json`](phase-thread-pilot-v1.json) has
+all 18 timed rows. All outputs, inputs, token counts and EOS match the frozen
+reference; no concurrent MOSS was observed. Artifact integrity, old-production
+and frozen-opt48 gates all passed (exit 0). A fresh native build passed all ten
+model-independent CTests, including the worker-budget test, and 25 Python
+tests; [`thread-validation-v1.json`](thread-validation-v1.json) records the
+frozen source trees and verified test-log hashes for each build.
+
+| 60 s fixture | Frozen opt 48, all 16 threads | Candidate 16 encoder/prefill, 8 decode/logits | Speedup |
+|---|---:|---:|---:|
+| English meeting | 37.351 s | 32.664 s | 1.143x |
+| German dinner | 31.058 s | 28.310 s | 1.097x |
+| Public vmaiq | 32.186 s | 28.878 s | 1.115x |
+
+These are two-repeat medians including loading, after one discarded full-model
+warmup per variant. Host load ranged 35.81–40.87; peak candidate RSS was about
+1.58–1.62 GiB. The suite has no same-build all-16 or global-eight-thread control,
+so it cannot isolate scope/build costs or establish that mixed budgets beat
+global eight. Cross-suite timings cannot supply that missing comparison.
+This is a shared-host optimization lead, not a quiet-host gain or new corpus
+accuracy result. The quiet 10x target is unchanged and unachieved.
+
+The new controls and trace diagnostic remain opt-in. Automatic processing was
+restored to 1 and authenticated API health returned OK after the controller
+finished. The production binary and its inference policy were not promoted.
+
 ## Actual-token replay audit
 
 `MTD_TRACE_TOKENS=1` logs the actual greedy token IDs at generation completion.

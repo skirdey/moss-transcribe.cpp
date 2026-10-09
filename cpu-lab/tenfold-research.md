@@ -307,3 +307,41 @@ The expected native pilot status is 1 (latency rejection), although shared-host
 timings can vary. See `exact-graph-provenance-v1.json` for actual compiled source,
 library, binary and graph-report hashes; its base commit alone does not describe
 the dirty experimental tree. The failed build remains frozen for reproducibility.
+
+## CPU worker budgets and actual draft replay, 2026-10-09
+
+The [thread scheduling report](thread-scheduling.md) preserves the complete
+30-run 4/8/16-thread pilot, the separate 18-run mixed-phase pilot, bounded
+passive-wait failure, initial logger truncation and repaired private trace
+audit. All 48 timed outputs and EOS matched the frozen reference; artifact
+integrity passed. Global eight threads observed 1.21–1.36x speedups, while four
+failed latency by 26.68–43.69%. The mixed candidate kept encoder/prefill at 16
+and decode/logits at eight; it passed all gates at 1.10–1.14x speedup.
+
+Both suites ran with other TTS jobs active and high shared load. Same-opt
+controls varied materially; the mixed suite lacks a same-build all-16/global-8
+control. These results cannot establish a quiet-host gain, prove mixed beats
+global eight, or replace the original quiet opt48 reference for the 10x goal.
+Production remains on its validated binary and policy. Automatic processing
+was restored and authenticated API health was OK after each controller.
+
+Bounded CPU phase scopes default to the startup thread budget and restore it
+after nested scopes or exceptions. The fresh native build passed ten
+model-independent CTests and 25 Python tests. Private tracing is off by
+default; repaired chunks passed all three output/EOS smokes and full trace
+parser checks. Public source mappings, exact replay-repair patch, test-log
+hashes and numeric reports accompany the implementation.
+
+Actual past-only eight-token ngram replay reduced target calls by only
+1.23–1.34x while requiring 2.31–3.19x the sequential target-token work.
+Four-token drafts saved almost as many calls for less rejected work. This is
+an oracle acceptance/work estimate, with no batched target, numerical verifier,
+KV rollback or latency implementation. It does not justify prioritizing this
+ngram draft toward a 10x full-input improvement.
+
+The tenfold objective remains active and unachieved. Next investigate exact
+multirow encoder compute and loader copy costs; continue measuring against
+the frozen fastest opt48 reference. Encoder, prefill and loading must improve
+alongside decoding. Track persistent/batch throughput separately, preserve
+full text/speaker/timestamp/EOS gates, and avoid rerunning rejected kernels
+without a concrete implementation change.
