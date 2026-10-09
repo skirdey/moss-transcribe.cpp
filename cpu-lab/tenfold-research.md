@@ -229,6 +229,29 @@ compatible projection fusion and exact batched dots, and instrument encoder,
 mel and adaptor costs directly. Adding packed copies or accepting a warm dot
 gain alone is insufficient.
 
+## Direct frontend and encoder isolation
+
+The [new phase report](mel-phases.md) records a 36-run, two-round full-model
+pilot and actual mel/Whisper/adaptor costs. All exact parallel DFT outputs,
+tokens and EOS matched; all 12 native frontend cases were float-bit identical.
+Its 5–18x frontend samples did not establish an end-to-end gain: English and
+German medians failed the 5% gate. The same-opt control itself was 20.63% slower
+on English, so this loaded run does not isolate a causal regression cost.
+FFT changed English/German text, and encoder-only AMX changed German/public
+speech outputs. All three model routes are archived against `4f40141`; helper
+transforms and opt-in numeric profiling remain. A fresh probes-only build
+passed nine native CTests. The intermediate build's three complete output/EOS
+smokes passed but are not a latency acceptance. No broader/long or human DER
+suite was run after failure, and production is not promoted.
+
+Control inference medians were 31.739–44.494 s under shared load. Mel occupied
+about 1.9–2.9%, graph construction/allocation 0.65–0.94%; decode and Whisper
+encoding remain the major measured phases. Backend compute includes worker
+scheduling and barriers, not only arithmetic. New work should target those
+compute paths, tune thread budgets and prototype compatible projection fusion
+or exact multirow kernels. A single-row arithmetic proof is insufficient for
+the encoder's multirow SGEMM path. The 10x goal remains active and unachieved.
+
 ## Reproduce the probes
 
 Use a native Release build with `-DMT_BUILD_TESTS=ON`, as documented in the root

@@ -1,6 +1,7 @@
 #include "whisper_encoder.hpp"
 
 #include "backend.hpp"
+#include "cpu_profile.hpp"
 #include "common.hpp"
 #include "ggml_extend.hpp"
 
@@ -80,6 +81,8 @@ WhisperEncoder::WhisperEncoder(ModelLoader& m) {
 
 void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_frames,
                             std::vector<float>& out, int& out_T, int& out_D) const {
+    CpuPhaseScope phase(CpuPhase::Whisper);
+    CpuTimer build_timer;
     (void)n_mels;
     const int d  = d_model_;
     const int H  = n_heads_;
@@ -156,6 +159,7 @@ void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_fra
     ggml_set_output(cur);
     ggml_build_forward_expand(gf, cur);
 
+    cpu_profile_record(CpuStage::Build, build_timer.seconds());
     const bool ok = compute_graph_with_inputs(gf, [&]() {
         ggml_backend_tensor_set(mel_in, mel.data(), 0, mel.size() * sizeof(float));
     });

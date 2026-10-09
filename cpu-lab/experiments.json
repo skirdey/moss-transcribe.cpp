@@ -9963,5 +9963,27 @@
         }
       ]
     }
+  },
+  "mel-phase-research-v1": {
+    "status": "All new transcription routes archived; exact kernel and phase profiler retained for research",
+    "sourceBase": "4f40141",
+    "experimentalSource": "de5234c",
+    "activeSource": "0cb554b",
+    "productionDeployed": false,
+    "fullModelRuns": 36,
+    "allComplete": true,
+    "artifactGatePassed": true,
+    "humanDerRescored": false,
+    "expandedSevenCaseOrLongSuiteRun": false,
+    "reports": [
+      "mel-pilot-v1.json",
+      "mel-kernel-v1.jsonl",
+      "mel-intermediate-smoke-v1.json",
+      "mel-provenance-v1.json"
+    ],
+    "exactDft": "12 raw-float probe cases match, six paired full outputs match; full English/German timing gate fails",
+    "fft": "English and German text changes, finite probe does not establish parity",
+    "encoderAmx": "German 458 to 436 and Vox 490 to 476 tokens in both rounds; 144 enc.blk Q8 tensors, packed buffer 358612992 bytes",
+    "next": "Tune compute scheduling and prototype exact multirow arithmetic; metadata construction/allocation is under one percent of observed inference"
   }
 }

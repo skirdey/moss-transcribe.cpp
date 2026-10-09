@@ -35,6 +35,8 @@ endif()
 add_test(NAME moss_exact_q8_bench COMMAND moss_exact_q8_bench)
 set_tests_properties(moss_exact_q8_bench PROPERTIES SKIP_RETURN_CODE 77)
 
+mt_add_test(test_mel_cpu)
+
 mt_add_test(test_mel)
 set_tests_properties(test_mel PROPERTIES LABELS "model")
 

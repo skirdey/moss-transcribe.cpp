@@ -1,6 +1,7 @@
 #include "backend.hpp"
 
 #include "common.hpp"
+#include "cpu_profile.hpp"
 
 #include "ggml-alloc.h"
 #include "ggml-backend.h"
@@ -157,11 +158,17 @@ const char* backend_name() {
 bool compute_graph(ggml_cgraph* graph) {
     ggml_backend_t b = backend();
     if (!b || !graph || !g_gallocr) return false;
-    if (!ggml_gallocr_alloc_graph(g_gallocr, graph)) {
+    CpuTimer allocation_timer;
+    const bool allocated = ggml_gallocr_alloc_graph(g_gallocr, graph);
+    cpu_profile_record(CpuStage::Allocate, allocation_timer.seconds());
+    if (!allocated) {
         MT_LOGE("backend: gallocr_alloc_graph failed");
         return false;
     }
-    return ggml_backend_graph_compute(b, graph) == GGML_STATUS_SUCCESS;
+    CpuTimer compute_timer;
+    const bool ok = ggml_backend_graph_compute(b, graph) == GGML_STATUS_SUCCESS;
+    cpu_profile_record(CpuStage::Compute, compute_timer.seconds());
+    return ok;
 }
 
 bool compute_graph_with_inputs(ggml_cgraph* graph,
@@ -169,13 +176,21 @@ bool compute_graph_with_inputs(ggml_cgraph* graph,
     ggml_backend_t b = backend();
     if (!b || !graph || !g_gallocr) return false;
     // Allocate first: input + intermediate tensors get their backend buffers.
-    if (!ggml_gallocr_alloc_graph(g_gallocr, graph)) {
+    CpuTimer allocation_timer;
+    const bool allocated = ggml_gallocr_alloc_graph(g_gallocr, graph);
+    cpu_profile_record(CpuStage::Allocate, allocation_timer.seconds());
+    if (!allocated) {
         MT_LOGE("backend: gallocr_alloc_graph failed");
         return false;
     }
     // Now the input leaves have real (possibly device) buffers — upload data.
+    CpuTimer input_timer;
     if (set_inputs) set_inputs();
-    return ggml_backend_graph_compute(b, graph) == GGML_STATUS_SUCCESS;
+    cpu_profile_record(CpuStage::Input, input_timer.seconds());
+    CpuTimer compute_timer;
+    const bool ok = ggml_backend_graph_compute(b, graph) == GGML_STATUS_SUCCESS;
+    cpu_profile_record(CpuStage::Compute, compute_timer.seconds());
+    return ok;
 }
 
 ggml_backend_buffer_t allocate_ctx_tensors(ggml_context* ctx) {

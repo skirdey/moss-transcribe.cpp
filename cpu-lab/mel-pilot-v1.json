@@ -1,0 +1,3234 @@
+{
+  "protocol": "Sequential fresh processes, 16 threads, pinned model, alternating variant order each round, warm filesystem cache. Production auto processing paused; API stays available. Wall includes load. Shared host; no hardware counter support.",
+  "modelSha256": "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c",
+  "binarySha256": {
+    "baseline": "90c7424f2e7b20403a92d6bdcc2130dbff6bba147169ffeeb21572e473484815",
+    "candidate": "51554c242c16dbbace7c2c929ddf4b4e0ac0bd8d043ba57a71f4f0a147433236",
+    "cache-reference": "bb8bd09737c1063657f4bb0dde0c114bc63cde1a528518950c19007295387825"
+  },
+  "libraries": {
+    "/home/stan/hw-moss-mel-phases-v1/build/third_party/ggml/src/libggml-base.so": "66af57283f23d9290f1d404f2ef5b39a16dd9a1e03a111a0670271f3c465d35a",
+    "/home/stan/hw-moss-mel-phases-v1/build/third_party/ggml/src/libggml-cpu.so": "77334de1b48807a2485aca400a0ed55eec08c31a439d8937dbea044d8b0c4ecf",
+    "/home/stan/hw-moss-mel-phases-v1/build/third_party/ggml/src/libggml.so": "f5931835ffdfea519d57e7dfd8d40adfe08694516cdf81a2169f8c8dd372a07c"
+  },
+  "sourceCommit": "de5234c8d409cba4c06137acc5f4e0efe07c00c1",
+  "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 57 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  32\nOn-line CPU(s) list:                     0-31\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Xeon(R) Gold 5416S\nCPU family:                              6\nModel:                                   143\nThread(s) per core:                      2\nCore(s) per socket:                      16\nSocket(s):                               1\nStepping:                                8\nCPU(s) scaling MHz:                      67%\nCPU max MHz:                             4000.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                4000.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cat_l2 cdp_l3 cdp_l2 ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb intel_pt avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local split_lock_detect user_shstk avx_vnni avx512_bf16 wbnoinvd dtherm ida arat pln pts hwp hwp_act_window hwp_pkg_req hfi vnmi avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid bus_lock_detect cldemote movdiri movdir64b enqcmd fsrm md_clear serialize tsxldtrk pconfig arch_lbr ibt amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities\nVirtualization:                          VT-x\nL1d cache:                               768 KiB (16 instances)\nL1i cache:                               512 KiB (16 instances)\nL2 cache:                                32 MiB (16 instances)\nL3 cache:                                30 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-31\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Vulnerable\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+  "runs": [
+    {
+      "case": "meeting-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 65.71198888774961,
+      "maxRssKiB": 1587020,
+      "hostLoadBefore": [
+        40.18115234375,
+        40.11572265625,
+        36.82080078125
+      ],
+      "hostLoadAfter": [
+        39.31640625,
+        39.98779296875,
+        37.005859375
+      ],
+      "timing": {
+        "load": 0.985355,
+        "inference": 64.560559
+      },
+      "profile": {},
+      "phaseProfile": null
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 34.86430576071143,
+      "maxRssKiB": 1701748,
+      "hostLoadBefore": [
+        39.31640625,
+        39.98779296875,
+        37.005859375
+      ],
+      "hostLoadAfter": [
+        39.263671875,
+        39.8701171875,
+        37.0751953125
+      ],
+      "timing": {
+        "load": 0.925283,
+        "inference": 33.769191
+      },
+      "profile": {
+        "prefill": 3.731309,
+        "embedding": 0.020541,
+        "decoder": 16.428771,
+        "logits": 1.687035
+      },
+      "phaseProfile": null
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "48",
+      "repeat": 0,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 34.49801979307085,
+      "maxRssKiB": 1701776,
+      "hostLoadBefore": [
+        39.263671875,
+        39.8701171875,
+        37.0751953125
+      ],
+      "hostLoadAfter": [
+        40.6455078125,
+        40.18994140625,
+        37.2890625
+      ],
+      "timing": {
+        "load": 0.961423,
+        "inference": 33.384574
+      },
+      "profile": {
+        "prefill": 3.412074,
+        "embedding": 0.017595,
+        "decoder": 16.757807,
+        "logits": 1.657613
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.00106254,
+          "inputSeconds": 0.000209187,
+          "computeSeconds": 0.002895959
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.671505708,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 10.231934385,
+          "buildSeconds": 0.002670031,
+          "allocateSeconds": 0.000340625,
+          "inputSeconds": 0.000746382,
+          "computeSeconds": 10.204210148
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.043836113,
+          "buildSeconds": 3.072e-05,
+          "allocateSeconds": 2.5117e-05,
+          "inputSeconds": 0.001865914,
+          "computeSeconds": 0.039788644
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 3.412072818,
+          "buildSeconds": 0.000231194,
+          "allocateSeconds": 0.000271087,
+          "inputSeconds": 0.002586245,
+          "computeSeconds": 3.407943708
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 16.757610929,
+          "buildSeconds": 0.172967931,
+          "allocateSeconds": 0.20578626,
+          "inputSeconds": 0.000696431,
+          "computeSeconds": 16.376226221
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 1.657075882,
+          "buildSeconds": 0.015017595,
+          "allocateSeconds": 0.008004337,
+          "inputSeconds": 0.000268129,
+          "computeSeconds": 1.563787103
+        }
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "2096",
+      "repeat": 0,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 33.68810484325513,
+      "maxRssKiB": 1701616,
+      "hostLoadBefore": [
+        40.6455078125,
+        40.18994140625,
+        37.2890625
+      ],
+      "hostLoadAfter": [
+        37.93017578125,
+        39.5546875,
+        37.16796875
+      ],
+      "timing": {
+        "load": 0.98641,
+        "inference": 32.504735
+      },
+      "profile": {
+        "prefill": 3.477658,
+        "embedding": 0.017732,
+        "decoder": 16.203041,
+        "logits": 1.682792
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.00105757,
+          "inputSeconds": 0.000212794,
+          "computeSeconds": 0.002772814
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.095105795,
+          "buildSeconds": 4.7435e-05,
+          "allocateSeconds": 4.5519e-05,
+          "inputSeconds": 0.001325641,
+          "computeSeconds": 0.090362778
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 10.359640508,
+          "buildSeconds": 0.005082132,
+          "allocateSeconds": 0.000586248,
+          "inputSeconds": 0.000938439,
+          "computeSeconds": 10.344452655
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.029381388,
+          "buildSeconds": 3.0972e-05,
+          "allocateSeconds": 2.2167e-05,
+          "inputSeconds": 0.001830763,
+          "computeSeconds": 0.02588502
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 3.477656851,
+          "buildSeconds": 0.000234506,
+          "allocateSeconds": 0.000285308,
+          "inputSeconds": 0.002615468,
+          "computeSeconds": 3.472733875
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 16.202859642,
+          "buildSeconds": 0.16999281,
+          "allocateSeconds": 0.206152411,
+          "inputSeconds": 0.000647406,
+          "computeSeconds": 15.82399693
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 1.682258331,
+          "buildSeconds": 0.011887481,
+          "allocateSeconds": 0.008054536,
+          "inputSeconds": 0.000280891,
+          "computeSeconds": 1.59224563
+        }
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "4144",
+      "repeat": 0,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "76ede8587c76ac993326c49e66c5890e3163d33eb7da58761c24d784002b524b",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 33.815782902762294,
+      "maxRssKiB": 1701760,
+      "hostLoadBefore": [
+        37.93017578125,
+        39.5546875,
+        37.16796875
+      ],
+      "hostLoadAfter": [
+        39.46337890625,
+        39.82470703125,
+        37.35009765625
+      ],
+      "timing": {
+        "load": 1.010847,
+        "inference": 32.641436
+      },
+      "profile": {
+        "prefill": 3.516937,
+        "embedding": 0.017466,
+        "decoder": 15.565729,
+        "logits": 1.768439
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.001005259,
+          "inputSeconds": 0.000181826,
+          "computeSeconds": 0.002796391
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.040250576,
+          "buildSeconds": 3.5941e-05,
+          "allocateSeconds": 4.6391e-05,
+          "inputSeconds": 0.001540307,
+          "computeSeconds": 0.035401112
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 11.115252239,
+          "buildSeconds": 0.004132483,
+          "allocateSeconds": 0.000547905,
+          "inputSeconds": 0.000905995,
+          "computeSeconds": 11.099037111
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.022640999,
+          "buildSeconds": 2.6044e-05,
+          "allocateSeconds": 2.0282e-05,
+          "inputSeconds": 0.001664293,
+          "computeSeconds": 0.019012218
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 3.516936014,
+          "buildSeconds": 0.000232718,
+          "allocateSeconds": 0.000284842,
+          "inputSeconds": 0.00250603,
+          "computeSeconds": 3.512738599
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 15.565516028,
+          "buildSeconds": 0.165393071,
+          "allocateSeconds": 0.207406816,
+          "inputSeconds": 0.000651748,
+          "computeSeconds": 15.19013774
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 1.767910379,
+          "buildSeconds": 0.011874765,
+          "allocateSeconds": 0.008222817,
+          "inputSeconds": 0.000260403,
+          "computeSeconds": 1.678547656
+        }
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "1072",
+      "repeat": 0,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 32.23874969407916,
+      "maxRssKiB": 2052112,
+      "hostLoadBefore": [
+        39.46337890625,
+        39.82470703125,
+        37.35009765625
+      ],
+      "hostLoadAfter": [
+        40.04931640625,
+        39.9111328125,
+        37.45654296875
+      ],
+      "timing": {
+        "load": 1.17738,
+        "inference": 30.848993
+      },
+      "profile": {
+        "prefill": 3.834365,
+        "embedding": 0.017664,
+        "decoder": 16.548963,
+        "logits": 1.623343
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000977435,
+          "inputSeconds": 0.000204823,
+          "computeSeconds": 0.002728021
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 1.074041021,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 7.122128223,
+          "buildSeconds": 0.002969444,
+          "allocateSeconds": 0.000519869,
+          "inputSeconds": 0.001039119,
+          "computeSeconds": 7.099725888
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.037209619,
+          "buildSeconds": 3.0596e-05,
+          "allocateSeconds": 2.277e-05,
+          "inputSeconds": 0.001976487,
+          "computeSeconds": 0.033312838
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 3.834364103,
+          "buildSeconds": 0.000223252,
+          "allocateSeconds": 0.000257025,
+          "inputSeconds": 0.002641267,
+          "computeSeconds": 3.830296393
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 16.548748987,
+          "buildSeconds": 0.181324424,
+          "allocateSeconds": 0.193559002,
+          "inputSeconds": 0.000612653,
+          "computeSeconds": 16.171163667
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 1.62268639,
+          "buildSeconds": 0.012050714,
+          "allocateSeconds": 0.007889648,
+          "inputSeconds": 0.000274903,
+          "computeSeconds": 1.532065007
+        }
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 46.604751461185515,
+      "maxRssKiB": 1538104,
+      "hostLoadBefore": [
+        40.04931640625,
+        39.9111328125,
+        37.45654296875
+      ],
+      "hostLoadAfter": [
+        40.8828125,
+        40.2587890625,
+        37.708984375
+      ],
+      "timing": {
+        "load": 1.007817,
+        "inference": 45.414943
+      },
+      "profile": {},
+      "phaseProfile": null
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 29.622314432170242,
+      "maxRssKiB": 1653308,
+      "hostLoadBefore": [
+        40.8828125,
+        40.2587890625,
+        37.708984375
+      ],
+      "hostLoadAfter": [
+        42.7841796875,
+        40.77783203125,
+        37.96337890625
+      ],
+      "timing": {
+        "load": 0.904371,
+        "inference": 28.53589
+      },
+      "profile": {
+        "prefill": 4.064533,
+        "embedding": 0.011909,
+        "decoder": 10.921163,
+        "logits": 1.163559
+      },
+      "phaseProfile": null
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "48",
+      "repeat": 0,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 28.79735079733655,
+      "maxRssKiB": 1652880,
+      "hostLoadBefore": [
+        42.7841796875,
+        40.77783203125,
+        37.96337890625
+      ],
+      "hostLoadAfter": [
+        43.841796875,
+        41.158203125,
+        38.16259765625
+      ],
+      "timing": {
+        "load": 0.986474,
+        "inference": 27.617137
+      },
+      "profile": {
+        "prefill": 3.70534,
+        "embedding": 0.012097,
+        "decoder": 10.76739,
+        "logits": 1.34268
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 458,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.00074302,
+          "inputSeconds": 0.000130224,
+          "computeSeconds": 0.002067192
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.962508432,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 10.254988985,
+          "buildSeconds": 0.003354585,
+          "allocateSeconds": 0.000418936,
+          "inputSeconds": 0.000893725,
+          "computeSeconds": 10.2419943
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.021114478,
+          "buildSeconds": 2.9669e-05,
+          "allocateSeconds": 2.1814e-05,
+          "inputSeconds": 0.001828715,
+          "computeSeconds": 0.017420616
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 3.705339096,
+          "buildSeconds": 0.000234835,
+          "allocateSeconds": 0.000267481,
+          "inputSeconds": 0.002975629,
+          "computeSeconds": 3.700618117
+        },
+        "decode": {
+          "calls": 457,
+          "graphs": 457,
+          "totalSeconds": 10.767273183,
+          "buildSeconds": 0.118291321,
+          "allocateSeconds": 0.138594804,
+          "inputSeconds": 0.000471249,
+          "computeSeconds": 10.508549742
+        },
+        "logits": {
+          "calls": 458,
+          "graphs": 458,
+          "totalSeconds": 1.342332382,
+          "buildSeconds": 0.00825514,
+          "allocateSeconds": 0.00535594,
+          "inputSeconds": 0.000190865,
+          "computeSeconds": 1.280430888
+        }
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "2096",
+      "repeat": 0,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 27.6826504310593,
+      "maxRssKiB": 1653132,
+      "hostLoadBefore": [
+        43.841796875,
+        41.158203125,
+        38.16259765625
+      ],
+      "hostLoadAfter": [
+        43.26220703125,
+        41.2333984375,
+        38.28125
+      ],
+      "timing": {
+        "load": 1.003511,
+        "inference": 26.483508
+      },
+      "profile": {
+        "prefill": 3.74262,
+        "embedding": 0.012428,
+        "decoder": 9.989994,
+        "logits": 1.3529
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 458,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000720361,
+          "inputSeconds": 0.000174057,
+          "computeSeconds": 0.002145502
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.223927249,
+          "buildSeconds": 3.6238e-05,
+          "allocateSeconds": 4.613e-05,
+          "inputSeconds": 0.001561106,
+          "computeSeconds": 0.219130264
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 10.578427028,
+          "buildSeconds": 0.003704324,
+          "allocateSeconds": 0.000474561,
+          "inputSeconds": 0.000695172,
+          "computeSeconds": 10.565799448
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.020542269,
+          "buildSeconds": 2.9535e-05,
+          "allocateSeconds": 2.3079e-05,
+          "inputSeconds": 0.001756328,
+          "computeSeconds": 0.017007933
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 3.742618873,
+          "buildSeconds": 0.000348758,
+          "allocateSeconds": 0.000404866,
+          "inputSeconds": 0.003238164,
+          "computeSeconds": 3.737230521
+        },
+        "decode": {
+          "calls": 457,
+          "graphs": 457,
+          "totalSeconds": 9.989847722,
+          "buildSeconds": 0.11664192,
+          "allocateSeconds": 0.148683128,
+          "inputSeconds": 0.000481958,
+          "computeSeconds": 9.722463877
+        },
+        "logits": {
+          "calls": 458,
+          "graphs": 458,
+          "totalSeconds": 1.352517596,
+          "buildSeconds": 0.008415986,
+          "allocateSeconds": 0.005679589,
+          "inputSeconds": 0.000193735,
+          "computeSeconds": 1.290432308
+        }
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "4144",
+      "repeat": 0,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "e42d5ac6e1049f0752dbc14a0a716b55cef0252b60fd73dd81dcf6829f0816b9",
+      "returncode": 0,
+      "tokens": 456,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 27.774306709878147,
+      "maxRssKiB": 1653024,
+      "hostLoadBefore": [
+        43.26220703125,
+        41.2333984375,
+        38.28125
+      ],
+      "hostLoadAfter": [
+        43.43505859375,
+        41.46728515625,
+        38.453125
+      ],
+      "timing": {
+        "load": 1.03162,
+        "inference": 26.548648
+      },
+      "profile": {
+        "prefill": 3.561573,
+        "embedding": 0.011941,
+        "decoder": 10.364352,
+        "logits": 1.267104
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 456,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000718867,
+          "inputSeconds": 0.00012589,
+          "computeSeconds": 0.001983545
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.074047853,
+          "buildSeconds": 3.7433e-05,
+          "allocateSeconds": 4.6626e-05,
+          "inputSeconds": 0.001430266,
+          "computeSeconds": 0.069248065
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 10.695091249,
+          "buildSeconds": 0.004357159,
+          "allocateSeconds": 0.000493936,
+          "inputSeconds": 0.000601201,
+          "computeSeconds": 10.68062686
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.015742607,
+          "buildSeconds": 3.0737e-05,
+          "allocateSeconds": 2.2075e-05,
+          "inputSeconds": 0.001938516,
+          "computeSeconds": 0.011649553
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 3.56157163,
+          "buildSeconds": 0.00023176,
+          "allocateSeconds": 0.000264891,
+          "inputSeconds": 0.002456424,
+          "computeSeconds": 3.557383959
+        },
+        "decode": {
+          "calls": 455,
+          "graphs": 455,
+          "totalSeconds": 10.364223217,
+          "buildSeconds": 0.11332085,
+          "allocateSeconds": 0.131955281,
+          "inputSeconds": 0.000439901,
+          "computeSeconds": 10.117220872
+        },
+        "logits": {
+          "calls": 456,
+          "graphs": 456,
+          "totalSeconds": 1.266749667,
+          "buildSeconds": 0.008003805,
+          "allocateSeconds": 0.005422867,
+          "inputSeconds": 0.000191554,
+          "computeSeconds": 1.203330646
+        }
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "1072",
+      "repeat": 0,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "704888d71f260e216a29da945c0a711a2771c86a0de8a1cd25d3437d3ca1b65c",
+      "returncode": 0,
+      "tokens": 436,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 28.128002014011145,
+      "maxRssKiB": 1998680,
+      "hostLoadBefore": [
+        43.43505859375,
+        41.46728515625,
+        38.453125
+      ],
+      "hostLoadAfter": [
+        41.7333984375,
+        41.2216796875,
+        38.45166015625
+      ],
+      "timing": {
+        "load": 1.357296,
+        "inference": 26.527534
+      },
+      "profile": {
+        "prefill": 3.776103,
+        "embedding": 0.011947,
+        "decoder": 13.331339,
+        "logits": 1.221252
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 436,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000690295,
+          "inputSeconds": 0.000127761,
+          "computeSeconds": 0.002071362
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.990030287,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 6.605129541,
+          "buildSeconds": 0.003322243,
+          "allocateSeconds": 0.00047332,
+          "inputSeconds": 0.000913081,
+          "computeSeconds": 6.591450838
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.024998674,
+          "buildSeconds": 3.0253e-05,
+          "allocateSeconds": 1.9573e-05,
+          "inputSeconds": 0.002186373,
+          "computeSeconds": 0.021002369
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 3.776102108,
+          "buildSeconds": 0.000354736,
+          "allocateSeconds": 0.000905357,
+          "inputSeconds": 0.003574942,
+          "computeSeconds": 3.770195574
+        },
+        "decode": {
+          "calls": 435,
+          "graphs": 435,
+          "totalSeconds": 13.331198242,
+          "buildSeconds": 0.113893579,
+          "allocateSeconds": 0.12530999,
+          "inputSeconds": 0.000424539,
+          "computeSeconds": 13.090069921
+        },
+        "logits": {
+          "calls": 436,
+          "graphs": 436,
+          "totalSeconds": 1.220794219,
+          "buildSeconds": 0.008212749,
+          "allocateSeconds": 0.008356655,
+          "inputSeconds": 0.000190497,
+          "computeSeconds": 1.149886385
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 77.88046207092702,
+      "maxRssKiB": 1545688,
+      "hostLoadBefore": [
+        41.7333984375,
+        41.2216796875,
+        38.45166015625
+      ],
+      "hostLoadAfter": [
+        42.90087890625,
+        41.681640625,
+        38.8369140625
+      ],
+      "timing": {
+        "load": 1.002438,
+        "inference": 76.679221
+      },
+      "profile": {},
+      "phaseProfile": null
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 49.3584590498358,
+      "maxRssKiB": 1660524,
+      "hostLoadBefore": [
+        42.90087890625,
+        41.681640625,
+        38.8369140625
+      ],
+      "hostLoadAfter": [
+        40.884765625,
+        41.3505859375,
+        38.87548828125
+      ],
+      "timing": {
+        "load": 0.956546,
+        "inference": 48.22289
+      },
+      "profile": {
+        "prefill": 4.988133,
+        "embedding": 0.01447,
+        "decoder": 26.914911,
+        "logits": 1.576979
+      },
+      "phaseProfile": null
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "48",
+      "repeat": 0,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 45.00966392457485,
+      "maxRssKiB": 1660604,
+      "hostLoadBefore": [
+        40.884765625,
+        41.3505859375,
+        38.87548828125
+      ],
+      "hostLoadAfter": [
+        41.94580078125,
+        41.6142578125,
+        39.08544921875
+      ],
+      "timing": {
+        "load": 0.972092,
+        "inference": 43.900395
+      },
+      "profile": {
+        "prefill": 4.475968,
+        "embedding": 0.01416,
+        "decoder": 23.787247,
+        "logits": 1.590614
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000868029,
+          "inputSeconds": 0.000138732,
+          "computeSeconds": 0.002265833
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.7468581,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 12.701853474,
+          "buildSeconds": 0.003215846,
+          "allocateSeconds": 0.000389069,
+          "inputSeconds": 0.000728446,
+          "computeSeconds": 12.688643536
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.019220531,
+          "buildSeconds": 3.2122e-05,
+          "allocateSeconds": 2.3162e-05,
+          "inputSeconds": 0.001988068,
+          "computeSeconds": 0.01530496
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.475967316,
+          "buildSeconds": 0.000310952,
+          "allocateSeconds": 0.000364123,
+          "inputSeconds": 0.003049814,
+          "computeSeconds": 4.471282465
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 23.787034649,
+          "buildSeconds": 0.128733593,
+          "allocateSeconds": 0.139570916,
+          "inputSeconds": 0.000473242,
+          "computeSeconds": 23.5163952
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 1.590158682,
+          "buildSeconds": 0.009951937,
+          "allocateSeconds": 0.006318439,
+          "inputSeconds": 0.000226529,
+          "computeSeconds": 1.52029986
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "2096",
+      "repeat": 0,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 47.684265525080264,
+      "maxRssKiB": 1660632,
+      "hostLoadBefore": [
+        41.94580078125,
+        41.6142578125,
+        39.08544921875
+      ],
+      "hostLoadAfter": [
+        40.01953125,
+        41.1923828125,
+        39.064453125
+      ],
+      "timing": {
+        "load": 0.969953,
+        "inference": 46.537502
+      },
+      "profile": {
+        "prefill": 4.968462,
+        "embedding": 0.01463,
+        "decoder": 25.58292,
+        "logits": 1.654718
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.00087469,
+          "inputSeconds": 0.000163984,
+          "computeSeconds": 0.002379954
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.1054712,
+          "buildSeconds": 3.4847e-05,
+          "allocateSeconds": 4.0688e-05,
+          "inputSeconds": 0.001478847,
+          "computeSeconds": 0.100895221
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 13.619531149,
+          "buildSeconds": 0.012406205,
+          "allocateSeconds": 0.000594984,
+          "inputSeconds": 0.000861322,
+          "computeSeconds": 13.591870532
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.036796129,
+          "buildSeconds": 4.4044e-05,
+          "allocateSeconds": 2.1995e-05,
+          "inputSeconds": 0.002007442,
+          "computeSeconds": 0.032282126
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.968461693,
+          "buildSeconds": 0.000234295,
+          "allocateSeconds": 0.000293203,
+          "inputSeconds": 0.003597001,
+          "computeSeconds": 4.963351301
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 25.582743712,
+          "buildSeconds": 0.128534841,
+          "allocateSeconds": 0.151016556,
+          "inputSeconds": 0.000506912,
+          "computeSeconds": 25.300901872
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 1.654312223,
+          "buildSeconds": 0.00996287,
+          "allocateSeconds": 0.006630549,
+          "inputSeconds": 0.000232464,
+          "computeSeconds": 1.5833588
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "4144",
+      "repeat": 0,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 44.16377068590373,
+      "maxRssKiB": 1660572,
+      "hostLoadBefore": [
+        40.01953125,
+        41.1923828125,
+        39.064453125
+      ],
+      "hostLoadAfter": [
+        38.67626953125,
+        40.6435546875,
+        38.97705078125
+      ],
+      "timing": {
+        "load": 1.041966,
+        "inference": 43.001776
+      },
+      "profile": {
+        "prefill": 4.119916,
+        "embedding": 0.014421,
+        "decoder": 24.098612,
+        "logits": 1.328338
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000920197,
+          "inputSeconds": 0.000170835,
+          "computeSeconds": 0.002372479
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.047381162,
+          "buildSeconds": 3.2555e-05,
+          "allocateSeconds": 4.0001e-05,
+          "inputSeconds": 0.001686492,
+          "computeSeconds": 0.042280003
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 12.755896155,
+          "buildSeconds": 0.004393064,
+          "allocateSeconds": 0.000693551,
+          "inputSeconds": 0.000880255,
+          "computeSeconds": 12.737459512
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.072349793,
+          "buildSeconds": 4.4067e-05,
+          "allocateSeconds": 2.2623e-05,
+          "inputSeconds": 0.002166887,
+          "computeSeconds": 0.067708414
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.119914586,
+          "buildSeconds": 0.000329413,
+          "allocateSeconds": 0.000364932,
+          "inputSeconds": 0.003151814,
+          "computeSeconds": 4.115024071
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 24.09840627,
+          "buildSeconds": 0.12121151,
+          "allocateSeconds": 0.144263083,
+          "inputSeconds": 0.000550856,
+          "computeSeconds": 23.830598539
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 1.327908122,
+          "buildSeconds": 0.009993451,
+          "allocateSeconds": 0.006658528,
+          "inputSeconds": 0.000229125,
+          "computeSeconds": 1.252829965
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "1072",
+      "repeat": 0,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "244aae65b0c3bd10e4d0d19c5caf2952ef153592c0d6a77fd4817281e72461ef",
+      "returncode": 0,
+      "tokens": 476,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 42.882833467330784,
+      "maxRssKiB": 2008012,
+      "hostLoadBefore": [
+        38.67626953125,
+        40.6435546875,
+        38.97705078125
+      ],
+      "hostLoadAfter": [
+        38.5263671875,
+        40.34765625,
+        38.95703125
+      ],
+      "timing": {
+        "load": 1.441438,
+        "inference": 41.206457
+      },
+      "profile": {
+        "prefill": 4.531108,
+        "embedding": 0.013745,
+        "decoder": 24.24199,
+        "logits": 1.835677
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 476,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000834946,
+          "inputSeconds": 0.000132739,
+          "computeSeconds": 0.00219317
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.878469949,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 9.070226244,
+          "buildSeconds": 0.003044319,
+          "allocateSeconds": 0.000342512,
+          "inputSeconds": 0.000679579,
+          "computeSeconds": 9.057290241
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.033472164,
+          "buildSeconds": 3.179e-05,
+          "allocateSeconds": 2.2383e-05,
+          "inputSeconds": 0.002160803,
+          "computeSeconds": 0.028753334
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.531104463,
+          "buildSeconds": 0.00031699,
+          "allocateSeconds": 0.000320303,
+          "inputSeconds": 0.003247446,
+          "computeSeconds": 4.526212156
+        },
+        "decode": {
+          "calls": 475,
+          "graphs": 475,
+          "totalSeconds": 24.241786259,
+          "buildSeconds": 0.120009504,
+          "allocateSeconds": 0.133892759,
+          "inputSeconds": 0.000496372,
+          "computeSeconds": 23.985641753
+        },
+        "logits": {
+          "calls": 476,
+          "graphs": 476,
+          "totalSeconds": 1.835162365,
+          "buildSeconds": 0.009553961,
+          "allocateSeconds": 0.006300488,
+          "inputSeconds": 0.000208338,
+          "computeSeconds": 1.765768681
+        }
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "1072",
+      "repeat": 1,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 52.466520610265434,
+      "maxRssKiB": 2052236,
+      "hostLoadBefore": [
+        38.5263671875,
+        40.34765625,
+        38.95703125
+      ],
+      "hostLoadAfter": [
+        40.19775390625,
+        40.62353515625,
+        39.1298828125
+      ],
+      "timing": {
+        "load": 1.261305,
+        "inference": 50.991211
+      },
+      "profile": {
+        "prefill": 5.107558,
+        "embedding": 0.019521,
+        "decoder": 32.836893,
+        "logits": 2.599927
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.001105028,
+          "inputSeconds": 0.000204715,
+          "computeSeconds": 0.00296235
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.941574283,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 8.869951586,
+          "buildSeconds": 0.002389509,
+          "allocateSeconds": 0.000290708,
+          "inputSeconds": 0.000678135,
+          "computeSeconds": 8.858569652
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.027995187,
+          "buildSeconds": 3.2657e-05,
+          "allocateSeconds": 2.2463e-05,
+          "inputSeconds": 0.00192762,
+          "computeSeconds": 0.023432791
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 5.107557114,
+          "buildSeconds": 0.000231653,
+          "allocateSeconds": 0.000281107,
+          "inputSeconds": 0.002558454,
+          "computeSeconds": 5.103505699
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 32.836661044,
+          "buildSeconds": 0.163907443,
+          "allocateSeconds": 0.194170063,
+          "inputSeconds": 0.000637837,
+          "computeSeconds": 32.475511673
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 2.59919413,
+          "buildSeconds": 0.013511488,
+          "allocateSeconds": 0.009109254,
+          "inputSeconds": 0.000312185,
+          "computeSeconds": 2.488795374
+        }
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "4144",
+      "repeat": 1,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "76ede8587c76ac993326c49e66c5890e3163d33eb7da58761c24d784002b524b",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 54.625203714706004,
+      "maxRssKiB": 1702568,
+      "hostLoadBefore": [
+        40.19775390625,
+        40.62353515625,
+        39.1298828125
+      ],
+      "hostLoadAfter": [
+        40.30078125,
+        40.64306640625,
+        39.22607421875
+      ],
+      "timing": {
+        "load": 0.981784,
+        "inference": 53.481233
+      },
+      "profile": {
+        "prefill": 4.927982,
+        "embedding": 0.022506,
+        "decoder": 33.030629,
+        "logits": 2.751813
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.001156757,
+          "inputSeconds": 0.000213459,
+          "computeSeconds": 0.00304974
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.05695458,
+          "buildSeconds": 3.54e-05,
+          "allocateSeconds": 4.127e-05,
+          "inputSeconds": 0.001276125,
+          "computeSeconds": 0.052846965
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 12.035535559,
+          "buildSeconds": 0.003811987,
+          "allocateSeconds": 0.000455922,
+          "inputSeconds": 0.000687015,
+          "computeSeconds": 12.021429089
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.03792717,
+          "buildSeconds": 3.0826e-05,
+          "allocateSeconds": 2.0093e-05,
+          "inputSeconds": 0.001970319,
+          "computeSeconds": 0.033972694
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.927978195,
+          "buildSeconds": 0.000240085,
+          "allocateSeconds": 0.000291392,
+          "inputSeconds": 0.00279726,
+          "computeSeconds": 4.923522972
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 33.030382958,
+          "buildSeconds": 0.166123144,
+          "allocateSeconds": 0.207698541,
+          "inputSeconds": 0.00059031,
+          "computeSeconds": 32.653575159
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 2.751234332,
+          "buildSeconds": 0.013523887,
+          "allocateSeconds": 0.00898051,
+          "inputSeconds": 0.000299686,
+          "computeSeconds": 2.652457528
+        }
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "2096",
+      "repeat": 1,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 51.36000210279599,
+      "maxRssKiB": 1701108,
+      "hostLoadBefore": [
+        40.30078125,
+        40.64306640625,
+        39.22607421875
+      ],
+      "hostLoadAfter": [
+        40.96484375,
+        40.7099609375,
+        39.3212890625
+      ],
+      "timing": {
+        "load": 1.01075,
+        "inference": 50.166253
+      },
+      "profile": {
+        "prefill": 4.536306,
+        "embedding": 0.018908,
+        "decoder": 30.099165,
+        "logits": 2.088548
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.001074364,
+          "inputSeconds": 0.000222942,
+          "computeSeconds": 0.002850253
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.131262693,
+          "buildSeconds": 3.1359e-05,
+          "allocateSeconds": 4.065e-05,
+          "inputSeconds": 0.001347727,
+          "computeSeconds": 0.126963236
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 12.659129311,
+          "buildSeconds": 0.00380839,
+          "allocateSeconds": 0.000485112,
+          "inputSeconds": 0.000674442,
+          "computeSeconds": 12.646831611
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.040343676,
+          "buildSeconds": 3.6777e-05,
+          "allocateSeconds": 3.0042e-05,
+          "inputSeconds": 0.002000422,
+          "computeSeconds": 0.036577588
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.536305194,
+          "buildSeconds": 0.000230276,
+          "allocateSeconds": 0.000266057,
+          "inputSeconds": 0.002654695,
+          "computeSeconds": 4.532135507
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 30.09896002,
+          "buildSeconds": 0.162286299,
+          "allocateSeconds": 0.196411521,
+          "inputSeconds": 0.000640565,
+          "computeSeconds": 29.737369894
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 2.087994056,
+          "buildSeconds": 0.013122088,
+          "allocateSeconds": 0.00862524,
+          "inputSeconds": 0.000289317,
+          "computeSeconds": 1.990978327
+        }
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "48",
+      "repeat": 1,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 55.19886126788333,
+      "maxRssKiB": 1701888,
+      "hostLoadBefore": [
+        40.96484375,
+        40.7099609375,
+        39.3212890625
+      ],
+      "hostLoadAfter": [
+        41.2490234375,
+        40.84423828125,
+        39.447265625
+      ],
+      "timing": {
+        "load": 1.007895,
+        "inference": 53.980857
+      },
+      "profile": {
+        "prefill": 4.445809,
+        "embedding": 0.019999,
+        "decoder": 33.3516,
+        "logits": 2.423864
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.001197634,
+          "inputSeconds": 0.000212539,
+          "computeSeconds": 0.003150673
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 1.037091904,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 12.032279412,
+          "buildSeconds": 0.002631782,
+          "allocateSeconds": 0.000323417,
+          "inputSeconds": 0.000710313,
+          "computeSeconds": 12.017364796
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.100844494,
+          "buildSeconds": 3.3746e-05,
+          "allocateSeconds": 2.2233e-05,
+          "inputSeconds": 0.001980903,
+          "computeSeconds": 0.094583804
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.445808603,
+          "buildSeconds": 0.000266744,
+          "allocateSeconds": 0.000296979,
+          "inputSeconds": 0.002500142,
+          "computeSeconds": 4.441742344
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 33.351371341,
+          "buildSeconds": 0.166451316,
+          "allocateSeconds": 0.216820727,
+          "inputSeconds": 0.000737909,
+          "computeSeconds": 32.965059723
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 2.423302301,
+          "buildSeconds": 0.013484849,
+          "allocateSeconds": 0.008949371,
+          "inputSeconds": 0.000317486,
+          "computeSeconds": 2.32353945
+        }
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 39.49460599804297,
+      "maxRssKiB": 1702384,
+      "hostLoadBefore": [
+        41.2490234375,
+        40.84423828125,
+        39.447265625
+      ],
+      "hostLoadAfter": [
+        42.7119140625,
+        41.2978515625,
+        39.6611328125
+      ],
+      "timing": {
+        "load": 0.92016,
+        "inference": 38.382304
+      },
+      "profile": {
+        "prefill": 4.43032,
+        "embedding": 0.017415,
+        "decoder": 17.74317,
+        "logits": 1.778265
+      },
+      "phaseProfile": null
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 65.07772194081917,
+      "maxRssKiB": 1587128,
+      "hostLoadBefore": [
+        42.7119140625,
+        41.2978515625,
+        39.6611328125
+      ],
+      "hostLoadAfter": [
+        40.984375,
+        41.2568359375,
+        39.76806640625
+      ],
+      "timing": {
+        "load": 0.910403,
+        "inference": 63.987704
+      },
+      "profile": {},
+      "phaseProfile": null
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "1072",
+      "repeat": 1,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "704888d71f260e216a29da945c0a711a2771c86a0de8a1cd25d3437d3ca1b65c",
+      "returncode": 0,
+      "tokens": 436,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 32.672246281057596,
+      "maxRssKiB": 1998472,
+      "hostLoadBefore": [
+        40.984375,
+        41.2568359375,
+        39.76806640625
+      ],
+      "hostLoadAfter": [
+        41.21630859375,
+        41.18994140625,
+        39.79443359375
+      ],
+      "timing": {
+        "load": 1.583117,
+        "inference": 30.894422
+      },
+      "profile": {
+        "prefill": 5.174818,
+        "embedding": 0.011157,
+        "decoder": 12.644408,
+        "logits": 1.211169
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 436,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000588027,
+          "inputSeconds": 0.000106083,
+          "computeSeconds": 0.001862328
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 1.085780823,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 10.156170263,
+          "buildSeconds": 0.003439926,
+          "allocateSeconds": 0.000451966,
+          "inputSeconds": 0.000835916,
+          "computeSeconds": 10.143526349
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.064855211,
+          "buildSeconds": 3.3796e-05,
+          "allocateSeconds": 2.4891e-05,
+          "inputSeconds": 0.001960747,
+          "computeSeconds": 0.06058957
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 5.174814501,
+          "buildSeconds": 0.000280684,
+          "allocateSeconds": 0.000328457,
+          "inputSeconds": 0.002965678,
+          "computeSeconds": 5.17020461
+        },
+        "decode": {
+          "calls": 435,
+          "graphs": 435,
+          "totalSeconds": 12.64429309,
+          "buildSeconds": 0.111062753,
+          "allocateSeconds": 0.122825678,
+          "inputSeconds": 0.000378454,
+          "computeSeconds": 12.408661069
+        },
+        "logits": {
+          "calls": 436,
+          "graphs": 436,
+          "totalSeconds": 1.210709592,
+          "buildSeconds": 0.007702277,
+          "allocateSeconds": 0.005066563,
+          "inputSeconds": 0.000157004,
+          "computeSeconds": 1.153265145
+        }
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "4144",
+      "repeat": 1,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "e42d5ac6e1049f0752dbc14a0a716b55cef0252b60fd73dd81dcf6829f0816b9",
+      "returncode": 0,
+      "tokens": 456,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 31.632799494080245,
+      "maxRssKiB": 1653052,
+      "hostLoadBefore": [
+        41.21630859375,
+        41.18994140625,
+        39.79443359375
+      ],
+      "hostLoadAfter": [
+        41.93505859375,
+        41.42822265625,
+        39.9228515625
+      ],
+      "timing": {
+        "load": 0.997798,
+        "inference": 30.438842
+      },
+      "profile": {
+        "prefill": 3.703343,
+        "embedding": 0.011869,
+        "decoder": 14.577438,
+        "logits": 1.146548
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 456,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000658257,
+          "inputSeconds": 0.000129373,
+          "computeSeconds": 0.002061764
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.071660177,
+          "buildSeconds": 4.2954e-05,
+          "allocateSeconds": 4.6275e-05,
+          "inputSeconds": 0.001320993,
+          "computeSeconds": 0.067302938
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 10.414334184,
+          "buildSeconds": 0.006962846,
+          "allocateSeconds": 0.000448417,
+          "inputSeconds": 0.000798953,
+          "computeSeconds": 10.394052493
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.017038632,
+          "buildSeconds": 3.2257e-05,
+          "allocateSeconds": 2.2412e-05,
+          "inputSeconds": 0.00202559,
+          "computeSeconds": 0.013138626
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 3.703342265,
+          "buildSeconds": 0.000373255,
+          "allocateSeconds": 0.000413084,
+          "inputSeconds": 0.003335062,
+          "computeSeconds": 3.698124077
+        },
+        "decode": {
+          "calls": 455,
+          "graphs": 455,
+          "totalSeconds": 14.577308216,
+          "buildSeconds": 0.109845978,
+          "allocateSeconds": 0.139898377,
+          "inputSeconds": 0.000403535,
+          "computeSeconds": 14.325760875
+        },
+        "logits": {
+          "calls": 456,
+          "graphs": 456,
+          "totalSeconds": 1.146205742,
+          "buildSeconds": 0.008155261,
+          "allocateSeconds": 0.005424931,
+          "inputSeconds": 0.000175773,
+          "computeSeconds": 1.081386561
+        }
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "2096",
+      "repeat": 1,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 44.07391474628821,
+      "maxRssKiB": 1653272,
+      "hostLoadBefore": [
+        41.93505859375,
+        41.42822265625,
+        39.9228515625
+      ],
+      "hostLoadAfter": [
+        43.615234375,
+        42.04296875,
+        40.2080078125
+      ],
+      "timing": {
+        "load": 0.977407,
+        "inference": 42.938452
+      },
+      "profile": {
+        "prefill": 4.023349,
+        "embedding": 0.012345,
+        "decoder": 22.164968,
+        "logits": 1.626906
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 458,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000680519,
+          "inputSeconds": 0.000132775,
+          "computeSeconds": 0.002080135
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.161488938,
+          "buildSeconds": 3.7336e-05,
+          "allocateSeconds": 4.791e-05,
+          "inputSeconds": 0.001469417,
+          "computeSeconds": 0.156519927
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 14.367864049,
+          "buildSeconds": 0.007255119,
+          "allocateSeconds": 0.000542062,
+          "inputSeconds": 0.000681543,
+          "computeSeconds": 14.349008372
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.06212934,
+          "buildSeconds": 3.1905e-05,
+          "allocateSeconds": 2.2325e-05,
+          "inputSeconds": 0.00188505,
+          "computeSeconds": 0.058409877
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.023347966,
+          "buildSeconds": 0.000244199,
+          "allocateSeconds": 0.000262515,
+          "inputSeconds": 0.002515416,
+          "computeSeconds": 4.017172066
+        },
+        "decode": {
+          "calls": 457,
+          "graphs": 457,
+          "totalSeconds": 22.164797565,
+          "buildSeconds": 0.109583403,
+          "allocateSeconds": 0.127528903,
+          "inputSeconds": 0.0004223,
+          "computeSeconds": 21.925725029
+        },
+        "logits": {
+          "calls": 458,
+          "graphs": 458,
+          "totalSeconds": 1.626519525,
+          "buildSeconds": 0.008692399,
+          "allocateSeconds": 0.005655016,
+          "inputSeconds": 0.000181508,
+          "computeSeconds": 1.563234755
+        }
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "48",
+      "repeat": 1,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 36.98589448072016,
+      "maxRssKiB": 1652788,
+      "hostLoadBefore": [
+        43.615234375,
+        42.04296875,
+        40.2080078125
+      ],
+      "hostLoadAfter": [
+        45.50537109375,
+        42.72509765625,
+        40.5068359375
+      ],
+      "timing": {
+        "load": 0.984673,
+        "inference": 35.861848
+      },
+      "profile": {
+        "prefill": 4.64325,
+        "embedding": 0.012095,
+        "decoder": 14.28337,
+        "logits": 1.415542
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 458,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000713519,
+          "inputSeconds": 0.000120585,
+          "computeSeconds": 0.002043639
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.856097716,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 14.045276793,
+          "buildSeconds": 0.002484813,
+          "allocateSeconds": 0.00028754,
+          "inputSeconds": 0.000678663,
+          "computeSeconds": 14.032753898
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.028062566,
+          "buildSeconds": 3.0578e-05,
+          "allocateSeconds": 2.3657e-05,
+          "inputSeconds": 0.001895114,
+          "computeSeconds": 0.024107531
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.643246335,
+          "buildSeconds": 0.000298475,
+          "allocateSeconds": 0.000400808,
+          "inputSeconds": 0.002966747,
+          "computeSeconds": 4.638661808
+        },
+        "decode": {
+          "calls": 457,
+          "graphs": 457,
+          "totalSeconds": 14.283239452,
+          "buildSeconds": 0.115879265,
+          "allocateSeconds": 0.138889562,
+          "inputSeconds": 0.000419884,
+          "computeSeconds": 14.02671508
+        },
+        "logits": {
+          "calls": 458,
+          "graphs": 458,
+          "totalSeconds": 1.415179864,
+          "buildSeconds": 0.008156787,
+          "allocateSeconds": 0.005479455,
+          "inputSeconds": 0.000183487,
+          "computeSeconds": 1.353867966
+        }
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 37.54331784322858,
+      "maxRssKiB": 1653240,
+      "hostLoadBefore": [
+        45.50537109375,
+        42.72509765625,
+        40.5068359375
+      ],
+      "hostLoadAfter": [
+        44.4326171875,
+        42.78173828125,
+        40.6181640625
+      ],
+      "timing": {
+        "load": 0.946823,
+        "inference": 36.40951
+      },
+      "profile": {
+        "prefill": 3.760672,
+        "embedding": 0.011914,
+        "decoder": 19.182235,
+        "logits": 1.384499
+      },
+      "phaseProfile": null
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 85.30652616219595,
+      "maxRssKiB": 1538500,
+      "hostLoadBefore": [
+        44.4326171875,
+        42.78173828125,
+        40.6181640625
+      ],
+      "hostLoadAfter": [
+        44.943359375,
+        43.22021484375,
+        40.95654296875
+      ],
+      "timing": {
+        "load": 0.919447,
+        "inference": 84.233941
+      },
+      "profile": {},
+      "phaseProfile": null
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "1072",
+      "repeat": 1,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "244aae65b0c3bd10e4d0d19c5caf2952ef153592c0d6a77fd4817281e72461ef",
+      "returncode": 0,
+      "tokens": 476,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 39.964810064062476,
+      "maxRssKiB": 2007684,
+      "hostLoadBefore": [
+        44.943359375,
+        43.22021484375,
+        40.95654296875
+      ],
+      "hostLoadAfter": [
+        43.296875,
+        42.96728515625,
+        40.96435546875
+      ],
+      "timing": {
+        "load": 1.658643,
+        "inference": 38.099558
+      },
+      "profile": {
+        "prefill": 5.012257,
+        "embedding": 0.012455,
+        "decoder": 19.452156,
+        "logits": 1.733082
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 476,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000631407,
+          "inputSeconds": 0.000123605,
+          "computeSeconds": 0.001995688
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.829865944,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 10.478562556,
+          "buildSeconds": 0.00272872,
+          "allocateSeconds": 0.000340922,
+          "inputSeconds": 0.000733796,
+          "computeSeconds": 10.466894493
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.08009806,
+          "buildSeconds": 2.9049e-05,
+          "allocateSeconds": 2.0718e-05,
+          "inputSeconds": 0.002006174,
+          "computeSeconds": 0.076258592
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 5.012256236,
+          "buildSeconds": 0.000243454,
+          "allocateSeconds": 0.00027731,
+          "inputSeconds": 0.002688406,
+          "computeSeconds": 5.007862378
+        },
+        "decode": {
+          "calls": 475,
+          "graphs": 475,
+          "totalSeconds": 19.452015069,
+          "buildSeconds": 0.10873004,
+          "allocateSeconds": 0.12695437,
+          "inputSeconds": 0.000393435,
+          "computeSeconds": 19.214455652
+        },
+        "logits": {
+          "calls": 476,
+          "graphs": 476,
+          "totalSeconds": 1.732590201,
+          "buildSeconds": 0.008666811,
+          "allocateSeconds": 0.005751686,
+          "inputSeconds": 0.000178982,
+          "computeSeconds": 1.668750281
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "4144",
+      "repeat": 1,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 49.43016339093447,
+      "maxRssKiB": 1660688,
+      "hostLoadBefore": [
+        43.296875,
+        42.96728515625,
+        40.96435546875
+      ],
+      "hostLoadAfter": [
+        46.6787109375,
+        43.9296875,
+        41.39794921875
+      ],
+      "timing": {
+        "load": 0.901426,
+        "inference": 48.383037
+      },
+      "profile": {
+        "prefill": 5.903865,
+        "embedding": 0.013724,
+        "decoder": 26.505184,
+        "logits": 1.752948
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000793437,
+          "inputSeconds": 0.000149724,
+          "computeSeconds": 0.002334266
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.129123508,
+          "buildSeconds": 3.3305e-05,
+          "allocateSeconds": 3.9303e-05,
+          "inputSeconds": 0.001215867,
+          "computeSeconds": 0.124888258
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 13.38874089,
+          "buildSeconds": 0.004225853,
+          "allocateSeconds": 0.000531565,
+          "inputSeconds": 0.001744746,
+          "computeSeconds": 13.374167641
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.134822204,
+          "buildSeconds": 3.0757e-05,
+          "allocateSeconds": 2.3715e-05,
+          "inputSeconds": 0.00173888,
+          "computeSeconds": 0.131259753
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 5.903863953,
+          "buildSeconds": 0.000243149,
+          "allocateSeconds": 0.000294984,
+          "inputSeconds": 0.002718475,
+          "computeSeconds": 5.899590036
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 26.50502418,
+          "buildSeconds": 0.122749969,
+          "allocateSeconds": 0.157176215,
+          "inputSeconds": 0.000531754,
+          "computeSeconds": 26.222876756
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 1.752523453,
+          "buildSeconds": 0.009491205,
+          "allocateSeconds": 0.006194028,
+          "inputSeconds": 0.000202476,
+          "computeSeconds": 1.675360497
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "2096",
+      "repeat": 1,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 47.62341266917065,
+      "maxRssKiB": 1660756,
+      "hostLoadBefore": [
+        46.6787109375,
+        43.9296875,
+        41.39794921875
+      ],
+      "hostLoadAfter": [
+        47.27490234375,
+        44.38134765625,
+        41.66552734375
+      ],
+      "timing": {
+        "load": 0.943857,
+        "inference": 46.512226
+      },
+      "profile": {
+        "prefill": 5.390134,
+        "embedding": 0.013144,
+        "decoder": 24.491463,
+        "logits": 1.585404
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000743775,
+          "inputSeconds": 0.000136038,
+          "computeSeconds": 0.002232651
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 0.24705317,
+          "buildSeconds": 2.9519e-05,
+          "allocateSeconds": 4.2995e-05,
+          "inputSeconds": 0.001437328,
+          "computeSeconds": 0.201586919
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 13.977390374,
+          "buildSeconds": 0.004064416,
+          "allocateSeconds": 0.000550945,
+          "inputSeconds": 0.000657754,
+          "computeSeconds": 13.964367877
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.18929044,
+          "buildSeconds": 2.8342e-05,
+          "allocateSeconds": 2.1089e-05,
+          "inputSeconds": 0.001523082,
+          "computeSeconds": 0.185294083
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 5.390133389,
+          "buildSeconds": 0.000229016,
+          "allocateSeconds": 0.000267999,
+          "inputSeconds": 0.002567426,
+          "computeSeconds": 5.385920742
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 24.491306286,
+          "buildSeconds": 0.1169526,
+          "allocateSeconds": 0.144457875,
+          "inputSeconds": 0.000457526,
+          "computeSeconds": 24.224862187
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 1.584984658,
+          "buildSeconds": 0.009036764,
+          "allocateSeconds": 0.006019596,
+          "inputSeconds": 0.000195971,
+          "computeSeconds": 1.514695209
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "48",
+      "repeat": 1,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 46.240614101756364,
+      "maxRssKiB": 1660068,
+      "hostLoadBefore": [
+        47.27490234375,
+        44.38134765625,
+        41.66552734375
+      ],
+      "hostLoadAfter": [
+        44.408203125,
+        44.068359375,
+        41.70361328125
+      ],
+      "timing": {
+        "load": 0.980662,
+        "inference": 45.086974
+      },
+      "profile": {
+        "prefill": 4.972277,
+        "embedding": 0.013453,
+        "decoder": 22.583998,
+        "logits": 1.622933
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000790172,
+          "inputSeconds": 0.000143883,
+          "computeSeconds": 0.002172987
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.913054353,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 14.277721831,
+          "buildSeconds": 0.00302182,
+          "allocateSeconds": 0.000427608,
+          "inputSeconds": 0.000866907,
+          "computeSeconds": 14.265091962
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.088961048,
+          "buildSeconds": 2.8533e-05,
+          "allocateSeconds": 2.3689e-05,
+          "inputSeconds": 0.001818137,
+          "computeSeconds": 0.084993715
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.972276161,
+          "buildSeconds": 0.000451351,
+          "allocateSeconds": 0.000528032,
+          "inputSeconds": 0.003164803,
+          "computeSeconds": 4.967133873
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 22.58380657,
+          "buildSeconds": 0.115387622,
+          "allocateSeconds": 0.152994627,
+          "inputSeconds": 0.000549782,
+          "computeSeconds": 22.313319038
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 1.622516544,
+          "buildSeconds": 0.009228704,
+          "allocateSeconds": 0.006083077,
+          "inputSeconds": 0.000204636,
+          "computeSeconds": 1.551726062
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 47.5458488506265,
+      "maxRssKiB": 1660608,
+      "hostLoadBefore": [
+        44.408203125,
+        44.068359375,
+        41.70361328125
+      ],
+      "hostLoadAfter": [
+        45.451171875,
+        44.36181640625,
+        41.91357421875
+      ],
+      "timing": {
+        "load": 0.997258,
+        "inference": 46.41255
+      },
+      "profile": {
+        "prefill": 5.135597,
+        "embedding": 0.016093,
+        "decoder": 23.86814,
+        "logits": 1.794007
+      },
+      "phaseProfile": null
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 80.4286386477761,
+      "maxRssKiB": 1545520,
+      "hostLoadBefore": [
+        45.451171875,
+        44.36181640625,
+        41.91357421875
+      ],
+      "hostLoadAfter": [
+        43.03369140625,
+        43.66796875,
+        41.85888671875
+      ],
+      "timing": {
+        "load": 0.98998,
+        "inference": 79.235821
+      },
+      "profile": {},
+      "phaseProfile": null
+    }
+  ],
+  "harnessSha256": "810c9cee4f2f208b4a324a08c3e361d43f41eb352ed2d875ebe6c3e3642919aa",
+  "threads": 16,
+  "phaseProfiling": true,
+  "sourceSha256": {
+    "src/audio_adaptor.cpp": "469594f94f0bc2a7c133595c4f1165848eeef88d58eb082b31ba47146307a96f",
+    "src/audio_adaptor.hpp": "28a869e7b61dca4d8714e666f42f522fabed02ee3548e17e3c3a43d7b2ca9ce5",
+    "src/audio_encoder.cpp": "e14d4e6ab81410c5935c9550634ea8a7136fe9b017c440e01ab987a759102275",
+    "src/audio_encoder.hpp": "e806d772246567aaef102ac6c0256beae0acf85dcc6cb2fe6c849bc4717a2c90",
+    "src/audio_io.cpp": "58afc26038a602f3f7776e5dbe347f2967a38dcb194a9272c55ddeb0333798e0",
+    "src/audio_io.hpp": "5c157587c0aae23a6b24cfce10c24affa30fe9b7d027ac044b97267b285ab281",
+    "src/audio_span.cpp": "3444e83c6b18406d4db40b822653985b8ac74392749284b62da5a3b81f163c6f",
+    "src/audio_span.hpp": "2aa9c7463f263f91b42bc381087aaebb2e724ec7ec491ebe5c73b69c6bee8b25",
+    "src/backend.cpp": "45edea7bc31764ed9474708782424ae880668d7aede050f9f2d7c650e75586e2",
+    "src/backend.hpp": "76ed355d41f7ea35f53183daa1ac33b188e0ef1b84552d1e32e70c78a7fdfdb4",
+    "src/cli.cpp": "aed5c7e01f7ca2b3f0371edbc78ed7321effba842339ac0085317fe5d9630a28",
+    "src/common.cpp": "6ed693a6dead299bb10622ea277ed9d07d5eced97f15cb1d3b89d68eebe4cefc",
+    "src/common.hpp": "af2b2b4f9b6528e534c6661bb05528d4e9f6bb1489226980c53fbf85a2998cb1",
+    "src/config.hpp": "010b0568cb664e34af6542bebbe750cdfb6ad9ded4feea307a403d3850927904",
+    "src/cpu_profile.cpp": "1c58d8dcfc0130f7f74dbd31b3522907840613f2fdee113b9e283fac7b95af0f",
+    "src/cpu_profile.hpp": "967a70a270bc4dd4a36732cdbbd2881bfce5128f431cb51dc268c9f156177da3",
+    "src/cpu_q8.cpp": "6b9815078262dcbd2b111b7fdc057f4a248e17911c2654019962e9f1a3db45f6",
+    "src/cpu_q8.hpp": "c04db806345eca28e90b860c8a30f4924cc2937ff24fe7ced8a29a96728e0c23",
+    "src/cpu_softmax.cpp": "f9bd82df53f4140756219516daf71f7c8c5e106ef77f7c369cd9e308cc776673",
+    "src/cpu_softmax.hpp": "fada005cbc7328f29cd018fc20aa107d1f167e32744705e44152a9bdadd42590",
+    "src/fft.cpp": "3ae3ad6260748d2c800bd580763bf205fc8ea27def1a8bcb8aea3482fc4cb71e",
+    "src/fft.hpp": "daa215fc289f14368c0c693c2efdcc2842437dd92edeac5bb19404efd57085e7",
+    "src/generate.cpp": "8343cd91983743d3a95c8e100870fc6446360ea2fdbcef74b930805fb0d0d067",
+    "src/generate.hpp": "22354fb77fc43f74955f0da44c78c36686ad4b400ad0eab4e605988deaf358a7",
+    "src/ggml_extend.hpp": "198f246cb40305b283a9498bdfa43290a8c35a50f59a512fe11b303edc381c0f",
+    "src/mel.cpp": "afdc97d28f3071403ce5feb0ecf26d085cb0ba1ae2e7dbd20143e40ac8a1c4eb",
+    "src/mel.hpp": "8fd0786fc8c5c0411246454038711adc370971238dde7e44579ea40113e7b9ea",
+    "src/model_loader.cpp": "6be10450f420367ac41f65e5846beee2238d1117966800661ca082cf4e2852be",
+    "src/model_loader.hpp": "1c35328cd778eec5196f8c5e6ad270c92ec76fae2a51173f0275efd3d0343c7d",
+    "src/moss_transcribe_capi.cpp": "5116d2e88b53ede36b2a332fd2b896a125b48fb6e53c2c357a6700100757fa36",
+    "src/qwen3.cpp": "601958fa1d2a3a1d4548de80603698c82e24bf6a1e04e4014646f7ba4885540a",
+    "src/qwen3.hpp": "0b4f260515741533c0408808cf0c040bf25d01f83b2e2c3acfe9e01f440bda81",
+    "src/qwen3_decoder.cpp": "40c760a0d306f1e1ed87a184f48afd10dde1609f435fdf35c39800d91f069d93",
+    "src/qwen3_decoder.hpp": "14fb8dccde78b569235fecc18a7eedbe7aa0705f41306d94209238cb55816df5",
+    "src/subtitle.cpp": "d9b47b76d366a2a4c7a8e78e45a54a50301d5437440738890392d0cce829cdda",
+    "src/subtitle.hpp": "24a6f1e18939f289b72fb64fefc2ffd7f54b78443df054bdb408f5383099b438",
+    "src/tokenizer.cpp": "2ab86907d56c8c5eeec6a7210674019834c2fc5216a27357ec099d9c0bfac637",
+    "src/tokenizer.hpp": "5220bfcaba7ea63089dd2573fa8797e3c4df9bf0ece23386e90a9fdab7c2403f",
+    "src/transcribe.cpp": "d80930ac6ee4d9d80489bc46333199562e018f729e1e0852988f15435caac901",
+    "src/transcribe.hpp": "25873e76e6649eef604bfaba491dc8b3a042121188281b210cd4045f559d9549",
+    "src/transcript_parser.cpp": "51c9b2c3e2b07475075b2dd7b576aceb3dcd87342978ae4373e8d01a2fcca0cd",
+    "src/transcript_parser.hpp": "3df79a9d2c6202c6609709d346c84e40ee6ea74e8ad1275110f1b20abcaea8bd",
+    "src/whisper_encoder.cpp": "85f47ed18998b06cdadfb6f385cc604adddff7ba727f620a9aca3907ea865c98",
+    "src/whisper_encoder.hpp": "948798c44ba93af336c1a7e14eb7dfe46e664b176d6d20929b113bceb0587227",
+    "CMakeLists.txt": "85a0bd5f1f38d34e592d1804408141e34b57cbdf9a45a7990559ba3c3003a20f",
+    "third_party/pocketfft/LICENSE.md": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056",
+    "third_party/pocketfft/README.md": "ea59c3a5225b45084bd3e4aa6d959b796a47c5392d506f9884b73da22510248e",
+    "third_party/pocketfft/pocketfft_hdronly.h": "3e9a05318d8e3b1446bda1c4617e6a103cdd23599ae0a776a92a6e8800e92fdc"
+  },
+  "referenceRoot": "/home/stan/hw-moss-softmax-v1",
+  "referenceOpt": 48,
+  "referenceLibraries": {
+    "/home/stan/hw-moss-softmax-v1/build/third_party/ggml/src/libggml-base.so": "42bd51826f227dbcb96a7552252bceb0bfd2e50a282406d4099cc78de1999166",
+    "/home/stan/hw-moss-softmax-v1/build/third_party/ggml/src/libggml-cpu.so": "dee88b8684c0380888314831b83016d309709cc7ff1b968961e5e85b262a0a79",
+    "/home/stan/hw-moss-softmax-v1/build/third_party/ggml/src/libggml.so": "3daebdf5d96b54a2a2016ca626cf02c2a5f22eb72a3bdff19eea44b2df4d6af8"
+  },
+  "productionLibraries": {
+    "/home/stan/hw-moss-api/lib/libggml-base.so": "0c8dd498fd349ba17bbc090afe4274fde3e65955caff4afd692e444f764a2523",
+    "/home/stan/hw-moss-api/lib/libggml-cpu.so": "c153ebcf094813a3c4daa3db594a5d6e14d1c9fc9772eb28ac22c17107e9262d",
+    "/home/stan/hw-moss-api/lib/libggml.so": "a6e942d5f8310743f9829d20967165302a0e18d123b7cd3e9ff46c8079fecff2"
+  },
+  "warmupDiscarded": true,
+  "ggmlCommit": "eced84c86f8b012c752c016f7fe789adea168e1e",
+  "physicalCoreAffinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "timeoutSeconds": 300.0,
+  "artifactGate": {
+    "passed": true,
+    "changed": []
+  },
+  "gate": {
+    "passed": false,
+    "failures": [
+      "dinner-60s/1072: output or completion regression",
+      "dinner-60s/4144: output or completion regression",
+      "meeting-60s/4144: output or completion regression",
+      "vox-vmaiq-60s/1072: output or completion regression"
+    ],
+    "comparisons": [
+      {
+        "case": "dinner-60s",
+        "variant": "1072",
+        "repeats": 2,
+        "baselineSeconds": 65.95563881169073,
+        "candidateSeconds": 30.40012414753437,
+        "speedup": 2.1695845218132153,
+        "exactOutputParity": false,
+        "maxRssKiB": 1998680,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "2096",
+        "repeats": 2,
+        "baselineSeconds": 65.95563881169073,
+        "candidateSeconds": 35.878282588673756,
+        "speedup": 1.8383164982515623,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653272,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "4144",
+        "repeats": 2,
+        "baselineSeconds": 65.95563881169073,
+        "candidateSeconds": 29.703553101979196,
+        "speedup": 2.220462938734962,
+        "exactOutputParity": false,
+        "maxRssKiB": 1653052,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 65.95563881169073,
+        "candidateSeconds": 32.891622639028355,
+        "speedup": 2.005241259621818,
+        "exactOutputParity": true,
+        "maxRssKiB": 1652880,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 65.95563881169073,
+        "candidateSeconds": 33.58281613769941,
+        "speedup": 1.963969863076796,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653308,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "1072",
+        "repeats": 2,
+        "baselineSeconds": 65.3948554142844,
+        "candidateSeconds": 42.3526351521723,
+        "speedup": 1.5440563539747123,
+        "exactOutputParity": true,
+        "maxRssKiB": 2052236,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "2096",
+        "repeats": 2,
+        "baselineSeconds": 65.3948554142844,
+        "candidateSeconds": 42.52405347302556,
+        "speedup": 1.5378321226071863,
+        "exactOutputParity": true,
+        "maxRssKiB": 1701616,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "4144",
+        "repeats": 2,
+        "baselineSeconds": 65.3948554142844,
+        "candidateSeconds": 44.22049330873415,
+        "speedup": 1.478835954129169,
+        "exactOutputParity": false,
+        "maxRssKiB": 1702568,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 65.3948554142844,
+        "candidateSeconds": 44.84844053047709,
+        "speedup": 1.458129973768984,
+        "exactOutputParity": true,
+        "maxRssKiB": 1701888,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 65.3948554142844,
+        "candidateSeconds": 37.1794558793772,
+        "speedup": 1.7588975918971903,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702384,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "1072",
+        "repeats": 2,
+        "baselineSeconds": 79.15455035935156,
+        "candidateSeconds": 41.42382176569663,
+        "speedup": 1.9108461504848406,
+        "exactOutputParity": false,
+        "maxRssKiB": 2008012,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "2096",
+        "repeats": 2,
+        "baselineSeconds": 79.15455035935156,
+        "candidateSeconds": 47.653839097125456,
+        "speedup": 1.6610319726396665,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660756,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "4144",
+        "repeats": 2,
+        "baselineSeconds": 79.15455035935156,
+        "candidateSeconds": 46.7969670384191,
+        "speedup": 1.6914461634739646,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660688,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 79.15455035935156,
+        "candidateSeconds": 45.62513901316561,
+        "speedup": 1.734888968480966,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660604,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 79.15455035935156,
+        "candidateSeconds": 48.45215395023115,
+        "speedup": 1.6336642214225843,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660608,
+        "speedPass": true
+      }
+    ]
+  },
+  "cacheReferenceGate": {
+    "passed": false,
+    "failures": [
+      "dinner-60s/1072: output or completion regression",
+      "dinner-60s/2096: median slowdown 6.84%",
+      "dinner-60s/4144: output or completion regression",
+      "meeting-60s/1072: median slowdown 13.91%",
+      "meeting-60s/2096: median slowdown 14.38%",
+      "meeting-60s/4144: output or completion regression",
+      "meeting-60s/4144: median slowdown 18.94%",
+      "meeting-60s/48: median slowdown 20.63%",
+      "vox-vmaiq-60s/1072: output or completion regression"
+    ],
+    "comparisons": [
+      {
+        "case": "dinner-60s",
+        "variant": "1072",
+        "repeats": 2,
+        "baselineSeconds": 33.58281613769941,
+        "candidateSeconds": 30.40012414753437,
+        "speedup": 1.1046933879190481,
+        "exactOutputParity": false,
+        "maxRssKiB": 1998680,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "2096",
+        "repeats": 2,
+        "baselineSeconds": 33.58281613769941,
+        "candidateSeconds": 35.878282588673756,
+        "speedup": 0.9360207265969026,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653272,
+        "speedPass": false
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "4144",
+        "repeats": 2,
+        "baselineSeconds": 33.58281613769941,
+        "candidateSeconds": 29.703553101979196,
+        "speedup": 1.1305992930341298,
+        "exactOutputParity": false,
+        "maxRssKiB": 1653052,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 33.58281613769941,
+        "candidateSeconds": 32.891622639028355,
+        "speedup": 1.0210142718179827,
+        "exactOutputParity": true,
+        "maxRssKiB": 1652880,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "1072",
+        "repeats": 2,
+        "baselineSeconds": 37.1794558793772,
+        "candidateSeconds": 42.3526351521723,
+        "speedup": 0.8778546068217963,
+        "exactOutputParity": true,
+        "maxRssKiB": 2052236,
+        "speedPass": false
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "2096",
+        "repeats": 2,
+        "baselineSeconds": 37.1794558793772,
+        "candidateSeconds": 42.52405347302556,
+        "speedup": 0.8743158951900336,
+        "exactOutputParity": true,
+        "maxRssKiB": 1701616,
+        "speedPass": false
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "4144",
+        "repeats": 2,
+        "baselineSeconds": 37.1794558793772,
+        "candidateSeconds": 44.22049330873415,
+        "speedup": 0.8407743355507469,
+        "exactOutputParity": false,
+        "maxRssKiB": 1702568,
+        "speedPass": false
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 37.1794558793772,
+        "candidateSeconds": 44.84844053047709,
+        "speedup": 0.8290022002908134,
+        "exactOutputParity": true,
+        "maxRssKiB": 1701888,
+        "speedPass": false
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "1072",
+        "repeats": 2,
+        "baselineSeconds": 48.45215395023115,
+        "candidateSeconds": 41.42382176569663,
+        "speedup": 1.1696688495882515,
+        "exactOutputParity": false,
+        "maxRssKiB": 2008012,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "2096",
+        "repeats": 2,
+        "baselineSeconds": 48.45215395023115,
+        "candidateSeconds": 47.653839097125456,
+        "speedup": 1.0167523722795684,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660756,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "4144",
+        "repeats": 2,
+        "baselineSeconds": 48.45215395023115,
+        "candidateSeconds": 46.7969670384191,
+        "speedup": 1.03536953389422,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660688,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 48.45215395023115,
+        "candidateSeconds": 45.62513901316561,
+        "speedup": 1.061961782434236,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660604,
+        "speedPass": true
+      }
+    ]
+  }
+}

@@ -43,6 +43,7 @@ set(MT_SRC
   src/qwen3.cpp
   src/cpu_softmax.cpp
   src/cpu_q8.cpp
+  src/cpu_profile.cpp
   src/qwen3_decoder.cpp
   src/generate.cpp
   src/audio_encoder.cpp
