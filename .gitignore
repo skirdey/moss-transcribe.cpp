@@ -5,3 +5,12 @@
 __pycache__/
 .venv/
 benchmarks/demo/out/
+
+# Local CPU experiments and deployment credentials
+cpu-lab/data/
+__pycache__/
+*.pyc
+.venv/
+.env
+*.wav
+*.parquet

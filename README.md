@@ -233,3 +233,95 @@ moss-transcribe.cpp is released under the [MIT License](LICENSE). The MOSS-Trans
 ---
 
 Built by the [LocalAI](https://github.com/mudler/LocalAI) team. If you want to run speech transcription and diarization (and LLMs, vision, voice, image, and video models) locally on any hardware with an OpenAI-compatible API, [give LocalAI a star](https://github.com/mudler/LocalAI).
+
+
+## CPU optimization fork
+
+This public fork preserves upstream history and MIT licensing. Our CPU source changes,
+benchmark harness, API server, remote client, and deployment tooling are open source
+under the same license; see `cpu-lab/NOTICE.txt`. This is a research branch of the C++
+port, not a claim of full-corpus equivalence to the original PyTorch model.
+
+The validated optimization is `MTD_CPU_OPT=16`: store the F32 value cache transposed
+and append new values directly. It removes repeated copies of the growing cache while
+retaining reference attention matmul and softmax arithmetic. It is opt-in; unset/zero
+keeps the original layout. CPU was tested; GPU use with this experimental flag has not
+been validated. Keep experimental flash attention (bit 8) disabled: it changed outputs
+and increased one public clip's diarization error. Do not combine bits 8 and 16.
+
+```bash
+git clone --recursive https://github.com/skirdey/moss-transcribe.cpp.git
+cd moss-transcribe.cpp
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=ON -DMT_BUILD_TESTS=ON
+cmake --build build -j 8
+MTD_DEVICE=cpu MTD_THREADS=16 OMP_NUM_THREADS=16 MTD_CPU_OPT=16 \
+  ./build/moss-transcribe transcribe /path/to/moss-transcribe-q8_0.gguf /path/to/audio.wav --max-new 4096
+ctest --test-dir build --output-on-failure
+python3 -m unittest discover -s cpu-lab -p test_moss_cpu_regression.py
+```
+
+`cpu-lab/experiments.json` retains all measured and rejected experiments, pinned model,
+source, library and binary hashes, and protocol details. On a shared Xeon Gold 5416S,
+Q8, 16 threads with one worker per physical core, alternating matched runs measured:
+
+| Case | Reference wall | Transposed cache wall | Speedup |
+|---|---:|---:|---:|
+| English meeting, 60 s | 35.40 s | 21.34 s | 1.66x |
+| German conversation, 60 s | 28.41 s | 19.42 s | 1.46x |
+| English meeting, 120 s | 112.39 s | 50.55 s | 2.22x |
+
+All tested raw words, timestamps, speaker markers, token counts and EOS stops matched.
+The seven 60-second cases had two paired repetitions; the 120-second stress case had
+one pair. Memory rose about 7–8% on 60-second cases. These are small-suite results on a
+shared loaded host, not latency guarantees. Private audio is not published; the public
+accuracy smoke test uses the first three VoxConverse development rows, first 60 seconds.
+Macro DER was unchanged: 5.15% with no collar, 3.51% with a 0.25-second collar, overlap
+included. This is not the full VoxConverse or OpenBench benchmark and does not measure WER.
+
+Reproduce the public data preparation with Python 3.12 and the pinned requirements:
+
+```bash
+python3 -m venv cpu-lab/.venv
+cpu-lab/.venv/bin/pip install -r cpu-lab/moss_cpu_quality_requirements.txt
+mkdir -p cpu-lab/data
+curl -L 'https://huggingface.co/datasets/diarizers-community/voxconverse/resolve/3acfa1b45ca4b7419aee999d67d94c617f9c9d47/data/dev-00000-of-00005.parquet' \
+  -o cpu-lab/data/vox-dev.parquet
+cpu-lab/.venv/bin/python cpu-lab/moss_cpu_quality.py --data cpu-lab/data --prepare
+```
+
+The preparer verifies the pinned parquet hash and emits 16 kHz PCM16 cuts plus clipped
+human references. See the dataset card for CC BY 4.0 terms and cite VoxConverse (Chung
+et al., 2020), with Hugging Face packaging by diarizers-community.
+
+`moss_cpu_regression.py` is currently a host-specific paired runner for hp-fury: the
+candidate root has `source/` and `build/`; reference binary and model/audio paths are
+explicit in its source. Supply `--variants baseline 16 --pin-physical --repeats 3`
+and a unique `--name`. Public cases are `vox-rcxzg-60s`, `vox-fsaal-60s`, and
+`vox-vmaiq-60s`; copy prepared cuts into the configured audio directory. Keep other
+MOSS work paused during measurements and restore it afterward. The gate fails on
+changed output, incomplete or unstable reference, concurrent MOSS inference, or a
+median slowdown over 5%. `moss_cpu_quality.py --data ... --experiment ... --output ...`
+adds a per-case DER gate (no permitted increase). Raw inference outputs remain local.
+
+Native microbenchmarks isolate fused SwiGLU, flash attention, and value-cache matmul.
+A kernel speedup alone is insufficient: flash attention was rejected by the output
+and DER gates. Native cache tests had zero bitwise differences at lengths 1, 31, 256,
+1024 and 2048. Upstream ctest had five passes and nine skips because model fixtures
+were unavailable; skipped checks are not evidence of parity.
+
+The historical `moss_cpu_candidate.py` patch applicator is for a fresh pinned upstream
+checkout (190a569c13b4b247450f2fb3b2a431244e84833e) with the benchmark/recovery patch
+already applied; do not run it on this fork, which already contains those changes.
+Bits 1/2/4 are archived experiments without demonstrated end-to-end improvement.
+
+`cpu-lab/moss_api.py`, `moss_output.py`, and `moss_remote.py` provide the authenticated,
+bounded CPU API and client. The server serializes inference, rejects incomplete results,
+and retries marker loops with bounded repetition penalties. API and client retain
+pinned production provenance; the optimized candidate is not deployed to production.
+`moss-api.service` and `setup_moss_api.py` preserve the historical hp-fury installation
+recipe using the existing pinned production checkout/assets. The recipe enables user
+lingering, boot startup and crash recovery; it does not reboot the shared machine.
+It is host-specific, not a general-purpose installer. Never commit its generated token
+or `data/` directory. API tests can run with `PYTHONPATH=cpu-lab python -m pytest
+cpu-lab/test_moss_api.py` after installing pytest. The client needs NumPy, soundfile
+and SciPy for audio conversion; the API and latency harness use the Python standard library.
