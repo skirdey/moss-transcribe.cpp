@@ -455,3 +455,19 @@ threads; four threads failed the frozen-reference latency gate. A separate
 matched the reference. The final native build passed ten model-independent
 CTests and 25 Python tests. Ngram drafts saved few calls while increasing token
 work, so no speculative-inference speedup or production promotion is claimed.
+
+### CPU weight mapping and same-build latency gates
+
+The [weight mapping report](cpu-lab/model-mapping.md) preserves the complete
+read-only loader prototype and its tests as a reproducible patch. All 684
+checkpoint tensors matched byte-for-byte, and all 40 paired outputs, tokens
+and EOS matched. Mapping still failed full-input latency: 120-second speech
+was 22.78% slower and silence 8.34% slower than copied storage in the same
+binary. The route is archived; ordinary inference retains the original loader.
+
+`moss_cpu_regression.py --candidate-reference 48` now also compares candidate
+variants against that control in the same compiled binary, alongside production
+and frozen-reference gates. The final copied build passed ten native CTests and
+five output/EOS smokes; the updated harness passed 28 Python tests on hp-fury.
+Full numeric reports and exact source/test hashes accompany the report. Loader
+diagnostics and these busy-host trials do not establish a new end-to-end gain.

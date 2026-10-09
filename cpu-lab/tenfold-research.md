@@ -345,3 +345,65 @@ the frozen fastest opt48 reference. Encoder, prefill and loading must improve
 alongside decoding. Track persistent/batch throughput separately, preserve
 full text/speaker/timestamp/EOS gates, and avoid rerunning rejected kernels
 without a concrete implementation change.
+
+## September/October 2026 matrix-engine research
+
+[BF16 component-product emulation, September 4, 2026](https://arxiv.org/html/2609.04663)
+splits each FP32 operand into three BF16 residual components and evaluates six
+selected products. Prepacked panels and a tile-resident reuse schedule limit
+conversion and intermediate traffic. It targets FP32-level error relative to
+oneMKL SGEMM and explicitly does not promise bitwise identity. Its measurements
+use a dual-socket Xeon 8462Y+ with 64 physical workers. This is a candidate for
+an arithmetic probe, not evidence for MOSS speed or exactness on hp-fury.
+
+[HiNa-MoE, October 4, 2026](https://arxiv.org/html/2610.05123) investigates CPU
+matrix-engine tiling, fused layout transformation and MoE scheduling. Its
+reported gains use BF16 MoE workloads. MOSS is dense, Q8 and single-NUMA here;
+the reusable ideas are packing and scheduling, not its numerical format or
+published speed ratios.
+
+The pinned `ggml_compute_forward_mul_mat` in
+`third_party/ggml/src/ggml-cpu/ggml-cpu.c` first tries llamafile SGEMM and otherwise
+converts F32 activations to the weight type's dot format. Its Q8_0 SGEMM case
+also rejects an F32 right-hand operand: both ordinary Q8 routes use Q8_0
+activations. Replacing this with a plain FP32/BF16 product would change both
+activation conversion and reduction. A new probe must identify the executed
+multirow path, preserve its inputs, and report raw float differences before
+full-output gating. Neither paper establishes that equivalence.
+
+A separate next experiment is to share Q8 activation conversion across Q/K/V
+and gate/up while retaining ordinary weight storage and the reference
+`ggml_mul_mat`. The archived opt816 trial combined shared conversion with
+custom packed weights and dots; it did not isolate conversion sharing. A
+conversion-only probe can avoid its extra packing/storage cost. It must still
+compare the actual raw Q8 activation bytes and float outputs at one and multiple
+input rows: an already-Q8 operand reaches SGEMM at a different dispatch point.
+Conversion, scheduler barriers and full loading/inference remain timed. This
+is a proposed experiment, with no measured gain or integration yet.
+
+## Completed CPU model-mapping trial, 2026-10-09
+
+The [mapping report](model-mapping.md) records exact identity of all 684
+checkpoint tensors (980,917,056 payload bytes) and all 40 full-input outputs,
+tokens and EOS. Mapping passed artifact/storage gates, but failed latency:
+120-second speech was 22.78% slower and silence 8.34% slower than copied
+storage in the same binary. Silence also failed both older-reference gates;
+the frozen runner returned 1. Peak long-input RSS remained about 1.99 GiB.
+The copied/mapped loader diagnostics were 0.8593/0.0332 seconds in a shared
+process with warm file cache; lazy page faults were paid during the subsequent
+byte comparison. That ratio is not a full-input improvement.
+
+The entire prototype and tests remain public as an exact patch and historic
+tree. Ordinary inference restores the original loader and native configuration.
+The final build passed ten native CTests and five full-output/EOS smokes;
+the new same-build benchmark gate passed all 28 Python tests on hp-fury.
+Its failure test rejects candidates that beat older binaries while losing
+to the same-build control. Future paired trials should use
+`--candidate-reference` in addition to the frozen fastest opt48 comparison.
+
+Two repetitions under variable shared load establish rejection of this trial,
+not a statistical confidence interval or a new quiet-host speedup. Production
+remains on its validated binary; automatic processing and API health were
+restored. The tenfold objective is active and unachieved. Next isolate shared
+activation conversion with reference matrix math, without duplicated packed
+weights, and prove single/multirow activation bytes and float results first.

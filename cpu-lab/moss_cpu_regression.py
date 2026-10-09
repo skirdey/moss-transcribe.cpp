@@ -90,6 +90,33 @@ def evaluate(runs, baseline="baseline", tolerance=0.05):
     return {"passed": not failures, "failures": failures, "comparisons": comparisons}
 
 
+def parse_storage(stderr):
+    records = re.findall(r"BENCH_MODEL_STORAGE mode=(mapped|copied)(?: fileBytes=(\d+))? tensorBytes=(\d+) copiedBytes=(\d+)", stderr)
+    if len(records) != 1:
+        return None  # Old binaries have no record; duplicate records are ambiguous.
+    mode, file_bytes, tensors, copied = records[0]
+    return {"mode":mode, "fileBytes":int(file_bytes) if file_bytes else None,
+            "tensorBytes":int(tensors), "copiedBytes":int(copied)}
+
+
+def evaluate_storage(runs, settings):
+    failures = []
+    for r in runs:
+        if not (settings.get(r["variant"],{}).get("opt",0) & 4096):
+            continue
+        storage = r.get("modelStorage") or {}
+        if (storage.get("mode") != "mapped" or storage.get("copiedBytes") != 0 or
+                not storage.get("tensorBytes") or not storage.get("fileBytes") or
+                storage["fileBytes"] < storage["tensorBytes"]):
+            failures.append(f'{r["case"]}/{r["variant"]}/{r["repeat"]}: requested CPU mapping was not verified')
+    return {"passed":not failures,"failures":failures}
+
+
+def evaluate_candidate_reference(runs, reference):
+    """Compare numeric variants in the same build; old/frozen binaries are separate."""
+    return evaluate([r for r in runs if r["variant"] not in ("baseline","cache-reference")],baseline=reference)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", type=Path, required=True)
@@ -103,6 +130,7 @@ def main():
     p.add_argument("--timeout",type=float,default=300.)
     p.add_argument("--reference-root",type=Path,default=Path("/home/stan/hw-moss-cache-layout"),help="Fixed validated reference build; variant cache-reference uses --reference-opt")
     p.add_argument("--reference-opt",type=int,default=16,help="Opt bitmask of the fixed reference (48 for validated parallel softmax)")
+    p.add_argument("--candidate-reference",help="Numeric variant label in this same compiled binary; additionally reject regression against this control")
     p.add_argument("--model",type=Path,default=Path("/home/stan/hw-audio-bench/models/moss-transcribe-q8_0.gguf"))
     p.add_argument("--audio-dir",type=Path,default=Path("/home/stan/hw-audio-bench/audio"))
     p.add_argument("--baseline",type=Path,default=Path("/home/stan/hw-moss-api/bin/moss-transcribe"))
@@ -114,6 +142,9 @@ def main():
     args = p.parse_args()
     if args.repeats < 1 or args.threads < 1 or args.decode_threads < 0 or args.logits_threads < 0 or "baseline" not in args.variants or len(args.variants) < 2:
         p.error("Need at least one repeat, baseline, and a candidate")
+    candidates = [v for v in args.variants if v not in ("baseline","cache-reference")]
+    if args.candidate_reference and (args.candidate_reference not in candidates or len(set(candidates)) < 2):
+        p.error("Candidate reference must be a numeric variant with another same-build candidate")
     root = args.root.resolve()
     results = root / args.name
     results.mkdir(parents=True, exist_ok=True)
@@ -225,7 +256,8 @@ def main():
                        "hostLoadBefore":load_before,"hostLoadAfter":os.getloadavg(),
                        "timing": {"load":float(timing[1]),"inference":float(timing[2])} if timing else None,
                        "profile": {k:float(v) for k,v in re.findall(r"(prefill|embedding|decoder|logits)=([\d.]+)",stderr)},
-                       "phaseProfile": json.loads(phase_match[1]) if (phase_match := re.search(r"^CPU_PHASE_PROFILE (\{.*\})$", stderr, re.M)) else None}
+                       "phaseProfile": json.loads(phase_match[1]) if (phase_match := re.search(r"^CPU_PHASE_PROFILE (\{.*\})$", stderr, re.M)) else None,
+                       "modelStorage":parse_storage(stderr)}
                 report["runs"].append(row)
                 report_path.write_text(json.dumps(report,indent=2))
                 print(json.dumps(row),flush=True)
@@ -236,13 +268,19 @@ def main():
     artifact_hashes.update({str(root / "source" / name):value for name,value in report["sourceSha256"].items()})
     changed = [path for path,value in artifact_hashes.items() if digest(path) != value]
     report["artifactGate"] = {"passed":not changed,"changed":changed}
+    report["storageGate"] = evaluate_storage(report["runs"],report["variantSettings"])
     report["gate"] = evaluate(report["runs"])
     if "cache-reference" in args.variants:
         compared = [r for r in report["runs"] if r["variant"] != "baseline"]
         report["cacheReferenceGate"] = evaluate(compared, baseline="cache-reference")
+    if args.candidate_reference:
+        report["candidateReference"] = args.candidate_reference
+        report["candidateReferenceGate"] = evaluate_candidate_reference(report["runs"],args.candidate_reference)
     report_path.write_text(json.dumps(report,indent=2))
     print(json.dumps(report["gate"],indent=2))
-    return 0 if report["artifactGate"]["passed"] and report["gate"]["passed"] and report.get("cacheReferenceGate",{"passed":True})["passed"] else 1
+    if args.candidate_reference:
+        print(json.dumps({"candidateReferenceGate":report["candidateReferenceGate"]},indent=2))
+    return 0 if report["artifactGate"]["passed"] and report["storageGate"]["passed"] and report["gate"]["passed"] and report.get("cacheReferenceGate",{"passed":True})["passed"] and report.get("candidateReferenceGate",{"passed":True})["passed"] else 1
 
 
 if __name__ == "__main__":

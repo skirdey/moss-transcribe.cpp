@@ -1,6 +1,6 @@
 """Meaningful failure-mode tests for the optimization acceptance gate."""
 import unittest
-from moss_cpu_regression import evaluate, run_environment, variant_settings
+from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference
 
 
 class RegressionGateTest(unittest.TestCase):
@@ -82,6 +82,31 @@ class RegressionGateTest(unittest.TestCase):
         self.assertEqual(env["MTD_THREADS_DECODE"],"8")
         self.assertEqual(env["MTD_THREADS_LOGITS"],"8")
         self.assertNotIn("MTD_THREADS_PREFILL",env)
+
+    def test_loader_records_are_unambiguous_and_old_binaries_remain_supported(self):
+        line="[info] BENCH_MODEL_STORAGE mode=mapped fileBytes=128 tensorBytes=64 copiedBytes=0"
+        self.assertEqual(parse_storage(line),{"mode":"mapped","fileBytes":128,"tensorBytes":64,"copiedBytes":0})
+        self.assertIsNone(parse_storage("old loader without a storage record"))
+        self.assertIsNone(parse_storage(line+"\n"+line))
+
+    def test_requested_mapping_cannot_pass_with_fallback_or_inconsistent_counters(self):
+        settings={"baseline":{"opt":0},"mapped":{"opt":4144}}
+        valid={"mode":"mapped","fileBytes":128,"tensorBytes":64,"copiedBytes":0}
+        row=self.row("mapped",repeat=0,modelStorage=valid)
+        self.assertTrue(evaluate_storage([self.row(),row],settings)["passed"])
+        for invalid in (None,{**valid,"mode":"copied"},{**valid,"copiedBytes":1},{**valid,"fileBytes":63}):
+            self.assertFalse(evaluate_storage([{**row,"modelStorage":invalid}],settings)["passed"])
+
+    def test_beating_older_builds_cannot_hide_same_build_storage_regression(self):
+        rows=[self.row(),self.row("cache-reference",wallSeconds=15.),
+              self.row("48",wallSeconds=10.),self.row("4144",wallSeconds=12.)]
+        self.assertTrue(evaluate(rows)["passed"])
+        self.assertTrue(evaluate([r for r in rows if r["variant"]!="baseline"],baseline="cache-reference")["passed"])
+        same=evaluate_candidate_reference(rows,"48")
+        self.assertFalse(same["passed"])
+        self.assertEqual([c["variant"] for c in same["comparisons"]],["4144"])
+        rows[-1]=self.row("4144",wallSeconds=9.8)
+        self.assertTrue(evaluate_candidate_reference(rows,"48")["passed"])
 
 
 if __name__ == "__main__":
