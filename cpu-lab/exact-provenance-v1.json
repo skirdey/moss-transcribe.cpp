@@ -1,0 +1,15 @@
+{
+  "protocol": "Standalone -O3 -std=c++17 -march=native -ffp-contract=off -fopenmp direct prequantized M=1 dots; 6 alternating rounds of 5 computes, discard first, median final 5. Fixed seed 20261009. OMP_PROC_BIND=spread; OMP_PLACES physical CPUs 0 through 15. Other users TTS CPU jobs active; per-sample host load was not recorded for this native probe. No model integration.",
+  "sourceSha256": "b89ea463c1f9b0a356d95a70bc416dd50492a55e12376d8c66020b123e4468d0",
+  "binarySha256": "82a0b44e84bba9766cae1674c85739c1aba2be01f82a12906a27a67331ebf161",
+  "reportSha256": "cbd289ef0d53a9270f0f0a1e1a67e9a592e548d6a1b775b469f589fa28afc5a3",
+  "libraries": {
+    "/home/stan/hw-moss-packed-v1/build/third_party/ggml/src/libggml-cpu.so": "64629020f4c0e7bf65952303f044aa1f3c1af82898261671c5f528e66b942fa3",
+    "/home/stan/hw-moss-packed-v1/build/third_party/ggml/src/libggml-base.so": "acd2782009ddf5e2987d4baf03fc1cad9d54ee1579fd80a6e3adeb0c538039c5",
+    "/home/stan/hw-moss-packed-v1/build/third_party/ggml/src/libggml.so": "84bf38be8ae61c4fa788ba46c2ab3c4e7cbdce1ccaab1abff07d58bbd744de88"
+  },
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "ggmlCommit": "eced84c86f8b012c752c016f7fe789adea168e1e",
+  "nativeExitCode": 0,
+  "cpu": "Intel Xeon Gold 5416S, 16 physical cores"
+}

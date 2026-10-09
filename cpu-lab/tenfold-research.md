@@ -1,0 +1,211 @@
+# Tenfold CPU performance research
+
+Started 2026-10-09. The 10x objective is **active and unachieved**. The primary
+comparison is the fastest validated Q8 build (opt 48, binary
+`bb8bd09737c1063657f4bb0dde0c114bc63cde1a528518950c19007295387825`),
+with the original production binary measured separately. Paired full-input wall
+time, including model initialization, is the primary latency metric. Batch
+throughput and warm persistent-server latency will be reported separately.
+
+The previous 63-run confirmation is the starting evidence, not a new result.
+English 60 s took 13.8929 s, German 60 s 11.6387 s, and the three public speech
+clips took 11.9394–12.8915 s. A 10x improvement means roughly 1.16–1.39 s for
+those short speech inputs. The 120 s stress input took 31.5263 s in one run;
+its target is 3.1526 s. Silence/empty-speech behavior remains a regression gate.
+
+## Current model and bottlenecks
+
+The pinned GGUF is 986,881,024 bytes. The read-only audit found 343 Q8_0 tensors
+(959,668,224 bytes) and 341 F32 tensors (21,248,832 bytes). Q8 accounts for 97.83%
+of tensor bytes. Qwen3 projection weights occupy about 468 MB, the tied
+embedding/LM head 165 MB, and the audio encoder about 342 MB. Model weights and
+private audio/transcripts are not included in this repository.
+
+In the validated English 60 s run, median phase timing was: prefill 1.4612 s,
+decoder 5.4506 s, LM head 0.8952 s, and embedding 0.0105 s. The remaining 6.0754 s
+includes audio preparation/encoding, model loading and other work. This is a
+residual, not a separately instrumented encoder measurement. Making only the
+decoder phase infinitely fast would cap the overall gain at about 1.65x. Both
+audio processing and generation therefore need substantial improvement.
+
+`moss_lossless_audit.py` samples each tensor's beginning, middle and end. Its
+weighted Q8 code entropy was 7.6408 bits, scale entropy 7.6008 bits per 32-weight
+block, and independent-symbol estimate 7.8783 bits/weight versus the stored 8.5.
+That estimate describes a specific coding model, not a universal compression
+bound. Sampled zlib1 and xz1 size ratios were 0.9127 and 0.9197. Median warm
+sample decode throughput was about 136 and 13 MB/s respectively on this run.
+These are sample codec measurements, not full-model compression or inference
+speed. Every codec sample passed an exact round trip.
+
+## Papers reviewed and applicable ideas
+
+Only primary papers, author technical reports and official documentation are
+used below. Reported gains retain their original hardware and baseline context.
+
+| Source | What it establishes | Implication for this CPU/Q8 workload |
+|---|---|---|
+| [DFloat11, NeurIPS 2025](https://arxiv.org/html/2504.11651v3) | Entropy-coded BF16 weights, approximately 30% smaller, exact reconstruction; online GPU decompression has a nonzero cost. Large gains compare with memory-constrained CPU offload. | BF16 exponent coding does not directly apply to most of this Q8 model. Its fused reconstruction principle is worth testing; its offload gains are not CPU speed predictions. |
+| [Unweight, Cloudflare technical report, April 2026](https://research.cloudflare.com/papers/unweight-2026.pdf) | BF16 palette/exponent compression reconstructed immediately before Hopper matrix instructions, with per-projection autotuning and pipelining. The report is explicitly ongoing research. | Reconstruct into the consumer's packed tile layout rather than expand a whole layer into RAM. Hopper kernels cannot execute on this host. |
+| [Approaching Shannon Bound, ISCA 2026](https://arxiv.org/html/2606.15789) | Tile-addressable ANS reconstruction integrated with GPU GEMM, across several numeric formats. Reported serving gains depend on model format and memory-enabled batch sizes. | Measure entropy on the actual checkpoint, then account for decode cost. The paper's large footprint reductions in skewed low-bit formats do not establish a 10x latency gain for this Q8 checkpoint. |
+| [ForgeMegakernel, September 2026](https://arxiv.org/html/2609.12379) | Per-model persistent H100 decode with instruction streams, dependency counters, buffer pools and intermediate-state checks. Serving gains are smaller than isolated-kernel gains. | Transfer the scheduling and validation methodology to CPU workers. GPU implementation is not directly usable. Final-output checks alone do not adequately diagnose fused arithmetic errors. |
+| [MPK / Mirage, December 2025](https://arxiv.org/html/2512.22219) | GPU task graphs, event dependencies and cross-task memory pipelining within a persistent kernel. | Explore CPU task scheduling and fewer global barriers; distinguish dispatch savings from memory-bandwidth savings. |
+| [Lossless but Not Free, July 2026](https://arxiv.org/abs/2607.17283) | A consumer-hardware speculative-decoding study with both wins and slowdowns; batched target verification and draft cost determine benefit. | Test greedy-verified multi-token drafting only after proving batch target execution is faster and matches sequential states/tokens. Draft speed alone is insufficient. |
+| [FairyFuse, April 2026](https://arxiv.org/html/2604.20913) | CPU ternary kernels fuse eight widely-linear GEMVs and reuse activation registers. Its 29.6x kernel gain compares with FP32; end-to-end speedup over llama.cpp Q4_K_M is 1.24x on a Xeon 8558P. | Requires a ternary-trained checkpoint and changes weights/architecture. It is not lossless repacking of this MOSS checkpoint; activation reuse and avoiding repeated parallel regions remain useful scheduling ideas. |
+| [CPU–GPU MoE design, OSDI 2026](https://arxiv.org/html/2606.10493) | CPU row tiling, concurrent gate/up work, fine-grained dependency barriers and fused activation conversions. FP8 post-scaling reports numerical differences from its reference. | Scheduling and conversion reuse are relevant to dense Qwen blocks; its FP8/BF16 arithmetic and dual-socket/GPU speed figures are not exact Q8 CPU evidence. Preserve the reference reduction tree before fusing scale application. |
+| [Intel AMX tuning guide](https://www.intel.com/content/www/us/en/developer/articles/technical/tuning-guide-for-ai-on-the-4th-generation.html) | Matrix acceleration for INT8/BF16 and ISA-aware framework dispatch. | The host exposes AMX/VNNI, but MOSS must allocate the appropriate packed weights to enter ggml's optimized path. Preserve existing Q8 codes/scales; no new activation precision change is assumed safe. |
+
+Some papers use "lossless" for equal task accuracy or matching distributions.
+That differs from exact weight bytes, exact arithmetic, and identical generated
+tokens. Each experiment must state which property is actually checked.
+
+## Experiments and next milestones
+
+1. **Packed Q8 matrices: rejected candidate.** The ordinary loader allocates
+   all weights in the default CPU buffer. The archived opt-bit-128 prototype
+   adds packed copies of eligible projection matrices using ggml's AMX/VNNI
+   buffer. The tied embedding stays ordinary for direct row lookup. Input Q8
+   codes/scales are unchanged, but native probes show float-bit differences.
+   Full-model output also changed on German and public speech. The candidate
+   was removed from active loader code. Opt 176 (128 + validated 48) is only for
+   reproducing the archived experiment; it is not a valid active option.
+
+   A separate exact-order AVX-512 probe computes 16 output rows together with
+   eight independent accumulator chains per row and the pinned dot's final
+   horizontal-add tree. Packing reconstructs every original Q8 byte. It tests
+   signed-byte extremes, zeros, normal random inputs, and a partial output tile.
+   This prequantized M=1 probe is not integrated into the model. Full graph,
+   activation-quantization, cold-load and quality gates remain necessary.
+2. **CPU megakernel scheduling.** Profile operator work and barriers, then
+   specialize the decode graph without changing dependencies. Try compatible
+   Q/K/V and gate/up projection scheduling, stable scratch/workspace reuse,
+   persistent worker teams, and dependency-based handoffs. The OSDI CPU study
+   provides a concrete gate/up scheduling example; its FP8 post-scaling math
+   is not numerically identical and will not be copied into this exact gate. Keep intermediate
+   state checks and varied shapes; the previous fused-attention failure remains
+   a warning against inferring full-model gains from warm microbenchmarks.
+3. **Audio encoder and prefill.** Benchmark packed GEMM and independently
+   instrument mel, encoder, adaptor and prefill. Investigate processing the
+   independent audio chunks in a compatible batch with exact boundary handling.
+   Encoder reduction is necessary for the end-to-end 10x latency objective.
+4. **Verified multi-token generation.** Prototype a cheap structural/ngram draft
+   or compatible smaller draft. The target must verify all accepted greedy
+   tokens, with correct causal masks, positions, KV rollback and EOS handling.
+   Token agreement, intermediate-state drift, acceptance rate and total time
+   must all be measured. Do not count reduced target calls as measured speed.
+5. **Lossless compressed tiles.** Investigate exact Q8 scale/code packing and
+   SIMD-friendly tile-addressable codecs if actual entropy supports a useful
+   bandwidth reduction. Compare compression/decompression traffic against plain
+   packed reads. Exact round-trip bytes alone do not establish faster inference.
+6. **Persistent API and batching.** Reuse loaded weights/workspaces and batch
+   independent audio jobs where useful. Report cold single-input, warm
+   single-input, and sustained throughput separately. Do not reinterpret batch
+   throughput as the requested single-input latency gain.
+
+## Acceptance protocol
+
+Pin the existing model/data and fixed opt-48 reference. Alternate variant order,
+keep physical-core affinity and thread counts matched, record host load, exclude
+concurrent MOSS inference, and verify artifact hashes. The harness now accepts
+`--reference-opt 48 --reference-root /home/stan/hw-moss-softmax-v1`.
+
+Retain the existing full-output, word/timestamp/speaker, token/EOS and genuine
+empty-speech gates. Score the human-reference subset and expand accuracy evidence
+as optimizations become more invasive. Record float-bit differences, exact weight
+reconstruction, memory, failures, acceptance rates and intermediate-state checks.
+A small regression suite is not proof of universal numerical equivalence.
+
+Keep the production API available and restore automatic processing after every
+temporary pause. Publish source, reproducible reports and failed experiments
+under MIT. Merge each PR once its stated checks pass; keep unvalidated research
+off the default/production path. The goal remains active until the actual tenfold
+end-to-end improvement is achieved and verified.
+
+
+## Measured research results (2026-10-09)
+
+The AMX/VNNI native probe (`packed-kernel-v1.jsonl`) used identical Q8 weight
+bytes and finite outputs, but all 12 shapes changed float bits. At 16 threads,
+its matrix probes were 1.46–4.20x faster, with maximum absolute error up to
+0.000106812. This was sufficient reason to require the full-output pilot.
+
+The paired pilot (`packed-pilot-v1.json`) completed 18 measured runs: three
+60 s inputs, three variants, two alternating rounds, after three discarded
+warmups. Artifact hashes passed and no concurrent MOSS process was detected.
+German output changed from 458 to 435 tokens in both rounds; public speech
+changed from 490 to 476. The English output hash matched. Every run reached EOS.
+The opt-48 reference retained exact output parity with production on all cases.
+
+| Input | Opt 48 median wall | Packed 176 median wall | Exact output | Decision |
+|---|---:|---:|---|---|
+| English 60 s | 41.137 s | 36.456 s | Yes, both repeats | Overall candidate rejected |
+| German 60 s | 39.860 s | 29.972 s | No, both repeats | Reject |
+| Public speech 60 s | 42.306 s | 31.700 s | No, both repeats | Reject |
+
+Other users' 20 TTS CPU workers were active and recorded host load rose from
+about 24 to 36. The production English samples varied from 26.64 to 107.48 s.
+These highly contended timings are not a stable isolated speed estimate, and
+changed token counts make the failing cases unsuitable for equivalent-work
+speed claims. Peak packed-process RSS was 2,568,752 KiB versus opt 48's
+1,701,948 KiB. The loader patch is archived; active loader source is unchanged.
+Human DER was not rescored after exact output already rejected the candidate.
+
+The new exact-order dot probe (`exact-kernel-v1.jsonl`) passed **54/54** cases
+with **zero float-bit differences** and exact byte reconstruction. It covers
+1/16 threads, K=32/1024/3072, N=17/1024/3072, and normal/zero/signed-byte-extreme
+inputs. For larger normal-random matrices (K,N >= 1024), 16-thread speedups were
+1.33–1.55x, and one-thread speedups 1.38–1.63x. Small/tail cases can be slower;
+all measurements are retained. The partially filled N=17 tile has padding;
+full tiles have exactly the ordinary Q8 storage size.
+
+The fresh native CMake build passed all seven model-independent CTests,
+including the exact-order probe. The 12 regression-gate unit tests and three
+synthetic GGUF audit tests pass. The archived loader patch applies cleanly to
+its pinned base. Production API health, enabled service and resumed automatic
+processing were verified after the pilot.
+
+These are warm direct dot measurements on prequantized input. They exclude
+input quantization, graph dispatch and packing from the timed dot loop. Packing
+cost is recorded separately; inference integration would retain extra copies
+or replace storage, which must be measured. Shared-host contention also applies
+to these microbenchmarks. They do not establish an end-to-end speedup or model
+output equivalence. The next step is an opt-in decode graph integration with
+matched activation quantization and the existing regression/quality gates.
+
+## Reproduce the probes
+
+Use a native Release build with `-DMT_BUILD_TESTS=ON`, as documented in the root
+README. On AVX-512 VNNI/BW/F16C with OpenMP, `moss_exact_q8_bench` compares the
+pinned library's Q8 dot against the exact-order candidate. Other hosts return 77.
+The AMX probe also returns 77 if no packed buffer is available; on this host its
+expected status is 1 because numerical differences reject it.
+
+```bash
+OMP_NUM_THREADS=16 OMP_PROC_BIND=spread \
+  OMP_PLACES='{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}' \
+  ./build/tests/moss_exact_q8_bench > exact-kernel.jsonl
+./build/tests/moss_packed_q8_bench > packed-kernel.jsonl
+python3 cpu-lab/moss_lossless_audit.py /path/to/moss-transcribe-q8_0.gguf \
+  --output lossless-audit.json
+python3 -m unittest discover -s cpu-lab -p test_moss_lossless_audit.py
+python3 -m unittest discover -s cpu-lab -p test_moss_cpu_regression.py
+ctest --test-dir build -LE model --output-on-failure
+```
+
+The rejected loader patch applies to a fresh fork checkout at `2dbe59e`:
+
+```bash
+git checkout 2dbe59e
+git apply /path/to/packed-q8-candidate-v1.patch
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j 4
+# Create a frozen root containing source/ and build/, then run the public harness:
+python3 /path/to/moss_cpu_regression.py --root /path/to/frozen-root \
+  --reference-root /path/to/validated-opt48-root --reference-opt 48 \
+  --variants baseline cache-reference 176 --cases meeting-60s dinner-60s vox-vmaiq-60s \
+  --repeats 2 --pin-physical --name packed-pilot
+```
+
+Supply baseline, model and audio paths using the harness options when reproducing
+elsewhere. Private fixtures are represented by hashes only; the public VoxConverse
+fixture can be prepared using the root README's pinned dataset instructions.
+Never mix a changed source/binary into an existing run directory.

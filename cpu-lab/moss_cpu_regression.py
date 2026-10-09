@@ -70,7 +70,8 @@ def main():
     p.add_argument("--skip-warmup", action="store_true", help="For a follow-on stress check after the same binaries/model were warmed in a preceding suite")
     p.add_argument("--pin-physical", action="store_true", help="Bind one OpenMP worker to each physical core, avoiding sibling/core collisions")
     p.add_argument("--timeout",type=float,default=300.)
-    p.add_argument("--reference-root",type=Path,default=Path("/home/stan/hw-moss-cache-layout"),help="Fixed validated transposed-cache build; variant cache-reference uses bit 16")
+    p.add_argument("--reference-root",type=Path,default=Path("/home/stan/hw-moss-cache-layout"),help="Fixed validated reference build; variant cache-reference uses --reference-opt")
+    p.add_argument("--reference-opt",type=int,default=16,help="Opt bitmask of the fixed reference (48 for validated parallel softmax)")
     p.add_argument("--model",type=Path,default=Path("/home/stan/hw-audio-bench/models/moss-transcribe-q8_0.gguf"))
     p.add_argument("--audio-dir",type=Path,default=Path("/home/stan/hw-audio-bench/audio"))
     p.add_argument("--baseline",type=Path,default=Path("/home/stan/hw-moss-api/bin/moss-transcribe"))
@@ -88,7 +89,7 @@ def main():
         if variant == "baseline":
             return baseline, "0", args.baseline_lib_dir
         if variant == "cache-reference":
-            return reference, "16", ""
+            return reference, str(args.reference_opt), ""
         if not variant.isdecimal():
             raise ValueError(f"Unknown variant: {variant}")
         return candidate, variant, ""
@@ -109,6 +110,7 @@ def main():
     if "cache-reference" in args.variants:
         report["binarySha256"]["cache-reference"] = digest(reference)
         report["referenceRoot"] = str(args.reference_root.resolve())
+        report["referenceOpt"] = args.reference_opt
         report["referenceLibraries"] = {str(path):digest(path) for path in sorted((args.reference_root / "build").rglob("*.so"))}
     report["productionLibraries"] = {str(path):digest(path) for path in sorted(Path(args.baseline_lib_dir).glob("*.so"))}
     report["warmupDiscarded"] = not args.skip_warmup
