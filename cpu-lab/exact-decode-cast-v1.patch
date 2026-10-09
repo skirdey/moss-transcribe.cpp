@@ -1,0 +1,519 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8e8456f..23f4f07 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -42,6 +42,7 @@ set(MT_SRC
+   src/audio_span.cpp
+   src/qwen3.cpp
+   src/cpu_softmax.cpp
++  src/cpu_q8.cpp
+   src/qwen3_decoder.cpp
+   src/generate.cpp
+   src/audio_encoder.cpp
+@@ -50,6 +51,9 @@ set(MT_SRC
+   src/subtitle.cpp
+   src/moss_transcribe_capi.cpp
+ )
++if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
++  set_source_files_properties(src/cpu_q8.cpp PROPERTIES COMPILE_OPTIONS "-march=native;-ffp-contract=off")
++endif()
+ if(MT_SHARED)
+   add_library(moss-transcribe SHARED ${MT_SRC})
+   set_target_properties(moss-transcribe PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+diff --git a/src/cpu_q8.cpp b/src/cpu_q8.cpp
+new file mode 100644
+index 0000000..b2def51
+--- /dev/null
++++ b/src/cpu_q8.cpp
+@@ -0,0 +1,130 @@
++#include "cpu_q8.hpp"
++#include "ggml-cpu.h"
++#define GGML_COMMON_DECL_CPP
++#include "ggml-common.h"
++#include <algorithm>
++#include <climits>
++#include <cstring>
++
++#if defined(__AVX512VNNI__) && defined(__AVX512BW__) && defined(__F16C__) && !defined(__AVXVNNIINT8__)
++#include <immintrin.h>
++#define MT_EXACT_Q8_NATIVE 1
++#else
++#define MT_EXACT_Q8_NATIVE 0
++#endif
++
++namespace mt {
++static_assert(sizeof(Q8Tile) == 16 * sizeof(block_q8_0), "full tiles add no bytes");
++
++bool cpu_exact_q8_supported() {
++#if MT_EXACT_Q8_NATIVE
++    ggml_cpu_init();
++    const auto* traits = ggml_get_type_traits_cpu(GGML_TYPE_Q8_0);
++    return ggml_cpu_has_avx512_vnni() && ggml_cpu_has_f16c()
++        && traits->vec_dot_type == GGML_TYPE_Q8_0 && traits->nrows == 1;
++#else
++    return false;
++#endif
++}
++
++std::unique_ptr<PackedQ8> cpu_pack_q8(const ggml_tensor* w, const void* ordinary) {
++    if (!cpu_exact_q8_supported() || !ordinary || !w || w->type != GGML_TYPE_Q8_0
++        || !ggml_is_contiguous(w) || w->ne[2] != 1 || w->ne[3] != 1
++        || w->ne[0] <= 0 || w->ne[0] > INT_MAX || w->ne[0] % 32
++        || w->ne[1] <= 0 || w->ne[1] > INT_MAX - 15) return nullptr;
++    auto p = std::make_unique<PackedQ8>();
++    p->k = static_cast<int>(w->ne[0]); p->n = static_cast<int>(w->ne[1]);
++    const int blocks = p->k / 32, tiles = (p->n + 15) / 16;
++    p->tiles.resize(static_cast<size_t>(tiles) * blocks);
++    const auto* source = static_cast<const block_q8_0*>(ordinary);
++    for (int tile = 0; tile < tiles; ++tile) for (int b = 0; b < blocks; ++b) {
++        auto& dst = p->tiles[static_cast<size_t>(tile) * blocks + b];
++        for (int lane = 0; lane < 16 && tile * 16 + lane < p->n; ++lane) {
++            const auto& src = source[static_cast<size_t>(tile * 16 + lane) * blocks + b];
++            dst.scales[lane] = src.d;
++            for (int g = 0; g < 8; ++g) std::memcpy(dst.groups[g] + lane * 4, src.qs + g * 4, 4);
++        }
++    }
++    return p;
++}
++
++bool PackedQ8::round_trip_exact(const void* ordinary) const {
++    const auto* source = static_cast<const block_q8_0*>(ordinary);
++    if (!source) return false;
++    const int blocks = k / 32;
++    for (int row = 0; row < n; ++row) for (int b = 0; b < blocks; ++b) {
++        const auto& tile = tiles[static_cast<size_t>(row / 16) * blocks + b];
++        block_q8_0 restored{};
++        restored.d = tile.scales[row % 16];
++        for (int g = 0; g < 8; ++g) std::memcpy(restored.qs + g * 4, tile.groups[g] + row % 16 * 4, 4);
++        if (std::memcmp(&restored, source + static_cast<size_t>(row) * blocks + b, sizeof(restored))) return false;
++    }
++    return true;
++}
++
++namespace {
++bool eligible(const ggml_tensor* x, const PackedQ8* p) {
++    return p && x && x->type == GGML_TYPE_F32 && ggml_is_contiguous(x)
++        && x->ne[0] == p->k && x->ne[1] == 1 && x->ne[2] == 1 && x->ne[3] == 1;
++}
++
++#if MT_EXACT_Q8_NATIVE
++void dot(const Q8Tile* p, const block_q8_0* x, int blocks, float* y, int lanes) {
++    __m512 acc[8];
++    for (auto& a : acc) a = _mm512_setzero_ps();
++    const auto zero = _mm512_setzero_si512();
++    for (int b = 0; b < blocks; ++b) {
++        const auto scale = _mm512_mul_ps(
++            _mm512_cvtph_ps(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(p[b].scales))),
++            _mm512_set1_ps(ggml_fp16_to_fp32(x[b].d)));
++        for (int g = 0; g < 8; ++g) {
++            int32_t four; std::memcpy(&four, x[b].qs + g * 4, 4);
++            const auto q = _mm512_loadu_si512(p[b].groups[g]);
++            const auto input = _mm512_set1_epi32(four);
++            const auto negative = _mm512_cmp_epi8_mask(q, zero, _MM_CMPINT_LT);
++            const auto signed_input = _mm512_mask_sub_epi8(input, negative, zero, input);
++            const auto sum = _mm512_dpbusd_epi32(zero, _mm512_abs_epi8(q), signed_input);
++            acc[g] = _mm512_fmadd_ps(scale, _mm512_cvtepi32_ps(sum), acc[g]);
++        }
++    }
++    // Preserve all eight eager accumulator chains and its horizontal add tree.
++    const auto even = _mm512_add_ps(_mm512_add_ps(acc[4], acc[0]), _mm512_add_ps(acc[6], acc[2]));
++    const auto odd = _mm512_add_ps(_mm512_add_ps(acc[5], acc[1]), _mm512_add_ps(acc[7], acc[3]));
++    _mm512_mask_storeu_ps(y, static_cast<__mmask16>((1u << lanes) - 1), _mm512_add_ps(even, odd));
++}
++
++void compute(ggml_tensor* dst, const ggml_tensor*, const ggml_tensor* x, int ith, int nth, void* userdata) {
++    const auto& p = *static_cast<const PackedQ8*>(userdata);
++    GGML_ASSERT(x->type == GGML_TYPE_Q8_0 && ggml_is_contiguous(x));
++    const int blocks = p.k / 32, tiles = (p.n + 15) / 16;
++    for (int tile = (static_cast<int64_t>(tiles) * ith) / nth;
++         tile < (static_cast<int64_t>(tiles) * (ith + 1)) / nth; ++tile)
++        dot(p.tiles.data() + static_cast<size_t>(tile) * blocks,
++            static_cast<const block_q8_0*>(x->data), blocks,
++            static_cast<float*>(dst->data) + tile * 16, std::min(16, p.n - tile * 16));
++}
++#endif
++}
++
++ggml_tensor* cpu_decode_quantize(ggml_context* ctx, ggml_tensor* x, const PackedQ8* p) {
++    return eligible(x, p) ? ggml_cast(ctx, x, GGML_TYPE_Q8_0) : nullptr;
++}
++
++ggml_tensor* cpu_decode_mul_mat(ggml_context* ctx, ggml_tensor* w, ggml_tensor* x,
++                               const PackedQ8* p, ggml_tensor* quantized) {
++#if MT_EXACT_Q8_NATIVE
++    if (eligible(x, p) && w->type == GGML_TYPE_Q8_0 && w->ne[0] == p->k && w->ne[1] == p->n) {
++        if (!quantized) quantized = cpu_decode_quantize(ctx, x, p);
++        GGML_ASSERT(quantized->type == GGML_TYPE_Q8_0 && quantized->ne[0] == p->k
++                    && ggml_nelements(quantized) == p->k);
++        // The public custom-op API inherits its first argument's shape. This
++        // unused prototype costs N*4 bytes; packed weights live with the loader.
++        auto* shape = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, p->n, 1);
++        return ggml_map_custom2(ctx, shape, quantized, compute, GGML_N_TASKS_MAX, const_cast<PackedQ8*>(p));
++    }
++#else
++    (void)p; (void)quantized;
++#endif
++    return ggml_mul_mat(ctx, w, x);
++}
++}
+diff --git a/src/cpu_q8.hpp b/src/cpu_q8.hpp
+new file mode 100644
+index 0000000..506f377
+--- /dev/null
++++ b/src/cpu_q8.hpp
+@@ -0,0 +1,29 @@
++#ifndef MT_CPU_Q8_HPP
++#define MT_CPU_Q8_HPP
++
++#include "ggml.h"
++#include <cstdint>
++#include <memory>
++#include <vector>
++
++namespace mt {
++// Immutable, loader-owned copy. Ordinary weights remain available for prefill
++// and embedding lookups. Sixteen complete rows are interleaved without changing
++// any scale or code; the final partial tile is padded.
++struct Q8Tile { uint16_t scales[16]; int8_t groups[8][64]; };
++struct PackedQ8 {
++    int k = 0, n = 0;
++    std::vector<Q8Tile> tiles;
++    bool round_trip_exact(const void* ordinary) const;
++};
++
++bool cpu_exact_q8_supported();
++std::unique_ptr<PackedQ8> cpu_pack_q8(const ggml_tensor* weight, const void* ordinary);
++
++// Optional shared conversion for projections of the same single-token input.
++// Returns null on unsupported shapes; the matmul helper then uses eager ggml.
++ggml_tensor* cpu_decode_quantize(ggml_context* ctx, ggml_tensor* input, const PackedQ8* packed);
++ggml_tensor* cpu_decode_mul_mat(ggml_context* ctx, ggml_tensor* weight, ggml_tensor* input,
++                               const PackedQ8* packed, ggml_tensor* quantized = nullptr);
++}
++#endif
+diff --git a/src/model_loader.cpp b/src/model_loader.cpp
+index 405d331..04d30c5 100644
+--- a/src/model_loader.cpp
++++ b/src/model_loader.cpp
+@@ -1,9 +1,12 @@
+ #include "model_loader.hpp"
+ #include "backend.hpp"
+ #include "common.hpp"
++#include "cpu_q8.hpp"
++#include "ggml-cpu.h"
+ 
+ #include <cstdio>
+ #include <cstring>
++#include <cstdlib>
+ #include <vector>
+ 
+ namespace mt {
+@@ -85,6 +88,10 @@ bool ModelLoader::load(const std::string& path) {
+         return false;
+     }
+     const size_t data_off = gguf_get_data_offset(gguf_);
++    const char* opt_env = std::getenv("MTD_CPU_OPT");
++    const int opt = opt_env ? std::atoi(opt_env) : 0;
++    const bool pack_cpu = (opt & (256 | 512)) && ggml_backend_is_cpu(mt::backend()) && cpu_exact_q8_supported();
++    size_t packed_bytes = 0;
+     std::vector<uint8_t> stage;
+     for (int64_t i = 0; i < n; ++i) {
+         const char* name = gguf_get_tensor_name(gguf_, i);
+@@ -102,8 +109,23 @@ bool ModelLoader::load(const std::string& path) {
+             return false;
+         }
+         ggml_backend_tensor_set(t, stage.data(), 0, sz);
++        const bool projection = std::strncmp(name, "qwen3.blk.", 10) == 0;
++        const bool head = std::strcmp(name, "token_embd.weight") == 0;
++        if (pack_cpu && (((opt & 256) && projection) || ((opt & 512) && head))) {
++            auto packed = cpu_pack_q8(t, stage.data());
++            if (packed) {
++                if (!packed->round_trip_exact(stage.data())) {
++                    MT_LOGE("exact Q8 packing changed bytes for %s", name);
++                    std::fclose(fp);
++                    return false;
++                }
++                packed_bytes += packed->tiles.size() * sizeof(Q8Tile);
++                packed_q8_.emplace(t, std::move(packed));
++            }
++        }
+     }
+     std::fclose(fp);
++    if (packed_bytes) MT_LOGI("exact decode Q8: %zu matrices, %zu extra bytes", packed_q8_.size(), packed_bytes);
+ 
+     MT_LOGI("loaded %s: %lld tensors, %lld kv (backend=%s)",
+                 path.c_str(),
+@@ -173,6 +195,11 @@ struct ggml_tensor* ModelLoader::tensor(const std::string& name) const {
+     return (it == tensor_by_name_.end()) ? nullptr : it->second;
+ }
+ 
++const PackedQ8* ModelLoader::packed_q8(const ggml_tensor* t) const {
++    auto it = packed_q8_.find(t);
++    return it == packed_q8_.end() ? nullptr : it->second.get();
++}
++
+ void ModelLoader::promote_small_f16_to_f32(size_t max_elems) {
+     if (!ctx_) return;
+     // Identify f16 tensors small enough to be worth promoting (norm
+diff --git a/src/model_loader.hpp b/src/model_loader.hpp
+index 49c5d4d..3f1af4d 100644
+--- a/src/model_loader.hpp
++++ b/src/model_loader.hpp
+@@ -19,6 +19,7 @@
+ #include <vector>
+ 
+ namespace mt {
++struct PackedQ8;
+ 
+ class ModelLoader {
+ public:
+@@ -38,6 +39,7 @@ public:
+ 
+     // Tensor lookup. Returns nullptr if not found.
+     struct ggml_tensor* tensor(const std::string& name) const;
++    const PackedQ8* packed_q8(const ggml_tensor* tensor) const;
+     bool                has(const std::string& name) const;
+ 
+     // Cast all small (1-D / scalar / few-row) f16 tensors to f32 in-place.
+@@ -77,6 +79,7 @@ private:
+     ggml_backend_buffer_t     promote_buffer_ = nullptr;  // owns promoted weight data
+     std::vector<std::string>  tensor_names_;
+     std::unordered_map<std::string, struct ggml_tensor*> tensor_by_name_;
++    std::unordered_map<const ggml_tensor*, std::unique_ptr<PackedQ8>> packed_q8_;
+     Config                    cfg_{};
+ };
+ 
+diff --git a/src/qwen3.cpp b/src/qwen3.cpp
+index 7ba8e28..d08e090 100644
+--- a/src/qwen3.cpp
++++ b/src/qwen3.cpp
+@@ -1,6 +1,7 @@
+ #include "qwen3.hpp"
+ #include "backend.hpp"
+ #include "cpu_softmax.hpp"
++#include "cpu_q8.hpp"
+ #include "ggml-cpu.h"
+ 
+ #include <cmath>
+@@ -49,6 +50,13 @@ bool qwen3_load_layer(const ModelLoader& m, const std::string& prefix, int i, Qw
+     ok &= get("ffn_gate.weight",    &out->ffn_gate);
+     ok &= get("ffn_up.weight",      &out->ffn_up);
+     ok &= get("ffn_down.weight",    &out->ffn_down);
++    out->packed_q = m.packed_q8(out->attn_q);
++    out->packed_k = m.packed_q8(out->attn_k);
++    out->packed_v = m.packed_q8(out->attn_v);
++    out->packed_o = m.packed_q8(out->attn_o);
++    out->packed_gate = m.packed_q8(out->ffn_gate);
++    out->packed_up = m.packed_q8(out->ffn_up);
++    out->packed_down = m.packed_q8(out->ffn_down);
+     return ok;
+ }
+ 
+@@ -77,9 +85,10 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor*
+     struct ggml_tensor* xn = rms_norm(ctx, x, w.attn_norm, eps);
+ 
+     // ---- q, k, v (no bias in Qwen3) ----
+-    struct ggml_tensor* q = ggml_mul_mat(ctx, w.attn_q, xn);
+-    struct ggml_tensor* k = ggml_mul_mat(ctx, w.attn_k, xn);
+-    struct ggml_tensor* v = ggml_mul_mat(ctx, w.attn_v, xn);
++    auto* xn_q8 = cpu_decode_quantize(ctx, xn, w.packed_q);
++    struct ggml_tensor* q = cpu_decode_mul_mat(ctx, w.attn_q, xn, w.packed_q, xn_q8);
++    struct ggml_tensor* k = cpu_decode_mul_mat(ctx, w.attn_k, xn, w.packed_k, xn_q8);
++    struct ggml_tensor* v = cpu_decode_mul_mat(ctx, w.attn_v, xn, w.packed_v, xn_q8);
+ 
+     // Reshape to [hd, n_h, seq, batch] and [hd, n_kv_h, seq, batch].
+     q = ggml_reshape_4d(ctx, q, hd, n_h,    n_tokens, n_batch);
+@@ -171,20 +180,21 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor*
+     o = ggml_cont_2d(ctx, o, n_h * hd, n_tokens * n_batch);
+     if (n_batch > 1) o = ggml_reshape_3d(ctx, o, n_h * hd, n_tokens, n_batch);
+ 
+-    o = ggml_mul_mat(ctx, w.attn_o, o);
++    o = cpu_decode_mul_mat(ctx, w.attn_o, o, w.packed_o);
+     struct ggml_tensor* h = ggml_add(ctx, x, o);
+ 
+     // ---- FFN: SwiGLU = down( silu(gate(x)) * up(x) ) ----
+     struct ggml_tensor* hn = rms_norm(ctx, h, w.ffn_norm, eps);
+-    struct ggml_tensor* g  = ggml_mul_mat(ctx, w.ffn_gate, hn);
+-    struct ggml_tensor* u  = ggml_mul_mat(ctx, w.ffn_up,   hn);
++    auto* hn_q8 = cpu_decode_quantize(ctx, hn, w.packed_gate);
++    struct ggml_tensor* g = cpu_decode_mul_mat(ctx, w.ffn_gate, hn, w.packed_gate, hn_q8);
++    struct ggml_tensor* u = cpu_decode_mul_mat(ctx, w.ffn_up, hn, w.packed_up, hn_q8);
+     const char* opt = std::getenv("MTD_CPU_OPT");
+     // One AVX-512/AVX2 pass instead of two passes and two graph barriers.
+     // The fused kernel uses the same vector SiLU and multiply primitives.
+     struct ggml_tensor* activation = opt && (std::atoi(opt) & 4)
+         ? ggml_swiglu_split(ctx, g, u)
+         : ggml_mul(ctx, ggml_silu(ctx, g), u);
+-    struct ggml_tensor* f = ggml_mul_mat(ctx, w.ffn_down, activation);
++    struct ggml_tensor* f = cpu_decode_mul_mat(ctx, w.ffn_down, activation, w.packed_down);
+ 
+     out.y = ggml_add(ctx, h, f);
+     return out;
+diff --git a/src/qwen3.hpp b/src/qwen3.hpp
+index 97b5e13..d51ade5 100644
+--- a/src/qwen3.hpp
++++ b/src/qwen3.hpp
+@@ -8,6 +8,8 @@ struct Qwen3Hparams { int hidden=0,n_heads=0,n_kv_heads=0,head_dim=0,intermediat
+ struct Qwen3Layer {
+     struct ggml_tensor *attn_norm=nullptr,*attn_q=nullptr,*attn_k=nullptr,*attn_v=nullptr,*attn_o=nullptr,
+                        *q_norm=nullptr,*k_norm=nullptr,*ffn_norm=nullptr,*ffn_gate=nullptr,*ffn_up=nullptr,*ffn_down=nullptr;
++    const PackedQ8 *packed_q=nullptr,*packed_k=nullptr,*packed_v=nullptr,*packed_o=nullptr,
++                   *packed_gate=nullptr,*packed_up=nullptr,*packed_down=nullptr;
+ };
+ // Load one transformer layer's weights. The prefix overload reads
+ // `{prefix}.blk.{i}.*` (e.g. "qwen3" or "local"); the 2-arg overload defaults
+diff --git a/src/qwen3_decoder.cpp b/src/qwen3_decoder.cpp
+index bac29e0..88f38ce 100644
+--- a/src/qwen3_decoder.cpp
++++ b/src/qwen3_decoder.cpp
+@@ -1,4 +1,5 @@
+ #include "qwen3_decoder.hpp"
++#include "cpu_q8.hpp"
+ #include <cstdlib>
+ 
+ #include "backend.hpp"
+@@ -177,8 +178,8 @@ std::vector<float> Qwen3Decoder::logits_from_hidden(const std::vector<float>& hi
+ 
+     struct ggml_tensor* hin = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, H, 1);
+     ggml_set_input(hin);
+-    struct ggml_tensor* logits = ggml_mul_mat(ctx, token_embd_, hin);
+-    ggml_mul_mat_set_prec(logits, GGML_PREC_F32);
++    struct ggml_tensor* logits = cpu_decode_mul_mat(ctx, token_embd_, hin, m_->packed_q8(token_embd_));
++    if (logits->op == GGML_OP_MUL_MAT) ggml_mul_mat_set_prec(logits, GGML_PREC_F32);
+     ggml_set_output(logits);
+ 
+     auto* gf = ggml_new_graph(ctx);
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 0bd9e0e..22d2ba3 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -10,6 +10,8 @@ endmacro()
+ 
+ mt_add_test(test_audio_io)
+ mt_add_test(test_cpu_softmax)
++mt_add_test(test_cpu_q8)
++target_include_directories(test_cpu_q8 PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
+ 
+ # Research executable, deliberately outside CTest: it reports arithmetic drift
+ # from packed kernels and returns failure when raw float bits differ.
+diff --git a/tests/test_cpu_q8.cpp b/tests/test_cpu_q8.cpp
+new file mode 100644
+index 0000000..3243c0a
+--- /dev/null
++++ b/tests/test_cpu_q8.cpp
+@@ -0,0 +1,115 @@
++// Graph-level exact-output gate, including activation conversion and ggml's
++// persistent workers. Packing is excluded from graph timings, reported separately.
++#include "cpu_q8.hpp"
++#include "ggml-cpu.h"
++#include "ggml-alloc.h"
++#define GGML_COMMON_DECL_CPP
++#include "ggml-common.h"
++#include <algorithm>
++#include <chrono>
++#include <cmath>
++#include <cstdio>
++#include <cstring>
++#include <random>
++#include <vector>
++
++int main() {
++    if (!mt::cpu_exact_q8_supported()) return 77;
++    auto backend = ggml_backend_cpu_init();
++    const auto* traits = ggml_get_type_traits_cpu(GGML_TYPE_Q8_0);
++    bool passed = true;
++    for (int threads : {1, 16}) {
++        ggml_backend_cpu_set_n_threads(backend, threads);
++        for (const auto dims : {std::pair<int,int>{32,17}, {1024,1024}, {1024,2048},
++                                {1024,3072}, {3072,1024}, {1024,151936}}) {
++        for (const char* distribution : {"normal", "extreme", "zero"}) {
++            const int k = dims.first, n = dims.second, blocks = k / 32;
++            std::mt19937 random(20261009); std::normal_distribution<float> normal(0, 1);
++            std::vector<block_q8_0> raw(static_cast<size_t>(blocks) * n);
++            std::vector<float> row(k), input(k);
++            for (int r = 0; r < n; ++r) {
++                for (auto& f : row) f = normal(random);
++                traits->from_float(row.data(), raw.data() + static_cast<size_t>(r) * blocks, k);
++            }
++            for (auto& f : input) f = normal(random);
++            if (std::strcmp(distribution, "normal")) {
++                const bool zero = !std::strcmp(distribution, "zero");
++                const int8_t codes[] = {-128,-127,0,127};
++                for (size_t b = 0; b < raw.size(); ++b) {
++                    raw[b].d = ggml_fp32_to_fp16(zero ? 0.f : 1.f / (1 + b % 9));
++                    for (int j = 0; j < 32; ++j) raw[b].qs[j] = zero ? 0 : codes[(b+j) % 4];
++                }
++                const float values[] = {-1000.f, 1000.f, -0.f, 1e-12f, -1e-12f};
++                for (int j = 0; j < k; ++j) input[j] = zero ? 0.f : values[j % 5];
++            }
++            auto ctx = ggml_init({2*1024*1024, nullptr, true});
++            auto w = ggml_new_tensor_2d(ctx, GGML_TYPE_Q8_0, k, n);
++            auto x = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, k, 1);
++            ggml_set_input(w); ggml_set_input(x);
++            auto start = std::chrono::steady_clock::now();
++            auto pack = mt::cpu_pack_q8(w, raw.data());
++            const double packing_us = std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count()*1e6;
++            if (!pack || !pack->round_trip_exact(raw.data())) return 2;
++            auto reference = ggml_mul_mat(ctx, w, x);
++            auto q = mt::cpu_decode_quantize(ctx, x, pack.get());
++            auto shared = mt::cpu_decode_mul_mat(ctx, w, x, pack.get(), q);
++            auto separate = mt::cpu_decode_mul_mat(ctx, w, x, pack.get());
++            if (shared->op != GGML_OP_MAP_CUSTOM2 || separate->op != GGML_OP_MAP_CUSTOM2) return 2;
++            for (auto t : {reference, shared, separate, q}) ggml_set_output(t);
++            auto graph = ggml_new_graph(ctx);
++            for (auto t : {reference, shared, separate, q}) ggml_build_forward_expand(graph, t);
++            auto alloc = ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
++            if (!ggml_gallocr_alloc_graph(alloc, graph)) return 2;
++            ggml_backend_tensor_set(w, raw.data(), 0, raw.size()*sizeof(block_q8_0));
++            ggml_backend_tensor_set(x, input.data(), 0, input.size()*sizeof(float));
++            if (ggml_backend_graph_compute(backend, graph) != GGML_STATUS_SUCCESS) return 2;
++            std::vector<float> a(n), b(n), c(n);
++            ggml_backend_tensor_get(reference, a.data(), 0, a.size()*sizeof(float));
++            ggml_backend_tensor_get(shared, b.data(), 0, b.size()*sizeof(float));
++            ggml_backend_tensor_get(separate, c.data(), 0, c.size()*sizeof(float));
++            std::vector<block_q8_0> expected(blocks), actual(blocks);
++            traits->from_float(input.data(), expected.data(), k);
++            ggml_backend_tensor_get(q, actual.data(), 0, actual.size()*sizeof(block_q8_0));
++            const bool conversion_exact = !std::memcmp(expected.data(), actual.data(), actual.size()*sizeof(block_q8_0));
++            size_t differences = 0;
++            for (int r = 0; r < n; ++r) {
++                differences += std::memcmp(&a[r], &b[r], sizeof(float)) != 0;
++                differences += std::memcmp(&a[r], &c[r], sizeof(float)) != 0;
++                passed &= std::isfinite(a[r]) && std::isfinite(b[r]) && std::isfinite(c[r]);
++            }
++            passed &= !differences && conversion_exact;
++            double rt = 0, ct = 0;
++            if (!std::strcmp(distribution, "normal")) {
++                auto rg = ggml_new_graph(ctx); ggml_build_forward_expand(rg, reference);
++                auto cg = ggml_new_graph(ctx); ggml_build_forward_expand(cg, shared);
++                std::vector<double> rtimes, ctimes;
++                for (int round = 0; round < 6; ++round) for (int step = 0; step < 2; ++step) {
++                    const bool optimized = (round+step) % 2;
++                    auto begin = std::chrono::steady_clock::now();
++                    for (int repeat = 0; repeat < 20; ++repeat)
++                        if (ggml_backend_graph_compute(backend, optimized ? cg : rg) != GGML_STATUS_SUCCESS) return 2;
++                    const double us = std::chrono::duration<double>(std::chrono::steady_clock::now()-begin).count()*1e6/20;
++                    if (round) (optimized ? ctimes : rtimes).push_back(us);
++                }
++                std::sort(rtimes.begin(), rtimes.end()); std::sort(ctimes.begin(), ctimes.end());
++                rt = rtimes[2]; ct = ctimes[2];
++            }
++            std::printf("{\"threads\":%d,\"K\":%d,\"N\":%d,\"M\":1,\"distribution\":\"%s\",\"activationQuantizationExact\":%s,\"floatBitDifferences\":%zu,\"packingUs\":%.3f,\"referenceGraphUs\":%.3f,\"candidateGraphUs\":%.3f,\"speedup\":%.4f}\n",
++                threads,k,n,distribution,conversion_exact ? "true" : "false",differences,packing_us,rt,ct,ct ? rt/ct : 0);
++            ggml_gallocr_free(alloc); ggml_free(ctx);
++        }
++        }
++        // Prefill remains the same eager op, with ordinary weights.
++        auto ctx = ggml_init({2*1024*1024, nullptr, true});
++        auto w = ggml_new_tensor_2d(ctx, GGML_TYPE_Q8_0, 32, 17);
++        auto x = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, 32, 16);
++        std::vector<block_q8_0> zeros(17);
++        auto pack = mt::cpu_pack_q8(w, zeros.data());
++        passed &= mt::cpu_decode_quantize(ctx, x, pack.get()) == nullptr;
++        passed &= mt::cpu_decode_mul_mat(ctx, w, x, pack.get())->op == GGML_OP_MUL_MAT;
++        passed &= mt::cpu_decode_mul_mat(ctx, w, x, nullptr)->op == GGML_OP_MUL_MAT;
++        ggml_free(ctx);
++    }
++    ggml_backend_free(backend);
++    return passed ? 0 : 1;
++}
