@@ -1,0 +1,19 @@
+diff --git a/tests/test_model_mapping.cpp b/tests/test_model_mapping.cpp
+index 383fbe5..fc19a91 100644
+--- a/tests/test_model_mapping.cpp
++++ b/tests/test_model_mapping.cpp
+@@ -42,6 +42,14 @@ void write_model(const std::string& path,uint32_t alignment=32,int padding=0) {
+     gguf_set_val_u32(gguf,"general.alignment",alignment);
+     gguf_set_val_u32(gguf,"mtd.text.hidden",32);
+     gguf_set_val_str(gguf,"test.padding",std::string(padding,'x').c_str());
++    if (alignment != 32) {
++        // Setting general.alignment changes metadata, not the writer context's
++        // cached alignment. Reopen the tensorless header so offsets and payload
++        // padding are actually generated using the requested alignment.
++        require(gguf_write_to_file(gguf,path.c_str(),true),"write alignment header");
++        gguf_free(gguf);
++        gguf=gguf_init_from_file(path.c_str(),{true,nullptr});require(gguf,"alignment header");
++    }
+     gguf_add_tensor(gguf,f);gguf_add_tensor(gguf,q);gguf_add_tensor(gguf,h);
+     require(gguf_write_to_file(gguf,path.c_str(),false),"write");
+     gguf_free(gguf);ggml_free(ctx);

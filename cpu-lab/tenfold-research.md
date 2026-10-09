@@ -345,3 +345,38 @@ the frozen fastest opt48 reference. Encoder, prefill and loading must improve
 alongside decoding. Track persistent/batch throughput separately, preserve
 full text/speaker/timestamp/EOS gates, and avoid rerunning rejected kernels
 without a concrete implementation change.
+
+## September/October 2026 matrix-engine research
+
+[BF16 component-product emulation, September 4, 2026](https://arxiv.org/html/2609.04663)
+splits each FP32 operand into three BF16 residual components and evaluates six
+selected products. Prepacked panels and a tile-resident reuse schedule limit
+conversion and intermediate traffic. It targets FP32-level error relative to
+oneMKL SGEMM and explicitly does not promise bitwise identity. Its measurements
+use a dual-socket Xeon 8462Y+ with 64 physical workers. This is a candidate for
+an arithmetic probe, not evidence for MOSS speed or exactness on hp-fury.
+
+[HiNa-MoE, October 4, 2026](https://arxiv.org/html/2610.05123) investigates CPU
+matrix-engine tiling, fused layout transformation and MoE scheduling. Its
+reported gains use BF16 MoE workloads. MOSS is dense, Q8 and single-NUMA here;
+the reusable ideas are packing and scheduling, not its numerical format or
+published speed ratios.
+
+The pinned `ggml_compute_forward_mul_mat` in
+`third_party/ggml/src/ggml-cpu/ggml-cpu.c` first tries llamafile SGEMM and otherwise
+converts F32 activations to the weight type's dot format. Its Q8_0 SGEMM case
+also rejects an F32 right-hand operand: both ordinary Q8 routes use Q8_0
+activations. Replacing this with a plain FP32/BF16 product would change both
+activation conversion and reduction. A new probe must identify the executed
+multirow path, preserve its inputs, and report raw float differences before
+full-output gating. Neither paper establishes that equivalence.
+
+A separate next experiment is to share Q8 activation conversion across Q/K/V
+and gate/up while retaining ordinary weight storage and the reference
+`ggml_mul_mat`. The archived opt816 trial combined shared conversion with
+custom packed weights and dots; it did not isolate conversion sharing. A
+conversion-only probe can avoid its extra packing/storage cost. It must still
+compare the actual raw Q8 activation bytes and float outputs at one and multiple
+input rows: an already-Q8 operand reaches SGEMM at a different dispatch point.
+Conversion, scheduler barriers and full loading/inference remain timed. This
+is a proposed experiment, with no measured gain or integration yet.
