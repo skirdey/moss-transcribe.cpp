@@ -1,5 +1,7 @@
 #include "qwen3.hpp"
 #include "backend.hpp"
+#include "cpu_softmax.hpp"
+#include "ggml-cpu.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -155,7 +157,10 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
     } else {
     struct ggml_tensor* scores = ggml_mul_mat(ctx, k_p, q_p);
     ggml_mul_mat_set_prec(scores, GGML_PREC_F32);
-    struct ggml_tensor* attn = ggml_soft_max_ext(ctx, scores, mask, scale, /*max_bias=*/0.0f);
+    struct ggml_tensor* attn = cpu_opt && (std::atoi(cpu_opt) & 32) && n_tokens == 1 && !mask
+        && ggml_backend_is_cpu(backend())
+        ? cpu_decode_softmax(ctx, scores, q_p)
+        : ggml_soft_max_ext(ctx, scores, mask, scale, /*max_bias=*/0.0f);
 
     struct ggml_tensor* v_t = transposed_v ? v_used
         : maybe_cont(ctx, ggml_transpose(ctx, v_p));  // [seq_kv, hd, n_kv, b]
