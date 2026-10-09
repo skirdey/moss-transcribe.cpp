@@ -299,6 +299,18 @@ std::vector<int32_t> greedy_generate(Qwen3Decoder& dec, ModelLoader& m,
     }
     MT_LOGI("CPU_PROFILE prefill=%.6f embedding=%.6f decoder=%.6f logits=%.6f",
         prefill_seconds, embed_seconds, decoder_seconds, logits_seconds);
+    // Explicit diagnostic only: token IDs can reconstruct private transcripts.
+    // Keep these logs private; publish aggregate replay statistics and hashes.
+    const char* trace = std::getenv("MTD_TRACE_TOKENS");
+    if (trace && std::strcmp(trace, "1") == 0) {
+        std::string values = "[";
+        for (size_t i = 0; i < ids.size(); ++i) {
+            if (i) values += ',';
+            values += std::to_string(ids[i]);
+        }
+        values += ']';
+        MT_LOGI("BENCH_TOKEN_TRACE eos=%d ids=%s", eos, values.c_str());
+    }
     return ids;
 }
 
