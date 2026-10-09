@@ -90,6 +90,7 @@ void Qwen3Decoder::reset() {
 
 bool Qwen3Decoder::run(const std::vector<float>& embeds, int T,
                        std::vector<float>* out_hidden) {
+    CpuThreadScope threads(T > 1 ? CpuThreadPhase::Prefill : CpuThreadPhase::Decode);
     CpuPhaseScope phase(T > 1 ? CpuPhase::Prefill : CpuPhase::Decode);
     CpuTimer build_timer;
     const int L    = hp_.n_layers;
@@ -169,6 +170,7 @@ std::vector<float> Qwen3Decoder::decode_one(const std::vector<float>& embed) {
 }
 
 std::vector<float> Qwen3Decoder::logits_from_hidden(const std::vector<float>& hidden_row) {
+    CpuThreadScope threads(CpuThreadPhase::Logits);
     CpuPhaseScope phase(CpuPhase::Logits);
     CpuTimer build_timer;
     std::vector<float> out;

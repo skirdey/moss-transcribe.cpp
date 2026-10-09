@@ -1,0 +1,24 @@
+{
+  "outcome": "Initial planned 36-run grid aborted during its last discarded warmup; no timed rows were recorded.",
+  "timedRuns": 0,
+  "warmupVariant": "48@16-passive",
+  "warmupTimeoutSeconds": 300,
+  "precedingWarmups": "Five subprocesses returned; output was discarded, so their EOS was not retained.",
+  "sourceCommit": "cbf3878f049d4077741789f9946e30e6ad767896",
+  "nativeBinarySourceCommit": "0cb554be5e4dd6fecd9e4fabd66c917b0a08da13",
+  "nativeCodeMatchesFrozenBuild": true,
+  "nativeCodeDifferences": [],
+  "currentArtifactSha256": {
+    "/home/stan/hw-moss-thread-scheduling-v1/build/moss-transcribe": "c173efe37a5356d256c5e2436bbcd1d6329f0e75487e7e8b99831087e876f491",
+    "/home/stan/hw-moss-thread-scheduling-v1/moss_cpu_regression.py": "a58cc8d369146537b4491c9e249cb0ad8782c6cbf78812f321603238b32d6914",
+    "/home/stan/hw-audio-bench/models/moss-transcribe-q8_0.gguf": "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c",
+    "/lib/x86_64-linux-gnu/libgomp.so.1": "135f3c8f006d2fe5e68e51281c7974cb991a03de3bfb3593d68d174dfcf854d1",
+    "/home/stan/hw-moss-thread-scheduling-v1/build/third_party/ggml/src/libggml-base.so": "0eb3736099e9718a5f5074bb0b586d9bd5912a2f9aa609cf354723a0c5bd9317",
+    "/home/stan/hw-moss-thread-scheduling-v1/build/third_party/ggml/src/libggml-cpu.so": "43fea895a5c843ed8dbe58f49b8dd7abef6ddd81cbf706f458bc5ca803a68ceb",
+    "/home/stan/hw-moss-thread-scheduling-v1/build/third_party/ggml/src/libggml.so": "e235617ca983089367bfd5f793f69193f44f13e7dd08dd9c8448f4de72afa1a2"
+  },
+  "originalWarmupArtifactGatePersisted": false,
+  "productionPromoted": false,
+  "automaticProcessingRestored": true,
+  "postFailureHealth": "ok"
+}

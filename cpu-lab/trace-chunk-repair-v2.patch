@@ -1,0 +1,99 @@
+diff --git a/cpu-lab/moss_ngram_audit.py b/cpu-lab/moss_ngram_audit.py
+index eee6367..802706f 100644
+--- a/cpu-lab/moss_ngram_audit.py
++++ b/cpu-lab/moss_ngram_audit.py
+@@ -69,11 +69,24 @@ def replay(tokens, eos, maximum=8, minimum_ngram=2, maximum_ngram=16):
+ 
+ def read_trace(path):
+     contents = Path(path).read_bytes()
+-    matches = re.findall(rb'BENCH_TOKEN_TRACE eos=(\d+) ids=(\[[0-9, -]*\])', contents)
++    chunks = re.findall(rb'BENCH_TOKEN_TRACE eos=(\d+) total=(\d+) offset=(\d+) ids=(\[[0-9, -]*\])', contents)
++    legacy = re.findall(rb'BENCH_TOKEN_TRACE eos=(\d+) ids=(\[[0-9, -]*\])', contents)
+     generation = re.findall(rb'BENCH_GENERATION tokens=(\d+) stop=(\w+)', contents)
+-    if len(matches) != 1 or len(generation) != 1:
+-        raise ValueError('Need exactly one token trace and generation record')
+-    eos = int(matches[0][0]); tokens = json.loads(matches[0][1])
++    record_count = len(re.findall(rb'BENCH_TOKEN_TRACE ', contents))
++    if len(generation) != 1 or record_count != len(chunks)+len(legacy):
++        raise ValueError('Truncated trace or missing/duplicate generation record')
++    if chunks:
++        if legacy: raise ValueError('Mixed trace formats')
++        eos = int(chunks[0][0]); total = int(chunks[0][1]); tokens = []
++        for chunk_eos, chunk_total, offset, values in chunks:
++            decoded = json.loads(values)
++            if int(chunk_eos)!=eos or int(chunk_total)!=total or int(offset)!=len(tokens) or not decoded:
++                raise ValueError('Missing, reordered, duplicate or inconsistent trace chunks')
++            tokens.extend(decoded)
++        if len(tokens)!=total: raise ValueError('Incomplete trace tail')
++    else:
++        if len(legacy)!=1: raise ValueError('Need one complete token trace')
++        eos = int(legacy[0][0]); tokens = json.loads(legacy[0][1])
+     if not isinstance(tokens,list) or any(type(token) is not int or token < 0 for token in tokens):
+         raise ValueError('Token IDs must be nonnegative integers')
+     if generation[0][1] != b'eos' or len(tokens) != int(generation[0][0]):
+diff --git a/cpu-lab/test_moss_ngram_audit.py b/cpu-lab/test_moss_ngram_audit.py
+index c815815..aec534d 100644
+--- a/cpu-lab/test_moss_ngram_audit.py
++++ b/cpu-lab/test_moss_ngram_audit.py
+@@ -1,4 +1,5 @@
+ import tempfile
++import json
+ from pathlib import Path
+ import unittest
+ from moss_ngram_audit import draft, read_trace, replay
+@@ -46,5 +47,25 @@ class DraftReplayTest(unittest.TestCase):
+             path.write_text('BENCH_GENERATION tokens=4 stop=eos\nBENCH_TOKEN_TRACE eos=99 ids=[1,2,99]\n')
+             with self.assertRaises(ValueError): read_trace(path)
+ 
++    def test_long_trace_chunks_preserve_all_tokens_and_require_contiguous_offsets(self):
++        values=list(range(600))+[100000]
++        records=['BENCH_GENERATION tokens=601 stop=eos']
++        for offset in range(0,len(values),128):
++            records.append('BENCH_TOKEN_TRACE eos=100000 total=601 offset='+str(offset)+' ids='+json.dumps(values[offset:offset+128]))
++        with tempfile.TemporaryDirectory() as directory:
++            path=Path(directory)/'private.log'
++            path.write_text('\n'.join(records)+'\n')
++            self.assertEqual(read_trace(path)[0],values)
++            for broken in (records[:-1], records[:2]+records[3:], records+[records[1]],
++                           records[:2]+[records[2][:-5]]+records[3:]):
++                path.write_text('\n'.join(broken)+'\n')
++                with self.assertRaises(ValueError): read_trace(path)
++
++    def test_logger_truncation_is_rejected_even_if_the_generation_count_is_complete(self):
++        with tempfile.TemporaryDirectory() as directory:
++            path=Path(directory)/'private.log'
++            path.write_text('BENCH_GENERATION tokens=3 stop=eos\nBENCH_TOKEN_TRACE eos=99 ids=[1,2,')
++            with self.assertRaises(ValueError): read_trace(path)
++
+ 
+ if __name__ == '__main__': unittest.main()
+diff --git a/src/generate.cpp b/src/generate.cpp
+index 301f04a..90f979f 100644
+--- a/src/generate.cpp
++++ b/src/generate.cpp
+@@ -303,13 +303,19 @@ std::vector<int32_t> greedy_generate(Qwen3Decoder& dec, ModelLoader& m,
+     // Keep these logs private; publish aggregate replay statistics and hashes.
+     const char* trace = std::getenv("MTD_TRACE_TOKENS");
+     if (trace && std::strcmp(trace, "1") == 0) {
+-        std::string values = "[";
+-        for (size_t i = 0; i < ids.size(); ++i) {
+-            if (i) values += ',';
+-            values += std::to_string(ids[i]);
++        // The callback logger has a 2048-byte buffer. Even 128 ten-digit IDs
++        // plus metadata fit, so long generations cannot silently lose a tail.
++        constexpr size_t chunk = 128;
++        for (size_t offset = 0; offset < ids.size(); offset += chunk) {
++            std::string values = "[";
++            for (size_t i = offset; i < std::min(ids.size(), offset+chunk); ++i) {
++                if (i != offset) values += ',';
++                values += std::to_string(ids[i]);
++            }
++            values += ']';
++            MT_LOGI("BENCH_TOKEN_TRACE eos=%d total=%zu offset=%zu ids=%s",
++                eos, ids.size(), offset, values.c_str());
+         }
+-        values += ']';
+-        MT_LOGI("BENCH_TOKEN_TRACE eos=%d ids=%s", eos, values.c_str());
+     }
+     return ids;
+ }

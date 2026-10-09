@@ -1,0 +1,24 @@
+{
+  "outcome": "Full-output/EOS smokes passed, but the replay audit rejected the incomplete English trace before producing a usable report.",
+  "sourceCommit": "7abfbc7b147955b54205c6f4278416310e964fa2",
+  "binarySha256": "89778000327ce5dea2272b8a24a47c0619ac19e244ca4eeb022e11ec6ed6d303",
+  "nativeModelIndependentTests": 9,
+  "nativeTestsPassed": true,
+  "pythonTests": 21,
+  "pythonTestsPassed": true,
+  "smokeReport": "trace-smoke-v1.json",
+  "fullOutputAndEosSmokesPassed": 3,
+  "usableReplayRows": 0,
+  "loggerMessageBufferBytes": 2048,
+  "traceObservations": [
+    {"case": "meeting-60s", "traceRecords": 1, "traceLineBytesIncludingPrefix": 2054, "hasCompleteArray": false},
+    {"case": "dinner-60s", "traceRecords": 1, "traceLineBytesIncludingPrefix": 1854, "hasCompleteArray": true},
+    {"case": "vox-vmaiq-60s", "traceRecords": 1, "traceLineBytesIncludingPrefix": 1978, "hasCompleteArray": true}
+  ],
+  "parserFailure": "Need exactly one token trace and generation record",
+  "repair": "Emit at most 128 IDs per record with total and offset; reject gaps, duplication, reorder, inconsistency and incomplete tails.",
+  "rawTokenIdsPublished": false,
+  "productionPromoted": false,
+  "automaticProcessingRestored": true,
+  "authenticatedPostFailureHealth": "ok"
+}

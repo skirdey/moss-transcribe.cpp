@@ -1,0 +1,54 @@
+{
+  "protocol": "Native Release model-independent CTests and Python gate/replay tests. Frozen local identities map to public trees in thread-scheduling.md. Logs remain private; hashes and aggregate results only. Model output and latency gates are separate.",
+  "nativeBuilds": [
+    {
+      "name": "initialTrace",
+      "root": "/home/stan/hw-moss-ngram-audit-v1",
+      "sourceCommit": "7abfbc7b147955b54205c6f4278416310e964fa2",
+      "sourceTree": "d441861f05eda71e7caf2aa7306669715f977b67",
+      "sourceClean": true,
+      "nativeTests": 9,
+      "nativeTestsPassed": true,
+      "pythonTests": 21,
+      "pythonTestsPassed": true,
+      "ctestLogSha256": "b66b26702d9360a3f4e8672e9dd81b8c8d07115aeb7a70bd09c0d5fe4c61b24a",
+      "pythonLogSha256": "1d8170c6d126f7d82088a647b4863a8c5c09c279d6d63f82f2fda0ad3a747c0d"
+    },
+    {
+      "name": "repairedTrace",
+      "root": "/home/stan/hw-moss-ngram-chunks-v2",
+      "sourceCommit": "bbd30c414562225a8e310ea43e42407aab1f5373",
+      "sourceTree": "8621748decfcd9d91a98d80013c969d0d4d70bd2",
+      "sourceClean": true,
+      "nativeTests": 9,
+      "nativeTestsPassed": true,
+      "pythonTests": 23,
+      "pythonTestsPassed": true,
+      "ctestLogSha256": "4579ea2a10635575e0719e75baeceef6b6077d3a871bdea88e3270909878e675",
+      "pythonLogSha256": "93ac8fc9821a401cb9f2b020d7075ad8227f3e662d499adb9f716d19e6afd2f8"
+    },
+    {
+      "name": "boundedPhaseThreads",
+      "root": "/home/stan/hw-moss-phase-threads-v1",
+      "sourceCommit": "ed49b96436cb1cd31f52eacdbf6db70710899a8a",
+      "sourceTree": "65068ca021e8fd0fd89775974666ec02959721d6",
+      "sourceClean": true,
+      "nativeTests": 10,
+      "nativeTestsPassed": true,
+      "pythonTests": 25,
+      "pythonTestsPassed": true,
+      "ctestLogSha256": "057a2606425a78308b1e9ceda4989bd5631752a97b4af5009fb93c867d34ddc4",
+      "pythonLogSha256": "c10ceef375d8373ad71f2dddce32d1f09c348648fa3c4c5effe52ef4d33f1f62",
+      "workerBudgetTestPassed": true
+    }
+  ],
+  "publicSourceEquivalents": {
+    "unchangedUniformNative": "dd6b1f859b7ff5025bbdfa4eee96eba1b45f90a4",
+    "initialTraceCode": "53b4c6450b16bcf54d740eb2f7a852c2d26cb61f",
+    "repairedTrace": "53b4c6 plus trace-chunk-repair-v2.patch",
+    "boundedPhaseThreadsCompleteTree": "1ecadbd2c6a84e61a373850ab94c61bb7a0be7ec"
+  },
+  "repairedTraceTreeReconstructionVerified": true,
+  "productionPromoted": false,
+  "rawTokensPublished": false
+}

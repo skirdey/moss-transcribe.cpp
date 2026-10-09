@@ -1,6 +1,6 @@
 """Meaningful failure-mode tests for the optimization acceptance gate."""
 import unittest
-from moss_cpu_regression import evaluate
+from moss_cpu_regression import evaluate, run_environment, variant_settings
 
 
 class RegressionGateTest(unittest.TestCase):
@@ -49,6 +49,39 @@ class RegressionGateTest(unittest.TestCase):
 
     def test_missing_candidate_rejected(self):
         self.assertFalse(evaluate([self.row()])["passed"])
+
+    def test_thread_sweep_rejects_invalid_worker_counts_and_labels(self):
+        for label in ("48@0", "48@-1", "48@4-active", "48@4-passive-extra", "baseline@4"):
+            with self.subTest(label=label), self.assertRaises(ValueError):
+                variant_settings(label, 16)
+        self.assertEqual(variant_settings("48", 16), ("48", 16, False))
+        self.assertEqual(variant_settings("48@4-passive", 16), ("48", 4, True))
+
+    def test_default_control_cannot_inherit_passive_wait_or_thread_limit(self):
+        inherited = {"OMP_WAIT_POLICY": "PASSIVE", "GOMP_SPINCOUNT": "0",
+                     "OMP_DYNAMIC": "TRUE", "OMP_THREAD_LIMIT": "2"}
+        default = run_environment(inherited, {"OMP_PROC_BIND": "spread"}, "48", 16, "")
+        self.assertNotIn("OMP_WAIT_POLICY", default)
+        self.assertNotIn("GOMP_SPINCOUNT", default)
+        self.assertNotIn("OMP_THREAD_LIMIT", default)
+        self.assertEqual(default["OMP_DYNAMIC"], "FALSE")
+        self.assertEqual(default["OMP_NUM_THREADS"], "16")
+        passive = run_environment(inherited, {}, "48", 4, "", passive=True)
+        self.assertEqual(passive["OMP_WAIT_POLICY"], "PASSIVE")
+        self.assertEqual(passive["GOMP_SPINCOUNT"], "0")
+        self.assertEqual(passive["MTD_THREADS"], "4")
+
+    def test_reference_cannot_inherit_candidate_phase_budgets(self):
+        env = run_environment({"MTD_THREADS_DECODE":"4", "MTD_THREADS_WHISPER":"2"}, {}, "48", 16, "")
+        self.assertNotIn("MTD_THREADS_DECODE",env)
+        self.assertNotIn("MTD_THREADS_WHISPER",env)
+
+    def test_phase_budget_preserves_startup_cap_and_is_explicit(self):
+        env = run_environment({}, {}, "48", 16, "", phase_threads={"decode":8,"logits":8})
+        self.assertEqual(env["MTD_THREADS"],"16")
+        self.assertEqual(env["MTD_THREADS_DECODE"],"8")
+        self.assertEqual(env["MTD_THREADS_LOGITS"],"8")
+        self.assertNotIn("MTD_THREADS_PREFILL",env)
 
 
 if __name__ == "__main__":
