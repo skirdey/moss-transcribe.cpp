@@ -413,3 +413,19 @@ opt 48, with about 603 MiB more peak memory. All 18 measured outputs and EOS
 stops matched. The integration is archived as
 `cpu-lab/exact-decode-cast-v1.patch` against `338aa8d`; opt 816 is only for that
 isolated reproduction. Active loader/decoder source retains opt 48 behavior.
+
+
+### Frontend and phase isolation
+
+The [mel/encoder research report](cpu-lab/mel-phases.md) adds direct phase and
+graph-stage timings (`MTD_PROFILE=1`) and explicit numerical probes. Exact
+parallel DFT matched all 12 native float-bit cases and all six paired speech
+outputs. Its frontend samples were 5–18x faster, but the 36-run full-model pilot
+failed the English/German latency gate; even the same-opt control was unstable
+on this busy shared host. FFT and encoder-only AMX changed model outputs. All
+three transcription routes are archived in `mel-encoder-candidate-v1.patch`
+against `4f40141`; ordinary inference retains the serial frontend and loader.
+The kernels remain explicit research transforms, and all nine model-independent
+Ctests pass in a fresh probes-only build. No new end-to-end gain or production
+promotion is claimed; the 10x goal remains unachieved. PocketFFT retains its
+BSD-3-Clause license and attribution; our source changes remain MIT.
