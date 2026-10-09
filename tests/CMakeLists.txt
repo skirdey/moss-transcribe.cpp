@@ -11,6 +11,12 @@ endmacro()
 mt_add_test(test_audio_io)
 mt_add_test(test_cpu_softmax)
 mt_add_test(test_cpu_threads)
+mt_add_test(test_model_mapping)
+
+# Explicit full-checkpoint storage probe; ordinary CTest needs no model file.
+add_executable(moss_model_storage_bench ../cpu-lab/moss_model_storage_bench.cpp)
+target_include_directories(moss_model_storage_bench PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(moss_model_storage_bench PRIVATE moss-transcribe)
 mt_add_test(test_cpu_q8)
 target_include_directories(test_cpu_q8 PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 
