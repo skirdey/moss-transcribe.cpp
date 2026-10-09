@@ -1,10 +1,21 @@
 #include "model_loader.hpp"
 #include "backend.hpp"
 #include "common.hpp"
+#include "ggml-cpu.h"
 
 #include <cstdio>
+#include <cstddef>
+#include <cstdlib>
 #include <cstring>
+#include <limits>
 #include <vector>
+
+#ifndef _WIN32
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
 
 namespace mt {
 
@@ -14,8 +25,73 @@ ModelLoader::~ModelLoader() {
     if (promote_buffer_) ggml_backend_buffer_free(promote_buffer_);
     if (promote_ctx_)    ggml_free(promote_ctx_);
     if (backend_buffer_) ggml_backend_buffer_free(backend_buffer_);
+#ifndef _WIN32
+    if (mapped_size_)    munmap(mapped_data_, mapped_size_);
+#endif
     if (gguf_)           gguf_free(gguf_);
     if (ctx_)            ggml_free(ctx_);
+}
+
+ModelLoader::MapResult ModelLoader::try_cpu_map(const std::string& path) {
+#ifdef _WIN32
+    (void)path;
+    return MapResult::Unavailable;
+#else
+    const int fd = open(path.c_str(), O_RDONLY);
+    if (fd < 0) return MapResult::Unavailable;
+    struct stat info {};
+    if (fstat(fd, &info) || !S_ISREG(info.st_mode) || info.st_size <= 0) {
+        close(fd);
+        return MapResult::Unavailable;
+    }
+    if (static_cast<uintmax_t>(info.st_size) > static_cast<uintmax_t>(std::numeric_limits<ptrdiff_t>::max())) {
+        close(fd);
+        return MapResult::Invalid;
+    }
+    const size_t bytes = static_cast<size_t>(info.st_size);
+    const size_t data_off = gguf_get_data_offset(gguf_);
+    if (data_off > bytes) { close(fd); return MapResult::Invalid; }
+    const int64_t n = gguf_get_n_tensors(gguf_);
+    // Validate *every* range before attaching any tensor. Subtractions avoid
+    // offset/size overflow and reject truncated payloads without touching pages.
+    bool aligned = true;
+    size_t payload = 0;
+    for (int64_t i = 0; i < n; ++i) {
+        const size_t off = gguf_get_tensor_offset(gguf_, i);
+        const size_t size = gguf_get_tensor_size(gguf_, i);
+        auto* tensor = ggml_get_tensor(ctx_, gguf_get_tensor_name(gguf_, i));
+        if (!tensor || off > bytes-data_off || size > bytes-data_off-off ||
+            size != ggml_nbytes(tensor)) {
+            close(fd);
+            MT_LOGE("CPU mapped weights: invalid tensor range");
+            return MapResult::Invalid;
+        }
+        // Keep natural scalar alignment. The wrapper requires a page-aligned
+        // base but imposes no separate 64-byte alignment on each tensor.
+        aligned &= (data_off+off) % alignof(std::max_align_t) == 0;
+        payload += size; // GGUF already checked non-overlapping padded ranges.
+    }
+    if (!aligned) { close(fd); return MapResult::Unavailable; }
+    void* data = mmap(nullptr, bytes, PROT_READ, MAP_PRIVATE, fd, 0);
+    close(fd); // Mapping retains the inode; the wrapper does not own its pages.
+    if (data == MAP_FAILED) return MapResult::Unavailable;
+    if (!data) { munmap(data, bytes); return MapResult::Unavailable; }
+    auto buffer = ggml_backend_cpu_buffer_from_ptr(data, bytes);
+    if (!buffer) { munmap(data, bytes); return MapResult::Unavailable; }
+    backend_buffer_ = buffer;
+    mapped_data_ = data;
+    mapped_size_ = bytes;
+    for (int64_t i = 0; i < n; ++i) {
+        auto* tensor = ggml_get_tensor(ctx_, gguf_get_tensor_name(gguf_, i));
+        const size_t off = data_off+gguf_get_tensor_offset(gguf_, i);
+        if (ggml_backend_tensor_alloc(buffer, tensor, static_cast<uint8_t*>(data)+off) != GGML_STATUS_SUCCESS) {
+            MT_LOGE("CPU mapped weights: tensor attachment failed");
+            return MapResult::Invalid;
+        }
+    }
+    MT_LOGI("BENCH_MODEL_STORAGE mode=mapped fileBytes=%zu tensorBytes=%zu copiedBytes=0", bytes, payload);
+    return MapResult::Ready;
+#endif
 }
 
 bool ModelLoader::load(const std::string& path) {
@@ -25,9 +101,8 @@ bool ModelLoader::load(const std::string& path) {
     }
 
     // Load gguf metadata only (no_alloc=true). The actual tensor data is
-    // copied into a backend buffer below so it lives wherever ggml's
-    // active backend wants — CPU RAM by default, GPU VRAM when CUDA /
-    // Metal / Vulkan / hipBLAS is selected.
+    // attached to CPU file pages when explicitly requested, or copied into
+    // the active backend's buffer (CPU RAM or device memory).
     struct gguf_init_params p {};
     p.no_alloc = true;
     p.ctx      = &ctx_;
@@ -52,6 +127,20 @@ bool ModelLoader::load(const std::string& path) {
         tensor_by_name_.emplace(name, t);
     }
 
+    // Metadata is independent of weight storage.
+    read_config();
+    const char* opt = std::getenv("MTD_CPU_OPT");
+    if (n > 0 && opt && (std::atoi(opt) & 4096) && ggml_backend_is_cpu(mt::backend())) {
+        const auto mapped = try_cpu_map(path);
+        if (mapped == MapResult::Invalid) return false;
+        if (mapped == MapResult::Ready) {
+            MT_LOGI("loaded %s: %lld tensors, %lld kv (backend=%s, mapped)", path.c_str(),
+                static_cast<long long>(n), static_cast<long long>(gguf_get_n_kv(gguf_)), mt::backend_name());
+            return true;
+        }
+        MT_LOGW("CPU mapping unavailable; retaining copied weight storage");
+    }
+
     // Allocate every tensor in ctx_ on the active backend's buffer. After
     // this each ggml_tensor's `data` pointer references backend memory
     // (host pages on CPU; device VRAM on GPU). Reads/writes have to go
@@ -64,9 +153,6 @@ bool ModelLoader::load(const std::string& path) {
             return false;
         }
     }
-
-    // Parse the mtd.* metadata block (independent of tensor data).
-    read_config();
 
     if (n == 0) {
         MT_LOGI("loaded %s: %lld tensors, %lld kv (no tensor data)",
@@ -86,6 +172,7 @@ bool ModelLoader::load(const std::string& path) {
     }
     const size_t data_off = gguf_get_data_offset(gguf_);
     std::vector<uint8_t> stage;
+    size_t copied = 0;
     for (int64_t i = 0; i < n; ++i) {
         const char* name = gguf_get_tensor_name(gguf_, i);
         if (!name) continue;
@@ -102,8 +189,10 @@ bool ModelLoader::load(const std::string& path) {
             return false;
         }
         ggml_backend_tensor_set(t, stage.data(), 0, sz);
+        copied += sz;
     }
     std::fclose(fp);
+    MT_LOGI("BENCH_MODEL_STORAGE mode=copied tensorBytes=%zu copiedBytes=%zu", copied, copied);
 
     MT_LOGI("loaded %s: %lld tensors, %lld kv (backend=%s)",
                 path.c_str(),

@@ -33,6 +33,12 @@ public:
     // Also fills config() from the `mtd.*` KV block.
     bool load(const std::string& path);
 
+    // MTD_CPU_OPT bit 4096: POSIX CPU-only, read-only file-backed weights.
+    // The file must remain immutable while this loader is alive. GPU/Windows
+    // and unsuitable alignment retain the copied-buffer path. Promotion owns
+    // a separate writable buffer; mapping never changes stored weight bytes.
+    bool cpu_mapped() const { return mapped_size_ != 0; }
+
     // Parsed model configuration (populated by load()).
     const Config& config() const { return cfg_; }
 
@@ -69,12 +75,16 @@ public:
 private:
     // Fill cfg_ from the gguf `mtd.*` (and general.*) KV block.
     void read_config();
+    enum class MapResult { Unavailable, Invalid, Ready };
+    MapResult try_cpu_map(const std::string& path);
 
     struct gguf_context*      gguf_           = nullptr;
     struct ggml_context*      ctx_            = nullptr;  // tensor metadata
     struct ggml_context*      promote_ctx_    = nullptr;  // f32 promoted tensors
     ggml_backend_buffer_t     backend_buffer_ = nullptr;  // owns the actual weight data
     ggml_backend_buffer_t     promote_buffer_ = nullptr;  // owns promoted weight data
+    void*                     mapped_data_    = nullptr;  // released after buffer wrapper
+    size_t                    mapped_size_    = 0;
     std::vector<std::string>  tensor_names_;
     std::unordered_map<std::string, struct ggml_tensor*> tensor_by_name_;
     Config                    cfg_{};
