@@ -90,6 +90,28 @@ def evaluate(runs, baseline="baseline", tolerance=0.05):
     return {"passed": not failures, "failures": failures, "comparisons": comparisons}
 
 
+def parse_storage(stderr):
+    records = re.findall(r"BENCH_MODEL_STORAGE mode=(mapped|copied)(?: fileBytes=(\d+))? tensorBytes=(\d+) copiedBytes=(\d+)", stderr)
+    if len(records) != 1:
+        return None  # Old binaries have no record; duplicate records are ambiguous.
+    mode, file_bytes, tensors, copied = records[0]
+    return {"mode":mode, "fileBytes":int(file_bytes) if file_bytes else None,
+            "tensorBytes":int(tensors), "copiedBytes":int(copied)}
+
+
+def evaluate_storage(runs, settings):
+    failures = []
+    for r in runs:
+        if not (settings.get(r["variant"],{}).get("opt",0) & 4096):
+            continue
+        storage = r.get("modelStorage") or {}
+        if (storage.get("mode") != "mapped" or storage.get("copiedBytes") != 0 or
+                not storage.get("tensorBytes") or not storage.get("fileBytes") or
+                storage["fileBytes"] < storage["tensorBytes"]):
+            failures.append(f'{r["case"]}/{r["variant"]}/{r["repeat"]}: requested CPU mapping was not verified')
+    return {"passed":not failures,"failures":failures}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", type=Path, required=True)
@@ -225,7 +247,8 @@ def main():
                        "hostLoadBefore":load_before,"hostLoadAfter":os.getloadavg(),
                        "timing": {"load":float(timing[1]),"inference":float(timing[2])} if timing else None,
                        "profile": {k:float(v) for k,v in re.findall(r"(prefill|embedding|decoder|logits)=([\d.]+)",stderr)},
-                       "phaseProfile": json.loads(phase_match[1]) if (phase_match := re.search(r"^CPU_PHASE_PROFILE (\{.*\})$", stderr, re.M)) else None}
+                       "phaseProfile": json.loads(phase_match[1]) if (phase_match := re.search(r"^CPU_PHASE_PROFILE (\{.*\})$", stderr, re.M)) else None,
+                       "modelStorage":parse_storage(stderr)}
                 report["runs"].append(row)
                 report_path.write_text(json.dumps(report,indent=2))
                 print(json.dumps(row),flush=True)
@@ -236,13 +259,14 @@ def main():
     artifact_hashes.update({str(root / "source" / name):value for name,value in report["sourceSha256"].items()})
     changed = [path for path,value in artifact_hashes.items() if digest(path) != value]
     report["artifactGate"] = {"passed":not changed,"changed":changed}
+    report["storageGate"] = evaluate_storage(report["runs"],report["variantSettings"])
     report["gate"] = evaluate(report["runs"])
     if "cache-reference" in args.variants:
         compared = [r for r in report["runs"] if r["variant"] != "baseline"]
         report["cacheReferenceGate"] = evaluate(compared, baseline="cache-reference")
     report_path.write_text(json.dumps(report,indent=2))
     print(json.dumps(report["gate"],indent=2))
-    return 0 if report["artifactGate"]["passed"] and report["gate"]["passed"] and report.get("cacheReferenceGate",{"passed":True})["passed"] else 1
+    return 0 if report["artifactGate"]["passed"] and report["storageGate"]["passed"] and report["gate"]["passed"] and report.get("cacheReferenceGate",{"passed":True})["passed"] else 1
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 """Meaningful failure-mode tests for the optimization acceptance gate."""
 import unittest
-from moss_cpu_regression import evaluate, run_environment, variant_settings
+from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage
 
 
 class RegressionGateTest(unittest.TestCase):
@@ -82,6 +82,20 @@ class RegressionGateTest(unittest.TestCase):
         self.assertEqual(env["MTD_THREADS_DECODE"],"8")
         self.assertEqual(env["MTD_THREADS_LOGITS"],"8")
         self.assertNotIn("MTD_THREADS_PREFILL",env)
+
+    def test_loader_records_are_unambiguous_and_old_binaries_remain_supported(self):
+        line="[info] BENCH_MODEL_STORAGE mode=mapped fileBytes=128 tensorBytes=64 copiedBytes=0"
+        self.assertEqual(parse_storage(line),{"mode":"mapped","fileBytes":128,"tensorBytes":64,"copiedBytes":0})
+        self.assertIsNone(parse_storage("old loader without a storage record"))
+        self.assertIsNone(parse_storage(line+"\n"+line))
+
+    def test_requested_mapping_cannot_pass_with_fallback_or_inconsistent_counters(self):
+        settings={"baseline":{"opt":0},"mapped":{"opt":4144}}
+        valid={"mode":"mapped","fileBytes":128,"tensorBytes":64,"copiedBytes":0}
+        row=self.row("mapped",repeat=0,modelStorage=valid)
+        self.assertTrue(evaluate_storage([self.row(),row],settings)["passed"])
+        for invalid in (None,{**valid,"mode":"copied"},{**valid,"copiedBytes":1},{**valid,"fileBytes":63}):
+            self.assertFalse(evaluate_storage([{**row,"modelStorage":invalid}],settings)["passed"])
 
 
 if __name__ == "__main__":
