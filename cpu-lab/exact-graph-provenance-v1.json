@@ -1,0 +1,103 @@
+{
+  "sourceBaseCommit": "338aa8d3d8d6408d86781e80731a2c0d5bdfafa4",
+  "sourceState": "Compiled working tree based on sourceBaseCommit. Reproduce with exact-decode-cast-v1.patch on that base and verify sourceSha256; all helper, loader and graph-test changes are included.",
+  "sourceSha256": {
+    "CMakeLists.txt": "4fd4718c9ccae3a1318c58313f04d6740aa344c4c4e8528268c2a78bc02fb6ff",
+    "tests/CMakeLists.txt": "38b0b011e9a492db26cc1f67652309baad3742d1ea3486830ad96656db331090",
+    "tests/test_cpu_q8.cpp": "352ac79de43edd01a674bba4355aae0ab961663395729df15019dff19f958a07",
+    "src/audio_adaptor.cpp": "d05d251cc7e7979d4f4e49b7005561a1daaa1daba967fff87e52ab130439ecb9",
+    "src/audio_adaptor.hpp": "28a869e7b61dca4d8714e666f42f522fabed02ee3548e17e3c3a43d7b2ca9ce5",
+    "src/audio_encoder.cpp": "e14d4e6ab81410c5935c9550634ea8a7136fe9b017c440e01ab987a759102275",
+    "src/audio_encoder.hpp": "e806d772246567aaef102ac6c0256beae0acf85dcc6cb2fe6c849bc4717a2c90",
+    "src/audio_io.cpp": "58afc26038a602f3f7776e5dbe347f2967a38dcb194a9272c55ddeb0333798e0",
+    "src/audio_io.hpp": "5c157587c0aae23a6b24cfce10c24affa30fe9b7d027ac044b97267b285ab281",
+    "src/audio_span.cpp": "3444e83c6b18406d4db40b822653985b8ac74392749284b62da5a3b81f163c6f",
+    "src/audio_span.hpp": "2aa9c7463f263f91b42bc381087aaebb2e724ec7ec491ebe5c73b69c6bee8b25",
+    "src/backend.cpp": "c7bcda5902a8c0a10acd8f8a51ca957664914c9ef4f9fc24eb4725aa82dadf39",
+    "src/backend.hpp": "76ed355d41f7ea35f53183daa1ac33b188e0ef1b84552d1e32e70c78a7fdfdb4",
+    "src/cli.cpp": "e459127552126f1d13eca4223dab70ae51e46afa7f8a9e6a808298ae5976c1a9",
+    "src/common.cpp": "6ed693a6dead299bb10622ea277ed9d07d5eced97f15cb1d3b89d68eebe4cefc",
+    "src/common.hpp": "af2b2b4f9b6528e534c6661bb05528d4e9f6bb1489226980c53fbf85a2998cb1",
+    "src/config.hpp": "010b0568cb664e34af6542bebbe750cdfb6ad9ded4feea307a403d3850927904",
+    "src/cpu_q8.cpp": "6b9815078262dcbd2b111b7fdc057f4a248e17911c2654019962e9f1a3db45f6",
+    "src/cpu_q8.hpp": "c04db806345eca28e90b860c8a30f4924cc2937ff24fe7ced8a29a96728e0c23",
+    "src/cpu_softmax.cpp": "f9bd82df53f4140756219516daf71f7c8c5e106ef77f7c369cd9e308cc776673",
+    "src/cpu_softmax.hpp": "fada005cbc7328f29cd018fc20aa107d1f167e32744705e44152a9bdadd42590",
+    "src/fft.cpp": "3ae3ad6260748d2c800bd580763bf205fc8ea27def1a8bcb8aea3482fc4cb71e",
+    "src/fft.hpp": "daa215fc289f14368c0c693c2efdcc2842437dd92edeac5bb19404efd57085e7",
+    "src/generate.cpp": "8343cd91983743d3a95c8e100870fc6446360ea2fdbcef74b930805fb0d0d067",
+    "src/generate.hpp": "22354fb77fc43f74955f0da44c78c36686ad4b400ad0eab4e605988deaf358a7",
+    "src/ggml_extend.hpp": "198f246cb40305b283a9498bdfa43290a8c35a50f59a512fe11b303edc381c0f",
+    "src/mel.cpp": "ffab34cac7454c81b555ff447c11c71ca2863635d682ced608b4977afe41f84c",
+    "src/mel.hpp": "4a93a68a966f9ff9308cee737ec30e0fc1931c2ac4a62aaaa83cf8750e6f0585",
+    "src/model_loader.cpp": "9cf8b6826fbf4181dcbe20b89656b111af005f3920297c5d6803443df3dd01b9",
+    "src/model_loader.hpp": "3332193e115b83ca5342e321bc962f42e26630a982a641751209a4dd26970bf4",
+    "src/moss_transcribe_capi.cpp": "5116d2e88b53ede36b2a332fd2b896a125b48fb6e53c2c357a6700100757fa36",
+    "src/qwen3.cpp": "c846b6538c4590bc41dcbd8f8d3c0f21564825b7ca22072b543b73dcc637b674",
+    "src/qwen3.hpp": "78f6eff2a94e9efecf5a12d4a249116e669637b39d8c9947265b544cbabb6b72",
+    "src/qwen3_decoder.cpp": "772c84433b28a90e36971f7fca71e8bde24b9054b4e8057094f2ca2a8975e47c",
+    "src/qwen3_decoder.hpp": "14fb8dccde78b569235fecc18a7eedbe7aa0705f41306d94209238cb55816df5",
+    "src/subtitle.cpp": "d9b47b76d366a2a4c7a8e78e45a54a50301d5437440738890392d0cce829cdda",
+    "src/subtitle.hpp": "24a6f1e18939f289b72fb64fefc2ffd7f54b78443df054bdb408f5383099b438",
+    "src/tokenizer.cpp": "2ab86907d56c8c5eeec6a7210674019834c2fc5216a27357ec099d9c0bfac637",
+    "src/tokenizer.hpp": "5220bfcaba7ea63089dd2573fa8797e3c4df9bf0ece23386e90a9fdab7c2403f",
+    "src/transcribe.cpp": "d80930ac6ee4d9d80489bc46333199562e018f729e1e0852988f15435caac901",
+    "src/transcribe.hpp": "25873e76e6649eef604bfaba491dc8b3a042121188281b210cd4045f559d9549",
+    "src/transcript_parser.cpp": "51c9b2c3e2b07475075b2dd7b576aceb3dcd87342978ae4373e8d01a2fcca0cd",
+    "src/transcript_parser.hpp": "3df79a9d2c6202c6609709d346c84e40ee6ea74e8ad1275110f1b20abcaea8bd",
+    "src/whisper_encoder.cpp": "ed5f88899463398a30baeb88a39e453269a815e06d1853ec465a2d72e15d4e91",
+    "src/whisper_encoder.hpp": "948798c44ba93af336c1a7e14eb7dfe46e664b176d6d20929b113bceb0587227"
+  },
+  "ggmlCommit": "eced84c86f8b012c752c016f7fe789adea168e1e",
+  "binaries": {
+    "build/moss-transcribe": "c94916d672a19c922c8b121ad861a1e491fad71a61eab9f13554514d2cbecca4",
+    "build/tests/test_cpu_q8": "baf684a5b7d02ab39bc708d4c558935a9e109e9fdd64e47c9ef73b6a239854d0"
+  },
+  "libraries": {
+    "build/third_party/ggml/src/libggml-base.so": "788aa275a0f2dbe0dcc9acd2ade7153bbdbc9ac34da7e58f966db423f411169f",
+    "build/third_party/ggml/src/libggml-cpu.so": "6c303c3befb6d21b21c71659e0d842c7ac98355cbf11591ce05258baac7e0aa5",
+    "build/third_party/ggml/src/libggml.so": "3a7014464687a0c5a012c32b4b8960e978c1d56638a814482f4ad1f8042f1e47"
+  },
+  "reports": {
+    "graph-v1.jsonl": "eb00f1011e6b8548fca465bdcdb6009d9e3f21197ee01265832c284341c9de4f",
+    "graph-pinned-v1.jsonl": "0fef6d918499c6dbfb42f7dc9a0773a5a78bba2e320a3bcc22485bd01809b8e5"
+  },
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 57 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  32\nOn-line CPU(s) list:                     0-31\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Xeon(R) Gold 5416S\nCPU family:                              6\nModel:                                   143\nThread(s) per core:                      2\nCore(s) per socket:                      16\nSocket(s):                               1\nStepping:                                8\nCPU(s) scaling MHz:                      66%\nCPU max MHz:                             4000.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                4000.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cat_l2 cdp_l3 cdp_l2 ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb intel_pt avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local split_lock_detect user_shstk avx_vnni avx512_bf16 wbnoinvd dtherm ida arat pln pts hwp hwp_act_window hwp_pkg_req hfi vnmi avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid bus_lock_detect cldemote movdiri movdir64b enqcmd fsrm md_clear serialize tsxldtrk pconfig arch_lbr ibt amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities\nVirtualization:                          VT-x\nL1d cache:                               768 KiB (16 instances)\nL1i cache:                               512 KiB (16 instances)\nL2 cache:                                32 MiB (16 instances)\nL3 cache:                                30 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-31\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Vulnerable\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+  "graphCasesPerRun": 36,
+  "graphExitCodes": [
+    0,
+    0
+  ],
+  "nativeOtherCtests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "pinnedGraphEnvironment": {
+    "OMP_NUM_THREADS": "16",
+    "OMP_PROC_BIND": "spread",
+    "OMP_PLACES": "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}"
+  },
+  "unpinnedGraphNotes": "No physical-core pinning; simultaneous production MOSS and other users TTS jobs. Timings are not a stable speed estimate. Pinned run paused production auto work, waited for API idle, and kept other TTS jobs active.",
+  "portableValidation": "Apple Clang C++17 syntax-only check passed for changed source and graph test; local CMake unavailable, so no macOS build/runtime claim.",
+  "patchSha256": "ae2412ed0ac4c9693afa8f5b15ebd26621231de051a5f58cc2ff46d6f4626d03",
+  "fullPilotReportSha256": "bac7fe02889af58c9f7780027bcdbbebb236089e9622efdaca5df7674903c350",
+  "fullPilotExitCode": 1,
+  "integrationDecision": "Reject latency: identical complete outputs, but 9.41-10.04 percent median slowdown versus opt 48. Loader/decoder routes archived; graph helper retained for research.",
+  "activeGraphOnlyBuild": {
+    "root": "/home/stan/hw-moss-exact-graph-public-v1",
+    "nativeCtestsPassed": 8,
+    "nativeCtestsFailed": 0,
+    "nativeExitCode": 0,
+    "productionInferenceIntegration": false,
+    "sha256": {
+      "build/moss-transcribe": "9184a29dc50f7e7c9936d1dcca7e3fddf33a93d1c418f7252eb85e37b5cacda2",
+      "build/tests/test_cpu_q8": "645126ab71da4dd311458c8529fc70ea5ce0600a27b48a54af2ed718da927289",
+      "source/CMakeLists.txt": "4fd4718c9ccae3a1318c58313f04d6740aa344c4c4e8528268c2a78bc02fb6ff",
+      "source/src/cpu_q8.cpp": "6b9815078262dcbd2b111b7fdc057f4a248e17911c2654019962e9f1a3db45f6",
+      "source/src/cpu_q8.hpp": "c04db806345eca28e90b860c8a30f4924cc2937ff24fe7ced8a29a96728e0c23",
+      "source/tests/CMakeLists.txt": "38b0b011e9a492db26cc1f67652309baad3742d1ea3486830ad96656db331090",
+      "source/tests/test_cpu_q8.cpp": "352ac79de43edd01a674bba4355aae0ab961663395729df15019dff19f958a07"
+    }
+  }
+}

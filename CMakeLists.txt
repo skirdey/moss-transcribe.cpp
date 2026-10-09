@@ -42,6 +42,7 @@ set(MT_SRC
   src/audio_span.cpp
   src/qwen3.cpp
   src/cpu_softmax.cpp
+  src/cpu_q8.cpp
   src/qwen3_decoder.cpp
   src/generate.cpp
   src/audio_encoder.cpp
@@ -50,6 +51,9 @@ set(MT_SRC
   src/subtitle.cpp
   src/moss_transcribe_capi.cpp
 )
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  set_source_files_properties(src/cpu_q8.cpp PROPERTIES COMPILE_OPTIONS "-march=native;-ffp-contract=off")
+endif()
 if(MT_SHARED)
   add_library(moss-transcribe SHARED ${MT_SRC})
   set_target_properties(moss-transcribe PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)

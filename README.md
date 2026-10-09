@@ -402,5 +402,14 @@ The [CPU research log](cpu-lab/tenfold-research.md) reviews recent lossless
 compression, persistent-kernel and verified-drafting papers against this specific
 CPU and Q8 checkpoint. The 10x end-to-end objective remains unachieved. The log
 contains the actual tensor/entropy audit, a rejected AMX packing experiment,
-an exact-order AVX-512 dot probe, limitations and reproduction commands.
+an exact-order AVX-512 dot and graph kernel, limitations and reproduction commands.
 No new kernel from that research is selected in default or production inference.
+
+The reusable graph kernel in `src/cpu_q8.*` passed 36 raw-float and activation-
+conversion cases at 1/16 threads, including the 151,936-row LM head. Pinned warm
+graphs were 1.18–1.43x faster at 16 threads. Its full-model integration still
+failed the paired speed gate: English and German medians were 9–10% slower than
+opt 48, with about 603 MiB more peak memory. All 18 measured outputs and EOS
+stops matched. The integration is archived as
+`cpu-lab/exact-decode-cast-v1.patch` against `338aa8d`; opt 816 is only for that
+isolated reproduction. Active loader/decoder source retains opt 48 behavior.

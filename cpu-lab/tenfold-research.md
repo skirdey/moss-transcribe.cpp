@@ -73,8 +73,9 @@ tokens. Each experiment must state which property is actually checked.
    eight independent accumulator chains per row and the pinned dot's final
    horizontal-add tree. Packing reconstructs every original Q8 byte. It tests
    signed-byte extremes, zeros, normal random inputs, and a partial output tile.
-   This prequantized M=1 probe is not integrated into the model. Full graph,
-   activation-quantization, cold-load and quality gates remain necessary.
+   The graph-level version now also matches activation conversion and passes
+   36 exactness cases. Its first model integration failed latency and is archived
+   below; the reusable graph helper has no active model routing.
 2. **CPU megakernel scheduling.** Profile operator work and barriers, then
    specialize the decode graph without changing dependencies. Try compatible
    Q/K/V and gate/up projection scheduling, stable scratch/workspace reuse,
@@ -168,8 +169,65 @@ input quantization, graph dispatch and packing from the timed dot loop. Packing
 cost is recorded separately; inference integration would retain extra copies
 or replace storage, which must be measured. Shared-host contention also applies
 to these microbenchmarks. They do not establish an end-to-end speedup or model
-output equivalence. The next step is an opt-in decode graph integration with
-matched activation quantization and the existing regression/quality gates.
+output equivalence. The graph and full-model follow-up below test those missing
+costs and reject the first integration on latency.
+
+### Exact Q8 graph integration: output passes, latency fails
+
+`src/cpu_q8.*` implements immutable 16-row packing and an exact-order custom
+graph dot. It uses the existing ggml workers and the pinned CPU activation
+converter. The archived model integration shares conversion across Q/K/V and
+gate/up; prefill, embedding lookup and unsupported shapes use ordinary weights.
+CPU-only loader ownership keeps callback pointers valid. Ordinary and packed
+copies coexist. Bit 256 selects Qwen projection copies, bit 512 the LM head;
+the pilot used 816 (48 + 256 + 512). These model routes are removed from active
+source. The reusable helper and synthetic graph test remain for further research.
+
+Both 36-case graph runs passed exact activation bytes and raw output floats,
+including shared/separate conversion, signed-byte extremes, zeros, tails,
+K=32/1024/3072 and N up to 151936. The first run was unpinned with simultaneous
+production MOSS and other users' TTS work; its erratic timings are retained in
+`exact-graph-cast-v1.jsonl`. The pinned run waited for API idle with auto work
+paused; other TTS jobs remained active. Its normal 16-thread graph gains were
+1.18–1.43x, including input conversion and graph compute, excluding packing
+and graph construction. Packing cost is separately recorded. Neither graph
+run establishes full-model latency. Unsupported ISA builds skip with code 77.
+
+The full pilot (`exact-decode-pilot-v1.json`) measured 18 fresh processes after
+three discarded warmups: three 60-second cases, three variants and two rounds
+with reversed order. Every output hash, token count and EOS stop matched;
+artifact hashes passed and no concurrent MOSS process was detected.
+
+| Input | Opt 48 median wall | Exact packed 816 median wall | Exact output | Latency gate |
+|---|---:|---:|---|---|
+| English 60 s | 17.970 s | 19.774 s | Yes, both rounds | Fail: 10.04% slower |
+| German 60 s | 15.793 s | 17.279 s | Yes, both rounds | Fail: 9.41% slower |
+| Public speech 60 s | 18.059 s | 18.162 s | Yes, both rounds | Pass: 0.58% slower |
+
+Peak RSS was 2319904 KiB versus 1702252 KiB for opt 48, an increase of
+603.18 MiB. Median model-load phase across all six speech runs was 1.781 s
+versus 1.017 s. The host was still shared (recorded one-minute loads about
+22.5–31.0), and two rounds do not establish a stable isolated speed estimate.
+Some decoder/logit phase timings improved while full wall time regressed;
+the full-input metric remains the gate. Packing, extra storage, graph building,
+dispatch and conversion scheduling need further work. The exact contribution
+of each cost has not been isolated.
+
+The latency failure stops promotion and the expanded quality/long-input suite.
+Human DER was not rescored for this rejected candidate; tested raw-text parity
+is reported separately from corpus-level accuracy. The native candidate build
+passed seven other model-independent CTests plus both graph runs; 12 harness
+tests and three audit tests pass. After removing model routes, a separate fresh
+native build passed all eight model-independent CTests. Apple Clang C++17
+syntax checks passed, but
+local CMake was unavailable, so no macOS runtime result is claimed. API health,
+active service and automatic processing restored to 1 were verified after the
+terminal pilot failure. The 10x objective remains active and unachieved.
+
+Next experiments should separate node/worker scheduling from arithmetic, try
+compatible projection fusion and exact batched dots, and instrument encoder,
+mel and adaptor costs directly. Adding packed copies or accepting a warm dot
+gain alone is insufficient.
 
 ## Reproduce the probes
 
@@ -209,3 +267,20 @@ Supply baseline, model and audio paths using the harness options when reproducin
 elsewhere. Private fixtures are represented by hashes only; the public VoxConverse
 fixture can be prepared using the root README's pinned dataset instructions.
 Never mix a changed source/binary into an existing run directory.
+
+The exact graph test is registered as `test_cpu_q8` in native builds:
+
+```bash
+OMP_NUM_THREADS=16 OMP_PROC_BIND=spread \
+  OMP_PLACES='{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}' \
+  ./build/tests/test_cpu_q8 > exact-graph.jsonl
+```
+
+To reproduce the rejected integration, start from a **fresh** checkout at
+`338aa8d` and apply `exact-decode-cast-v1.patch`, which includes the helper,
+loader/decoder routes and graph test. Use opt 816 and the paired harness with
+`--reference-opt 48 --variants baseline cache-reference 816 --repeats 2`.
+The expected native pilot status is 1 (latency rejection), although shared-host
+timings can vary. See `exact-graph-provenance-v1.json` for actual compiled source,
+library, binary and graph-report hashes; its base commit alone does not describe
+the dirty experimental tree. The failed build remains frozen for reproducibility.
