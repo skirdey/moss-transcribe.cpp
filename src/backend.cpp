@@ -122,6 +122,13 @@ void init() {
             if (nt <= 0) nt = (int) std::thread::hardware_concurrency();
             if (nt <= 0) nt = 4;
             ggml_backend_cpu_set_n_threads(g_backend, nt);
+            // OpenMP already reuses workers; this reuses ggml's pool metadata.
+            const char* opt = std::getenv("MTD_CPU_OPT");
+            if (opt && (std::atoi(opt) & 1)) {
+                auto params = ggml_threadpool_params_default(nt);
+                static ggml_threadpool_t pool = ggml_threadpool_new(&params);
+                if (pool) ggml_backend_cpu_set_threadpool(g_backend, pool);
+            }
             MT_LOGI("CPU threads: %d", nt);
         }
         // Allocator for graph intermediates. ggml_gallocr_new takes a

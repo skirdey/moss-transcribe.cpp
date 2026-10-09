@@ -2,6 +2,7 @@
 #include "backend.hpp"
 
 #include <cmath>
+#include <cstdlib>
 
 namespace mt {
 
@@ -60,6 +61,8 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
                                   struct ggml_cgraph* gf,
                                   struct ggml_tensor* k_cache, struct ggml_tensor* v_cache,
                                   int past_seq) {
+    const char* layout_opt = std::getenv("MTD_CPU_OPT");
+    const bool transposed_v = k_cache && layout_opt && (std::atoi(layout_opt) & 16);
     const int hd     = hp.head_dim;
     const int n_h    = hp.n_heads;
     const int n_kv_h = hp.n_kv_heads;
@@ -105,8 +108,12 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
         const int64_t kv = (int64_t)past_seq + n_tokens;
         struct ggml_tensor* k_dst = ggml_view_4d(ctx, k_cache, hd, n_kv_h, n_tokens, 1,
             k_cache->nb[1], k_cache->nb[2], k_cache->nb[3], (size_t)past_seq * k_cache->nb[2]);
-        struct ggml_tensor* v_dst = ggml_view_4d(ctx, v_cache, hd, n_kv_h, n_tokens, 1,
-            v_cache->nb[1], v_cache->nb[2], v_cache->nb[3], (size_t)past_seq * v_cache->nb[2]);
+        struct ggml_tensor* v_dst = transposed_v
+            ? ggml_view_4d(ctx, v_cache, n_tokens, hd, n_kv_h, 1,
+                v_cache->nb[1], v_cache->nb[2], v_cache->nb[3], (size_t)past_seq * sizeof(float))
+            : ggml_view_4d(ctx, v_cache, hd, n_kv_h, n_tokens, 1,
+                v_cache->nb[1], v_cache->nb[2], v_cache->nb[3], (size_t)past_seq * v_cache->nb[2]);
+        if (transposed_v) v = ggml_permute(ctx, v, 1, 2, 0, 3);
         out.k_store = ggml_cpy(ctx, k, k_dst);
         out.v_store = ggml_cpy(ctx, v, v_dst);
         // Expand the stores NOW so they execute before this layer's attention
@@ -115,8 +122,11 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
         ggml_build_forward_expand(gf, out.v_store);
         k_used = ggml_view_4d(ctx, k_cache, hd, n_kv_h, kv, 1,
             k_cache->nb[1], k_cache->nb[2], k_cache->nb[3], 0);
-        v_used = ggml_view_4d(ctx, v_cache, hd, n_kv_h, kv, 1,
-            v_cache->nb[1], v_cache->nb[2], v_cache->nb[3], 0);
+        v_used = transposed_v
+            ? ggml_view_4d(ctx, v_cache, kv, hd, n_kv_h, 1,
+                v_cache->nb[1], v_cache->nb[2], v_cache->nb[3], 0)
+            : ggml_view_4d(ctx, v_cache, hd, n_kv_h, kv, 1,
+                v_cache->nb[1], v_cache->nb[2], v_cache->nb[3], 0);
     } else {
         // ---- additive path: concat past K/V along the sequence dim (axis 2) ----
         struct ggml_tensor* k_full = k_past ? ggml_concat(ctx, k_past, k, /*dim=*/2) : k;
@@ -130,18 +140,29 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
     // ---- eager GQA attention (shared by both paths) ----
     struct ggml_tensor* q_p = ggml_permute(ctx, q,      0, 2, 1, 3);  // [hd, seq, n_h, b]
     struct ggml_tensor* k_p = ggml_permute(ctx, k_used, 0, 2, 1, 3);  // [hd, seq_kv, n_kv, b]
-    struct ggml_tensor* v_p = ggml_permute(ctx, v_used, 0, 2, 1, 3);
+    struct ggml_tensor* v_p = transposed_v ? ggml_transpose(ctx, v_used)
+        : ggml_permute(ctx, v_used, 0, 2, 1, 3);
 
     const float scale = 1.0f / std::sqrt(static_cast<float>(hd));
 
+    const char* cpu_opt = std::getenv("MTD_CPU_OPT");
+    struct ggml_tensor* o = nullptr;
+    if (cpu_opt && (std::atoi(cpu_opt) & 8) && n_tokens == 1 && !mask && backend_supports_flash_attn()) {
+        // Fused attention reads strided F32 KV cache directly, avoiding the
+        // growing V-cache transpose/copy on every token in every layer.
+        o = ggml_flash_attn_ext(ctx, q_p, k_p, v_p, nullptr, scale, 0.0f, 0.0f);
+        ggml_flash_attn_ext_set_prec(o, GGML_PREC_F32);
+    } else {
     struct ggml_tensor* scores = ggml_mul_mat(ctx, k_p, q_p);
     ggml_mul_mat_set_prec(scores, GGML_PREC_F32);
     struct ggml_tensor* attn = ggml_soft_max_ext(ctx, scores, mask, scale, /*max_bias=*/0.0f);
 
-    struct ggml_tensor* v_t = maybe_cont(ctx, ggml_transpose(ctx, v_p));  // [seq_kv, hd, n_kv, b]
-    struct ggml_tensor* o   = ggml_mul_mat(ctx, v_t, attn);
+    struct ggml_tensor* v_t = transposed_v ? v_used
+        : maybe_cont(ctx, ggml_transpose(ctx, v_p));  // [seq_kv, hd, n_kv, b]
+    o = ggml_mul_mat(ctx, v_t, attn);
 
     o = ggml_permute(ctx, o, 0, 2, 1, 3);
+    }
     o = ggml_cont_2d(ctx, o, n_h * hd, n_tokens * n_batch);
     if (n_batch > 1) o = ggml_reshape_3d(ctx, o, n_h * hd, n_tokens, n_batch);
 
@@ -152,7 +173,13 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
     struct ggml_tensor* hn = rms_norm(ctx, h, w.ffn_norm, eps);
     struct ggml_tensor* g  = ggml_mul_mat(ctx, w.ffn_gate, hn);
     struct ggml_tensor* u  = ggml_mul_mat(ctx, w.ffn_up,   hn);
-    struct ggml_tensor* f  = ggml_mul_mat(ctx, w.ffn_down, ggml_mul(ctx, ggml_silu(ctx, g), u));
+    const char* opt = std::getenv("MTD_CPU_OPT");
+    // One AVX-512/AVX2 pass instead of two passes and two graph barriers.
+    // The fused kernel uses the same vector SiLU and multiply primitives.
+    struct ggml_tensor* activation = opt && (std::atoi(opt) & 4)
+        ? ggml_swiglu_split(ctx, g, u)
+        : ggml_mul(ctx, ggml_silu(ctx, g), u);
+    struct ggml_tensor* f = ggml_mul_mat(ctx, w.ffn_down, activation);
 
     out.y = ggml_add(ctx, h, f);
     return out;

@@ -1,3 +1,9 @@
+#include <algorithm>
+#include <cstdlib>
+#include <deque>
+#include <regex>
+#include <unordered_set>
+#include "tokenizer.hpp"
 #include "generate.hpp"
 
 #include "backend.hpp"
@@ -5,6 +11,8 @@
 #include "ggml_extend.hpp"
 
 #include "ggml-backend.h"
+#include "ggml-cpu.h"
+#include <chrono>
 #include "ggml.h"
 
 #include <cstddef>
@@ -60,6 +68,11 @@ bool embed_rows_f32(struct ggml_tensor* tok, const int32_t* ids,
                     int n_ids, int hidden, std::vector<float>* out) {
     if (!tok || !ids || n_ids <= 0 || hidden <= 0 || !out) return false;
 
+    // CPU buffers can be read directly. Dequantize only selected rows using
+    // ggml's existing type trait; avoid graph allocation/dispatch per token.
+    const char* opt = std::getenv("MTD_CPU_OPT");
+    if (opt && (std::atoi(opt) & 2) && ggml_backend_is_cpu(backend()))
+        return embed_rows_f32_host(tok, ids, n_ids, hidden, out);
     const size_t max_nodes = 8;
     size_t buf_sz = ggml_tensor_overhead() * max_nodes + ggml_graph_overhead() +
                     (1u << 16);
@@ -194,6 +207,30 @@ static int argmax_first(const std::vector<float>& v) {
     return best;
 }
 
+
+// Dense empty timestamp/speaker turns are decoder loops. Lexical repetitions
+// and event labels break the run and are never removed by this guard.
+static bool empty_marker_loop(const std::string& text) {
+    static const std::regex marker(R"(\[(\d+(?:\.\d+)?)\]\s*\[S\d+\]\s*\[(\d+(?:\.\d+)?)\])");
+    std::deque<std::pair<double,double>> run;
+    size_t previous_end = 0;
+    for (std::sregex_iterator it(text.begin(), text.end(), marker), end; it != end; ++it) {
+        const auto& match = *it;
+        auto gap = text.substr(previous_end, static_cast<size_t>(match.position()) - previous_end);
+        if (gap.find_first_not_of(" \t\r\n") != std::string::npos) run.clear();
+        try { run.emplace_back(std::stod(match[1].str()), std::stod(match[2].str())); }
+        catch (...) { run.clear(); }
+        if (run.size() > 12) run.pop_front();
+        previous_end = static_cast<size_t>(match.position() + match.length());
+        if (run.size() == 12) {
+            double lo = run.front().first, hi = lo;
+            for (const auto& pair : run) { lo = std::min({lo,pair.first,pair.second}); hi = std::max({hi,pair.first,pair.second}); }
+            if (hi - lo <= 2.0) return true;
+        }
+    }
+    return false;
+}
+
 std::vector<int32_t> greedy_generate(Qwen3Decoder& dec, ModelLoader& m,
                                      const std::vector<float>& fused, int seq,
                                      int max_new, int eos) {
@@ -204,29 +241,64 @@ std::vector<int32_t> greedy_generate(Qwen3Decoder& dec, ModelLoader& m,
         return ids;
     }
 
+    using Clock = std::chrono::steady_clock;
+    double embed_seconds = 0, decoder_seconds = 0, logits_seconds = 0;
+    auto prefill_start = Clock::now();
     std::vector<float> hid;
     if (!dec.prefill(fused, seq, &hid)) { MT_LOGE("greedy_generate: prefill failed"); return ids; }
     if ((int)hid.size() < H * seq) { MT_LOGE("greedy_generate: short prefill hidden"); return ids; }
 
+    double prefill_seconds = std::chrono::duration<double>(Clock::now()-prefill_start).count();
+    auto first_logits_start = Clock::now();
     // Logits from the last prefilled position.
     std::vector<float> last(hid.end() - H, hid.end());
     std::vector<float> logits = dec.logits_from_hidden(last);
     if (logits.empty()) { MT_LOGE("greedy_generate: logits failed"); return ids; }
 
+    logits_seconds += std::chrono::duration<double>(Clock::now()-first_logits_start).count();
+    const char* penalty_env = std::getenv("MTD_REPETITION_PENALTY");
+    float penalty = penalty_env ? static_cast<float>(std::atof(penalty_env)) : 1.0f;
+    penalty = std::max(1.0f, std::min(1.5f, penalty));
+    const bool guarded = std::getenv("MTD_LOOP_GUARD") != nullptr;
+    Tokenizer guard_tokenizer;
+    if (guarded && !guard_tokenizer.load(m)) return ids;
     ids.reserve((size_t)max_new);
     for (;;) {
+        if (penalty > 1.0f) {
+            std::unordered_set<int32_t> recent;
+            for (int i = std::max(0, static_cast<int>(ids.size()) - 100); i < static_cast<int>(ids.size()); ++i) recent.insert(ids[i]);
+            for (int32_t id : recent) if (id >= 0 && id < static_cast<int32_t>(logits.size())) {
+                logits[id] = logits[id] > 0 ? logits[id] / penalty : logits[id] * penalty;
+            }
+        }
         int t = argmax_first(logits);
         ids.push_back(t);
-        if (t == eos) break;
-        if ((int)ids.size() >= max_new) break;
+        if (t == eos) { MT_LOGI("BENCH_GENERATION tokens=%zu stop=eos", ids.size()); break; }
+        if ((int)ids.size() >= max_new) { MT_LOGI("BENCH_GENERATION tokens=%zu stop=token_limit", ids.size()); break; }
+        if (guarded && ids.size() >= 128 && ids.size() % 32 == 0) {
+            auto begin = ids.begin() + std::max(0, static_cast<int>(ids.size()) - 512);
+            std::vector<int32_t> tail(begin, ids.end());
+            if (empty_marker_loop(guard_tokenizer.decode(tail))) {
+                MT_LOGI("BENCH_GENERATION tokens=%zu stop=empty_marker_loop", ids.size());
+                break;
+            }
+        }
 
+        auto phase_start = Clock::now();
         std::vector<float> emb = embed_token(m, t, H);
+        embed_seconds += std::chrono::duration<double>(Clock::now()-phase_start).count();
+        phase_start = Clock::now();
         if (emb.empty()) { MT_LOGE("greedy_generate: embed failed @%d", t); break; }
         std::vector<float> h1 = dec.decode_one(emb);
         if ((int)h1.size() < H) { MT_LOGE("greedy_generate: decode_one failed"); break; }
+        decoder_seconds += std::chrono::duration<double>(Clock::now()-phase_start).count();
+        phase_start = Clock::now();
         logits = dec.logits_from_hidden(h1);
+        logits_seconds += std::chrono::duration<double>(Clock::now()-phase_start).count();
         if (logits.empty()) { MT_LOGE("greedy_generate: logits failed"); break; }
     }
+    MT_LOGI("CPU_PROFILE prefill=%.6f embedding=%.6f decoder=%.6f logits=%.6f",
+        prefill_seconds, embed_seconds, decoder_seconds, logits_seconds);
     return ids;
 }
 

@@ -1,4 +1,5 @@
 #include "qwen3_decoder.hpp"
+#include <cstdlib>
 
 #include "backend.hpp"
 #include "ggml_extend.hpp"
@@ -64,8 +65,12 @@ bool Qwen3Decoder::load(const ModelLoader& m, int max_seq) {
     for (int l = 0; l < L; ++l) {
         k_cache_[l] = ggml_new_tensor_4d(kv_ctx_.get(), GGML_TYPE_F32,
                                          hp_.head_dim, hp_.n_kv_heads, max_seq_, 1);
-        v_cache_[l] = ggml_new_tensor_4d(kv_ctx_.get(), GGML_TYPE_F32,
-                                         hp_.head_dim, hp_.n_kv_heads, max_seq_, 1);
+        const char* opt = std::getenv("MTD_CPU_OPT");
+        v_cache_[l] = opt && (std::atoi(opt) & 16)
+            ? ggml_new_tensor_4d(kv_ctx_.get(), GGML_TYPE_F32,
+                max_seq_, hp_.head_dim, hp_.n_kv_heads, 1)
+            : ggml_new_tensor_4d(kv_ctx_.get(), GGML_TYPE_F32,
+                hp_.head_dim, hp_.n_kv_heads, max_seq_, 1);
     }
     kv_buffer_ = allocate_ctx_tensors(kv_ctx_.get());
     if (!kv_buffer_) { MT_LOGE("Qwen3Decoder: KV cache alloc failed"); return false; }
