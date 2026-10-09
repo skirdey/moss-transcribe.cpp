@@ -1,6 +1,6 @@
 """Meaningful failure-mode tests for the optimization acceptance gate."""
 import unittest
-from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage
+from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference
 
 
 class RegressionGateTest(unittest.TestCase):
@@ -96,6 +96,17 @@ class RegressionGateTest(unittest.TestCase):
         self.assertTrue(evaluate_storage([self.row(),row],settings)["passed"])
         for invalid in (None,{**valid,"mode":"copied"},{**valid,"copiedBytes":1},{**valid,"fileBytes":63}):
             self.assertFalse(evaluate_storage([{**row,"modelStorage":invalid}],settings)["passed"])
+
+    def test_beating_older_builds_cannot_hide_same_build_storage_regression(self):
+        rows=[self.row(),self.row("cache-reference",wallSeconds=15.),
+              self.row("48",wallSeconds=10.),self.row("4144",wallSeconds=12.)]
+        self.assertTrue(evaluate(rows)["passed"])
+        self.assertTrue(evaluate([r for r in rows if r["variant"]!="baseline"],baseline="cache-reference")["passed"])
+        same=evaluate_candidate_reference(rows,"48")
+        self.assertFalse(same["passed"])
+        self.assertEqual([c["variant"] for c in same["comparisons"]],["4144"])
+        rows[-1]=self.row("4144",wallSeconds=9.8)
+        self.assertTrue(evaluate_candidate_reference(rows,"48")["passed"])
 
 
 if __name__ == "__main__":

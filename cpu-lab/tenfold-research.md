@@ -380,3 +380,30 @@ compare the actual raw Q8 activation bytes and float outputs at one and multiple
 input rows: an already-Q8 operand reaches SGEMM at a different dispatch point.
 Conversion, scheduler barriers and full loading/inference remain timed. This
 is a proposed experiment, with no measured gain or integration yet.
+
+## Completed CPU model-mapping trial, 2026-10-09
+
+The [mapping report](model-mapping.md) records exact identity of all 684
+checkpoint tensors (980,917,056 payload bytes) and all 40 full-input outputs,
+tokens and EOS. Mapping passed artifact/storage gates, but failed latency:
+120-second speech was 22.78% slower and silence 8.34% slower than copied
+storage in the same binary. Silence also failed both older-reference gates;
+the frozen runner returned 1. Peak long-input RSS remained about 1.99 GiB.
+The copied/mapped loader diagnostics were 0.8593/0.0332 seconds in a shared
+process with warm file cache; lazy page faults were paid during the subsequent
+byte comparison. That ratio is not a full-input improvement.
+
+The entire prototype and tests remain public as an exact patch and historic
+tree. Ordinary inference restores the original loader and native configuration.
+The final build passed ten native CTests and five full-output/EOS smokes;
+the new same-build benchmark gate passed all 28 Python tests on hp-fury.
+Its failure test rejects candidates that beat older binaries while losing
+to the same-build control. Future paired trials should use
+`--candidate-reference` in addition to the frozen fastest opt48 comparison.
+
+Two repetitions under variable shared load establish rejection of this trial,
+not a statistical confidence interval or a new quiet-host speedup. Production
+remains on its validated binary; automatic processing and API health were
+restored. The tenfold objective is active and unachieved. Next isolate shared
+activation conversion with reference matrix math, without duplicated packed
+weights, and prove single/multirow activation bytes and float results first.

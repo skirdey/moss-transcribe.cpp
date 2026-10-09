@@ -1,0 +1,496 @@
+diff --git a/cpu-lab/moss_cpu_regression.py b/cpu-lab/moss_cpu_regression.py
+index 9d16135..df9ea4b 100644
+--- a/cpu-lab/moss_cpu_regression.py
++++ b/cpu-lab/moss_cpu_regression.py
+@@ -90,6 +90,28 @@ def evaluate(runs, baseline="baseline", tolerance=0.05):
+     return {"passed": not failures, "failures": failures, "comparisons": comparisons}
+ 
+ 
++def parse_storage(stderr):
++    records = re.findall(r"BENCH_MODEL_STORAGE mode=(mapped|copied)(?: fileBytes=(\d+))? tensorBytes=(\d+) copiedBytes=(\d+)", stderr)
++    if len(records) != 1:
++        return None  # Old binaries have no record; duplicate records are ambiguous.
++    mode, file_bytes, tensors, copied = records[0]
++    return {"mode":mode, "fileBytes":int(file_bytes) if file_bytes else None,
++            "tensorBytes":int(tensors), "copiedBytes":int(copied)}
++
++
++def evaluate_storage(runs, settings):
++    failures = []
++    for r in runs:
++        if not (settings.get(r["variant"],{}).get("opt",0) & 4096):
++            continue
++        storage = r.get("modelStorage") or {}
++        if (storage.get("mode") != "mapped" or storage.get("copiedBytes") != 0 or
++                not storage.get("tensorBytes") or not storage.get("fileBytes") or
++                storage["fileBytes"] < storage["tensorBytes"]):
++            failures.append(f'{r["case"]}/{r["variant"]}/{r["repeat"]}: requested CPU mapping was not verified')
++    return {"passed":not failures,"failures":failures}
++
++
+ def main():
+     p = argparse.ArgumentParser(description=__doc__)
+     p.add_argument("--root", type=Path, required=True)
+@@ -225,7 +247,8 @@ def main():
+                        "hostLoadBefore":load_before,"hostLoadAfter":os.getloadavg(),
+                        "timing": {"load":float(timing[1]),"inference":float(timing[2])} if timing else None,
+                        "profile": {k:float(v) for k,v in re.findall(r"(prefill|embedding|decoder|logits)=([\d.]+)",stderr)},
+-                       "phaseProfile": json.loads(phase_match[1]) if (phase_match := re.search(r"^CPU_PHASE_PROFILE (\{.*\})$", stderr, re.M)) else None}
++                       "phaseProfile": json.loads(phase_match[1]) if (phase_match := re.search(r"^CPU_PHASE_PROFILE (\{.*\})$", stderr, re.M)) else None,
++                       "modelStorage":parse_storage(stderr)}
+                 report["runs"].append(row)
+                 report_path.write_text(json.dumps(report,indent=2))
+                 print(json.dumps(row),flush=True)
+@@ -236,13 +259,14 @@ def main():
+     artifact_hashes.update({str(root / "source" / name):value for name,value in report["sourceSha256"].items()})
+     changed = [path for path,value in artifact_hashes.items() if digest(path) != value]
+     report["artifactGate"] = {"passed":not changed,"changed":changed}
++    report["storageGate"] = evaluate_storage(report["runs"],report["variantSettings"])
+     report["gate"] = evaluate(report["runs"])
+     if "cache-reference" in args.variants:
+         compared = [r for r in report["runs"] if r["variant"] != "baseline"]
+         report["cacheReferenceGate"] = evaluate(compared, baseline="cache-reference")
+     report_path.write_text(json.dumps(report,indent=2))
+     print(json.dumps(report["gate"],indent=2))
+-    return 0 if report["artifactGate"]["passed"] and report["gate"]["passed"] and report.get("cacheReferenceGate",{"passed":True})["passed"] else 1
++    return 0 if report["artifactGate"]["passed"] and report["storageGate"]["passed"] and report["gate"]["passed"] and report.get("cacheReferenceGate",{"passed":True})["passed"] else 1
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/cpu-lab/moss_model_storage_bench.cpp b/cpu-lab/moss_model_storage_bench.cpp
+new file mode 100644
+index 0000000..4620dfd
+--- /dev/null
++++ b/cpu-lab/moss_model_storage_bench.cpp
+@@ -0,0 +1,47 @@
++// Full-checkpoint byte/promotion check; loader timings are diagnostics only.
++// No inference, token output or weights are written. Backend initialization is
++// shared by both loaders: use the fresh-process full-model gate for latency.
++#include "model_loader.hpp"
++#include <chrono>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++
++static void env(const char* key,const char* value) {
++#ifdef _WIN32
++    _putenv_s(key,value);
++#else
++    setenv(key,value,1);
++#endif
++}
++static bool equal(const mt::ModelLoader& a,const mt::ModelLoader& b,size_t& bytes) {
++    if(a.tensor_names()!=b.tensor_names())return false;
++    bytes=0;
++    for(const auto& name:a.tensor_names()) {
++        auto x=a.tensor(name);auto y=b.tensor(name);
++        if(!x || !y || x->type!=y->type || std::memcmp(x->ne,y->ne,sizeof(x->ne)) ||
++            std::memcmp(x->nb,y->nb,sizeof(x->nb)) || std::memcmp(x->data,y->data,ggml_nbytes(x)))return false;
++        bytes+=ggml_nbytes(x);
++    }
++    return true;
++}
++int main(int argc,char** argv) {
++    if(argc!=2) {std::fprintf(stderr,"usage: moss_model_storage_bench model.gguf\n");return 2;}
++    env("MTD_DEVICE","cpu");env("MTD_CPU_OPT","0");
++    auto start=std::chrono::steady_clock::now();
++    mt::ModelLoader copied;if(!copied.load(argv[1]))return 1;
++    auto copied_end=std::chrono::steady_clock::now();
++    env("MTD_CPU_OPT","4096");
++    auto mapped_start=std::chrono::steady_clock::now();
++    mt::ModelLoader mapped;if(!mapped.load(argv[1]))return 1;
++    auto mapped_end=std::chrono::steady_clock::now();
++    if(!mapped.cpu_mapped())return 77;
++    size_t raw_bytes=0,promoted_bytes=0;
++    const bool raw_equal=equal(copied,mapped,raw_bytes);
++    copied.promote_small_f16_to_f32();mapped.promote_small_f16_to_f32();
++    const bool promoted_equal=equal(copied,mapped,promoted_bytes);
++    std::printf("{\"protocol\":\"Full tensor-byte and promotion check, same process/backend, shared/warm file cache. Loader time excludes lazy page faults until comparison; no inference or full-input latency claim.\",\"tensors\":%zu,\"rawBytesCompared\":%zu,\"postPromotionBytesCompared\":%zu,\"rawByteIdentity\":%s,\"postPromotionByteIdentity\":%s,\"mappedActive\":true,\"copiedLoadSeconds\":%.9f,\"mappedLoadSeconds\":%.9f}\n",
++        copied.tensor_names().size(),raw_bytes,promoted_bytes,raw_equal?"true":"false",promoted_equal?"true":"false",
++        std::chrono::duration<double>(copied_end-start).count(),std::chrono::duration<double>(mapped_end-mapped_start).count());
++    return raw_equal && promoted_equal ? 0 : 1;
++}
+diff --git a/cpu-lab/test_moss_cpu_regression.py b/cpu-lab/test_moss_cpu_regression.py
+index ceb6223..5ad2ac4 100644
+--- a/cpu-lab/test_moss_cpu_regression.py
++++ b/cpu-lab/test_moss_cpu_regression.py
+@@ -1,6 +1,6 @@
+ """Meaningful failure-mode tests for the optimization acceptance gate."""
+ import unittest
+-from moss_cpu_regression import evaluate, run_environment, variant_settings
++from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage
+ 
+ 
+ class RegressionGateTest(unittest.TestCase):
+@@ -83,6 +83,20 @@ class RegressionGateTest(unittest.TestCase):
+         self.assertEqual(env["MTD_THREADS_LOGITS"],"8")
+         self.assertNotIn("MTD_THREADS_PREFILL",env)
+ 
++    def test_loader_records_are_unambiguous_and_old_binaries_remain_supported(self):
++        line="[info] BENCH_MODEL_STORAGE mode=mapped fileBytes=128 tensorBytes=64 copiedBytes=0"
++        self.assertEqual(parse_storage(line),{"mode":"mapped","fileBytes":128,"tensorBytes":64,"copiedBytes":0})
++        self.assertIsNone(parse_storage("old loader without a storage record"))
++        self.assertIsNone(parse_storage(line+"\n"+line))
++
++    def test_requested_mapping_cannot_pass_with_fallback_or_inconsistent_counters(self):
++        settings={"baseline":{"opt":0},"mapped":{"opt":4144}}
++        valid={"mode":"mapped","fileBytes":128,"tensorBytes":64,"copiedBytes":0}
++        row=self.row("mapped",repeat=0,modelStorage=valid)
++        self.assertTrue(evaluate_storage([self.row(),row],settings)["passed"])
++        for invalid in (None,{**valid,"mode":"copied"},{**valid,"copiedBytes":1},{**valid,"fileBytes":63}):
++            self.assertFalse(evaluate_storage([{**row,"modelStorage":invalid}],settings)["passed"])
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/src/model_loader.cpp b/src/model_loader.cpp
+index 405d331..a092ec0 100644
+--- a/src/model_loader.cpp
++++ b/src/model_loader.cpp
+@@ -1,11 +1,22 @@
+ #include "model_loader.hpp"
+ #include "backend.hpp"
+ #include "common.hpp"
++#include "ggml-cpu.h"
+ 
+ #include <cstdio>
++#include <cstddef>
++#include <cstdlib>
+ #include <cstring>
++#include <limits>
+ #include <vector>
+ 
++#ifndef _WIN32
++#include <fcntl.h>
++#include <sys/mman.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#endif
++
+ namespace mt {
+ 
+ ModelLoader::ModelLoader() = default;
+@@ -14,10 +25,75 @@ ModelLoader::~ModelLoader() {
+     if (promote_buffer_) ggml_backend_buffer_free(promote_buffer_);
+     if (promote_ctx_)    ggml_free(promote_ctx_);
+     if (backend_buffer_) ggml_backend_buffer_free(backend_buffer_);
++#ifndef _WIN32
++    if (mapped_size_)    munmap(mapped_data_, mapped_size_);
++#endif
+     if (gguf_)           gguf_free(gguf_);
+     if (ctx_)            ggml_free(ctx_);
+ }
+ 
++ModelLoader::MapResult ModelLoader::try_cpu_map(const std::string& path) {
++#ifdef _WIN32
++    (void)path;
++    return MapResult::Unavailable;
++#else
++    const int fd = open(path.c_str(), O_RDONLY);
++    if (fd < 0) return MapResult::Unavailable;
++    struct stat info {};
++    if (fstat(fd, &info) || !S_ISREG(info.st_mode) || info.st_size <= 0) {
++        close(fd);
++        return MapResult::Unavailable;
++    }
++    if (static_cast<uintmax_t>(info.st_size) > static_cast<uintmax_t>(std::numeric_limits<ptrdiff_t>::max())) {
++        close(fd);
++        return MapResult::Invalid;
++    }
++    const size_t bytes = static_cast<size_t>(info.st_size);
++    const size_t data_off = gguf_get_data_offset(gguf_);
++    if (data_off > bytes) { close(fd); return MapResult::Invalid; }
++    const int64_t n = gguf_get_n_tensors(gguf_);
++    // Validate *every* range before attaching any tensor. Subtractions avoid
++    // offset/size overflow and reject truncated payloads without touching pages.
++    bool aligned = true;
++    size_t payload = 0;
++    for (int64_t i = 0; i < n; ++i) {
++        const size_t off = gguf_get_tensor_offset(gguf_, i);
++        const size_t size = gguf_get_tensor_size(gguf_, i);
++        auto* tensor = ggml_get_tensor(ctx_, gguf_get_tensor_name(gguf_, i));
++        if (!tensor || off > bytes-data_off || size > bytes-data_off-off ||
++            size != ggml_nbytes(tensor)) {
++            close(fd);
++            MT_LOGE("CPU mapped weights: invalid tensor range");
++            return MapResult::Invalid;
++        }
++        // Keep natural scalar alignment. The wrapper requires a page-aligned
++        // base but imposes no separate 64-byte alignment on each tensor.
++        aligned &= (data_off+off) % alignof(std::max_align_t) == 0;
++        payload += size; // GGUF already checked non-overlapping padded ranges.
++    }
++    if (!aligned) { close(fd); return MapResult::Unavailable; }
++    void* data = mmap(nullptr, bytes, PROT_READ, MAP_PRIVATE, fd, 0);
++    close(fd); // Mapping retains the inode; the wrapper does not own its pages.
++    if (data == MAP_FAILED) return MapResult::Unavailable;
++    if (!data) { munmap(data, bytes); return MapResult::Unavailable; }
++    auto buffer = ggml_backend_cpu_buffer_from_ptr(data, bytes);
++    if (!buffer) { munmap(data, bytes); return MapResult::Unavailable; }
++    backend_buffer_ = buffer;
++    mapped_data_ = data;
++    mapped_size_ = bytes;
++    for (int64_t i = 0; i < n; ++i) {
++        auto* tensor = ggml_get_tensor(ctx_, gguf_get_tensor_name(gguf_, i));
++        const size_t off = data_off+gguf_get_tensor_offset(gguf_, i);
++        if (ggml_backend_tensor_alloc(buffer, tensor, static_cast<uint8_t*>(data)+off) != GGML_STATUS_SUCCESS) {
++            MT_LOGE("CPU mapped weights: tensor attachment failed");
++            return MapResult::Invalid;
++        }
++    }
++    MT_LOGI("BENCH_MODEL_STORAGE mode=mapped fileBytes=%zu tensorBytes=%zu copiedBytes=0", bytes, payload);
++    return MapResult::Ready;
++#endif
++}
++
+ bool ModelLoader::load(const std::string& path) {
+     if (gguf_ || ctx_) {
+         MT_LOGE("ModelLoader::load called twice");
+@@ -25,9 +101,8 @@ bool ModelLoader::load(const std::string& path) {
+     }
+ 
+     // Load gguf metadata only (no_alloc=true). The actual tensor data is
+-    // copied into a backend buffer below so it lives wherever ggml's
+-    // active backend wants — CPU RAM by default, GPU VRAM when CUDA /
+-    // Metal / Vulkan / hipBLAS is selected.
++    // attached to CPU file pages when explicitly requested, or copied into
++    // the active backend's buffer (CPU RAM or device memory).
+     struct gguf_init_params p {};
+     p.no_alloc = true;
+     p.ctx      = &ctx_;
+@@ -52,6 +127,20 @@ bool ModelLoader::load(const std::string& path) {
+         tensor_by_name_.emplace(name, t);
+     }
+ 
++    // Metadata is independent of weight storage.
++    read_config();
++    const char* opt = std::getenv("MTD_CPU_OPT");
++    if (n > 0 && opt && (std::atoi(opt) & 4096) && ggml_backend_is_cpu(mt::backend())) {
++        const auto mapped = try_cpu_map(path);
++        if (mapped == MapResult::Invalid) return false;
++        if (mapped == MapResult::Ready) {
++            MT_LOGI("loaded %s: %lld tensors, %lld kv (backend=%s, mapped)", path.c_str(),
++                static_cast<long long>(n), static_cast<long long>(gguf_get_n_kv(gguf_)), mt::backend_name());
++            return true;
++        }
++        MT_LOGW("CPU mapping unavailable; retaining copied weight storage");
++    }
++
+     // Allocate every tensor in ctx_ on the active backend's buffer. After
+     // this each ggml_tensor's `data` pointer references backend memory
+     // (host pages on CPU; device VRAM on GPU). Reads/writes have to go
+@@ -65,9 +154,6 @@ bool ModelLoader::load(const std::string& path) {
+         }
+     }
+ 
+-    // Parse the mtd.* metadata block (independent of tensor data).
+-    read_config();
+-
+     if (n == 0) {
+         MT_LOGI("loaded %s: %lld tensors, %lld kv (no tensor data)",
+                     path.c_str(), 0LL, static_cast<long long>(gguf_get_n_kv(gguf_)));
+@@ -86,6 +172,7 @@ bool ModelLoader::load(const std::string& path) {
+     }
+     const size_t data_off = gguf_get_data_offset(gguf_);
+     std::vector<uint8_t> stage;
++    size_t copied = 0;
+     for (int64_t i = 0; i < n; ++i) {
+         const char* name = gguf_get_tensor_name(gguf_, i);
+         if (!name) continue;
+@@ -102,8 +189,10 @@ bool ModelLoader::load(const std::string& path) {
+             return false;
+         }
+         ggml_backend_tensor_set(t, stage.data(), 0, sz);
++        copied += sz;
+     }
+     std::fclose(fp);
++    MT_LOGI("BENCH_MODEL_STORAGE mode=copied tensorBytes=%zu copiedBytes=%zu", copied, copied);
+ 
+     MT_LOGI("loaded %s: %lld tensors, %lld kv (backend=%s)",
+                 path.c_str(),
+diff --git a/src/model_loader.hpp b/src/model_loader.hpp
+index 49c5d4d..f11f409 100644
+--- a/src/model_loader.hpp
++++ b/src/model_loader.hpp
+@@ -33,6 +33,12 @@ public:
+     // Also fills config() from the `mtd.*` KV block.
+     bool load(const std::string& path);
+ 
++    // MTD_CPU_OPT bit 4096: POSIX CPU-only, read-only file-backed weights.
++    // The file must remain immutable while this loader is alive. GPU/Windows
++    // and unsuitable alignment retain the copied-buffer path. Promotion owns
++    // a separate writable buffer; mapping never changes stored weight bytes.
++    bool cpu_mapped() const { return mapped_size_ != 0; }
++
+     // Parsed model configuration (populated by load()).
+     const Config& config() const { return cfg_; }
+ 
+@@ -69,12 +75,16 @@ public:
+ private:
+     // Fill cfg_ from the gguf `mtd.*` (and general.*) KV block.
+     void read_config();
++    enum class MapResult { Unavailable, Invalid, Ready };
++    MapResult try_cpu_map(const std::string& path);
+ 
+     struct gguf_context*      gguf_           = nullptr;
+     struct ggml_context*      ctx_            = nullptr;  // tensor metadata
+     struct ggml_context*      promote_ctx_    = nullptr;  // f32 promoted tensors
+     ggml_backend_buffer_t     backend_buffer_ = nullptr;  // owns the actual weight data
+     ggml_backend_buffer_t     promote_buffer_ = nullptr;  // owns promoted weight data
++    void*                     mapped_data_    = nullptr;  // released after buffer wrapper
++    size_t                    mapped_size_    = 0;
+     std::vector<std::string>  tensor_names_;
+     std::unordered_map<std::string, struct ggml_tensor*> tensor_by_name_;
+     Config                    cfg_{};
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 9614068..149a7ef 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -11,6 +11,12 @@ endmacro()
+ mt_add_test(test_audio_io)
+ mt_add_test(test_cpu_softmax)
+ mt_add_test(test_cpu_threads)
++mt_add_test(test_model_mapping)
++
++# Explicit full-checkpoint storage probe; ordinary CTest needs no model file.
++add_executable(moss_model_storage_bench ../cpu-lab/moss_model_storage_bench.cpp)
++target_include_directories(moss_model_storage_bench PRIVATE ${CMAKE_SOURCE_DIR}/src)
++target_link_libraries(moss_model_storage_bench PRIVATE moss-transcribe)
+ mt_add_test(test_cpu_q8)
+ target_include_directories(test_cpu_q8 PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
+ 
+diff --git a/tests/test_model_mapping.cpp b/tests/test_model_mapping.cpp
+new file mode 100644
+index 0000000..fc19a91
+--- /dev/null
++++ b/tests/test_model_mapping.cpp
+@@ -0,0 +1,129 @@
++// File-backed CPU weights: byte identity, graph use, promotion, inode lifetime,
++// bounds rejection and copied fallback for non-natural GGUF alignment.
++#include "model_loader.hpp"
++#include "backend.hpp"
++#include <algorithm>
++#include <cmath>
++#include <cstddef>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++#include <stdexcept>
++#include <string>
++#include <vector>
++#ifndef _WIN32
++#include <unistd.h>
++
++namespace {
++struct TempFile {
++    std::string path;
++    TempFile() {
++        char name[]="/tmp/moss-model-map-XXXXXX";
++        int fd=mkstemp(name);
++        if (fd<0) throw std::runtime_error("mkstemp");
++        close(fd); path=name;
++    }
++    ~TempFile() { std::remove(path.c_str()); }
++};
++void setting(const char* opt) { setenv("MTD_CPU_OPT",opt,1); }
++void require(bool value,const char* message) {
++    if (!value) throw std::runtime_error(message);
++}
++void write_model(const std::string& path,uint32_t alignment=32,int padding=0) {
++    auto ctx=ggml_init({65536,nullptr,false}); require(ctx,"context");
++    auto f=ggml_new_tensor_2d(ctx,GGML_TYPE_F32,32,4);ggml_set_name(f,"f32.weight");
++    for (int i=0;i<128;++i) static_cast<float*>(f->data)[i]=std::sin(float(i))*.7f;
++    auto q=ggml_new_tensor_2d(ctx,GGML_TYPE_Q8_0,32,3);ggml_set_name(q,"q8.weight");
++    std::vector<float> values(96);for(int i=0;i<96;++i)values[i]=std::cos(float(i))*.2f;
++    require(ggml_quantize_chunk(GGML_TYPE_Q8_0,values.data(),q->data,0,3,32,nullptr)==ggml_nbytes(q),"quantize");
++    auto h=ggml_new_tensor_1d(ctx,GGML_TYPE_F16,7);ggml_set_name(h,"small.norm");
++    for(int i=0;i<7;++i)static_cast<ggml_fp16_t*>(h->data)[i]=ggml_fp32_to_fp16(float(i)-2.5f);
++    auto gguf=gguf_init_empty();require(gguf,"gguf");
++    gguf_set_val_u32(gguf,"general.alignment",alignment);
++    gguf_set_val_u32(gguf,"mtd.text.hidden",32);
++    gguf_set_val_str(gguf,"test.padding",std::string(padding,'x').c_str());
++    if (alignment != 32) {
++        // Setting general.alignment changes metadata, not the writer context's
++        // cached alignment. Reopen the tensorless header so offsets and payload
++        // padding are actually generated using the requested alignment.
++        require(gguf_write_to_file(gguf,path.c_str(),true),"write alignment header");
++        gguf_free(gguf);
++        gguf=gguf_init_from_file(path.c_str(),{true,nullptr});require(gguf,"alignment header");
++    }
++    gguf_add_tensor(gguf,f);gguf_add_tensor(gguf,q);gguf_add_tensor(gguf,h);
++    require(gguf_write_to_file(gguf,path.c_str(),false),"write");
++    gguf_free(gguf);ggml_free(ctx);
++}
++struct Extent { size_t data, end; };
++Extent extent(const std::string& path) {
++    auto g=gguf_init_from_file(path.c_str(),{true,nullptr}); require(g,"header");
++    const auto data=gguf_get_data_offset(g);size_t end=data;
++    for(int64_t i=0;i<gguf_get_n_tensors(g);++i)
++        end=std::max(end,data+gguf_get_tensor_offset(g,i)+gguf_get_tensor_size(g,i));
++    gguf_free(g);return {data,end};
++}
++void compare(const mt::ModelLoader& a,const mt::ModelLoader& b) {
++    require(a.tensor_names()==b.tensor_names(),"names");
++    require(a.config().text_hidden==32 && b.config().text_hidden==32,"metadata");
++    for(const auto& name:a.tensor_names()) {
++        auto x=a.tensor(name);auto y=b.tensor(name);
++        require(x && y && x->type==y->type,"type");
++        require(!std::memcmp(x->ne,y->ne,sizeof(x->ne)),"shape");
++        require(!std::memcmp(x->nb,y->nb,sizeof(x->nb)),"strides");
++        require(!std::memcmp(x->data,y->data,ggml_nbytes(x)),"weight bytes");
++    }
++}
++std::vector<float> projection(const mt::ModelLoader& m,const char* name) {
++    auto ctx=ggml_init({1024*1024,nullptr,true});require(ctx,"graph context");
++    auto x=ggml_new_tensor_1d(ctx,GGML_TYPE_F32,32);ggml_set_input(x);
++    auto y=ggml_mul_mat(ctx,m.tensor(name),x);ggml_set_output(y);
++    auto graph=ggml_new_graph(ctx);ggml_build_forward_expand(graph,y);
++    float input[32];for(int i=0;i<32;++i)input[i]=float(i)/32-.5f;
++    require(mt::compute_graph_with_inputs(graph,[&]{ggml_backend_tensor_set(x,input,0,sizeof(input));}),"compute");
++    std::vector<float> out(ggml_nelements(y));ggml_backend_tensor_get(y,out.data(),0,out.size()*sizeof(float));
++    ggml_free(ctx);return out;
++}
++void run() {
++    setenv("MTD_DEVICE","cpu",1);setenv("MTD_THREADS","2",1);setenv("OMP_DYNAMIC","FALSE",1);
++    TempFile file;write_model(file.path);
++    setting("0");mt::ModelLoader copied;require(copied.load(file.path),"copied load");
++    require(!copied.cpu_mapped(),"default storage");
++    setting("4096");mt::ModelLoader mapped;require(mapped.load(file.path),"mapped load");
++    require(mapped.cpu_mapped(),"mapping active");compare(copied,mapped);
++    for(auto name:{"f32.weight","q8.weight"}) {
++        auto a=projection(copied,name);auto b=projection(mapped,name);
++        require(a.size()==b.size() && !std::memcmp(a.data(),b.data(),a.size()*sizeof(float)),"graph bits");
++    }
++    copied.promote_small_f16_to_f32();mapped.promote_small_f16_to_f32();compare(copied,mapped);
++    require(mapped.tensor("small.norm")->type==GGML_TYPE_F32,"promoted type");
++    require(!mapped.load(file.path),"double load");
++    // The descriptor is already closed. Unlinking the name must not invalidate
++    // the borrowed pages or prevent their later owner-controlled unmapping.
++    require(std::remove(file.path.c_str())==0,"unlink");compare(copied,mapped);
++    auto a=projection(copied,"q8.weight");auto b=projection(mapped,"q8.weight");
++    require(!std::memcmp(a.data(),b.data(),a.size()*sizeof(float)),"unlinked graph");
++
++    TempFile truncated;write_model(truncated.path);auto e=extent(truncated.path);
++    require(truncate(truncated.path.c_str(),static_cast<off_t>(e.end-1))==0,"truncate");
++    mt::ModelLoader bad;require(!bad.load(truncated.path),"truncated rejection");
++    require(!bad.cpu_mapped(),"invalid map not attached");
++    for(const auto& name:bad.tensor_names())require(!bad.tensor(name)->data,"validate all before attach");
++
++    TempFile unusual;bool selected=false;
++    for(int padding=0;padding<16;++padding) {
++        write_model(unusual.path,1,padding);
++        if(extent(unusual.path).data % alignof(std::max_align_t)) { selected=true;break; }
++    }
++    require(selected,"misaligned fixture");
++    setting("0");mt::ModelLoader normal;require(normal.load(unusual.path),"unaligned copied");
++    setting("4096");mt::ModelLoader fallback;require(fallback.load(unusual.path),"unaligned fallback");
++    require(!fallback.cpu_mapped(),"fallback storage");compare(normal,fallback);
++}
++}
++int main() {
++    try {run();std::puts("mapped CPU weights: bytes, graph, promotion, lifetime and bounds pass");return 0;}
++    catch(const std::exception& e) {std::fprintf(stderr,"mapping test: %s\n",e.what());return 1;}
++}
++#else
++int main() { return 77; }
++#endif

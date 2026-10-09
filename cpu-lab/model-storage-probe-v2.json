@@ -16,5 +16,5 @@
   "probeSourceSha256": "8ca03e0f51689fe19652761402a599490744cc41bb41f2900e7bb8df828ffdec",
   "originalResultSha256": "cb3897be18d138a5c27bc58d5ac555435f0e50898e88cf320a90eaa71f8e3dcb",
   "modelSha256": "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c",
-  "modelHashEvidence": "The paired full-input harness recorded this hash at startup. Require its final artifact gate before interpreting latency results."
+  "modelHashEvidence": "The paired full-input harness recorded this hash before all 40 runs; its final artifact gate passed with the same checkpoint hash. See mmap-pilot-v2.json."
 }
