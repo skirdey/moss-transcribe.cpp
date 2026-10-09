@@ -340,10 +340,37 @@ from the pinned submodule, so revalidate after any ggml upgrade.
 
 The native `test_cpu_softmax` compares raw float bits against the eager CPU operation
 at 1 and 16 threads, nine key lengths, three head/batch shapes and large or infinite
-logits. All 54 tested shapes matched exactly. The first two-repeat paired pilot showed
-5.0% lower English latency and 3.3% lower German latency relative to the validated cache
-candidate, without output changes or material memory increase. These are preliminary
-numbers; broader public-reference and long-input confirmation is still required.
+logits. All 54 tested shapes matched exactly. The final confirmation ran 63 matched
+fresh-process measurements (seven 60-second cases, three variants, three repeats),
+plus a three-way 120-second stress check. All complete raw outputs, words, speaker
+markers, timestamps, token counts and EOS stops matched. Source, model, binary and
+library hashes stayed unchanged, and no concurrent MOSS inference was observed.
+
+| Input | Production | Validated cache (16) | Cache + parallel softmax (48) | Speedup over cache |
+|---|---:|---:|---:|---:|
+| English meeting, 60 s | 21.81 s | 14.54 s | 13.89 s | 1.047x |
+| German dinner, 60 s | 16.50 s | 12.09 s | 11.64 s | 1.039x |
+| VoxConverse rcxzg, 60 s | 19.65 s | 13.54 s | 12.89 s | 1.050x |
+| VoxConverse fsaal, 60 s | 19.40 s | 13.44 s | 12.89 s | 1.043x |
+| VoxConverse vmaiq, 60 s | 17.30 s | 12.44 s | 11.94 s | 1.042x |
+| English meeting, 120 s (one run each) | 78.52 s | 34.08 s | 31.53 s | 1.081x |
+
+Q8, 16 pinned physical-core workers on Xeon Gold 5416S, alternating variant order,
+warm filesystem cache, wall time including model load, shared host. Silence and
+actual empty speech were essentially unchanged. Peak RSS was 1,702,100 KiB at 60 s
+and 2,083,376 KiB at 120 s; the incremental softmax change added under 0.1% relative
+to the transposed-cache candidate. The transposed cache itself uses about 5–8% more
+memory than production. These small paired samples are measured gains, not a
+statistical confidence claim or full-corpus throughput claim.
+
+The human-reference three-clip VoxConverse smoke subset had identical per-case DER
+for all three variants: macro 5.1456% at zero collar and 3.5110% at 250 ms collar,
+including overlap and optimal speaker permutation. There are no human WER references
+in this subset. Full raw-text parity covers transcription regression relative to
+production. See `cpu-lab/softmax-confirm-v3.json`, `softmax-long-v3.json` and
+`softmax-quality-v3.json` for reproducible hashes, measurements and quality evidence.
+The quality report records the final 63-run parity evidence used to validate its
+scored outputs. Regression-gate unit tests pass all 12 cases.
 
 The updated paired harness accepts `cache-reference` as a fixed binary at
 `--reference-root`. It has a separate gate against that candidate, since beating the
