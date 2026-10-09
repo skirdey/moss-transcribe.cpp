@@ -429,3 +429,20 @@ The kernels remain explicit research transforms, and all nine model-independent
 Ctests pass in a fresh probes-only build. No new end-to-end gain or production
 promotion is claimed; the 10x goal remains unachieved. PocketFFT retains its
 BSD-3-Clause license and attribution; our source changes remain MIT.
+
+### Thread scheduling and private token replay
+
+The [thread scheduling report](cpu-lab/thread-scheduling.md) documents matched
+4/8/16-thread trials, the bounded passive-wait warmup failure, and optional
+per-phase CPU budgets. `MTD_THREADS_DECODE` and `MTD_THREADS_LOGITS` can reduce
+workers for those phases while the encoder retains the startup thread count;
+the other phase budgets are also available. Values cannot exceed startup
+MTD_THREADS, and defaults retain it throughout. Native tests check the actual
+ggml callback worker count, nested scopes and exception restoration.
+
+`MTD_TRACE_TOKENS=1` is an opt-in private diagnostic: the IDs reconstruct text
+and must not be published. Chunked records and strict parser tests guard
+against logger truncation. `moss_ngram_audit.py` reports past-only draft
+acceptance and rejected token work from actual greedy traces. It is an oracle
+replay estimate, with no target verification or measured speculative speedup.
+Full-input paired gates and corpus accuracy checks remain separate.
