@@ -325,3 +325,44 @@ It is host-specific, not a general-purpose installer. Never commit its generated
 or `data/` directory. API tests can run with `PYTHONPATH=cpu-lab python -m pytest
 cpu-lab/test_moss_api.py` after installing pytest. The client needs NumPy, soundfile
 and SciPy for audio conversion; the API and latency harness use the Python standard library.
+
+
+### Parallel decode softmax research
+
+`MTD_CPU_OPT=32` assigns independent attention heads across CPU workers for unmasked,
+single-token decoding. The pinned ggml implementation partitions by query row, leaving
+all heads on one worker in this shape. Our custom op retains the same scaling, maximum,
+vector exponential/sum primitive, double reciprocal and float normalization. It reads
+the head dimension from the query tensor, avoiding mutable or borrowed callback state.
+Prefill and GPU softmax keep the reference path. `MTD_CPU_OPT=48` combines this with the
+validated transposed value cache (16 + 32). This uses ggml's private CPU vector header
+from the pinned submodule, so revalidate after any ggml upgrade.
+
+The native `test_cpu_softmax` compares raw float bits against the eager CPU operation
+at 1 and 16 threads, nine key lengths, three head/batch shapes and large or infinite
+logits. All 54 tested shapes matched exactly. The first two-repeat paired pilot showed
+5.0% lower English latency and 3.3% lower German latency relative to the validated cache
+candidate, without output changes or material memory increase. These are preliminary
+numbers; broader public-reference and long-input confirmation is still required.
+
+The updated paired harness accepts `cache-reference` as a fixed binary at
+`--reference-root`. It has a separate gate against that candidate, since beating the
+older production binary alone does not prove a new improvement. Model, audio and
+baseline paths are configurable, and before/after artifact hashes reject mutated
+source or binaries. Run the three-way comparison, for example:
+
+```bash
+python3 cpu-lab/moss_cpu_regression.py --root /home/stan/hw-moss-softmax-v1 \
+  --variants baseline cache-reference 48 --pin-physical --repeats 3 --name confirm
+```
+
+A separate fused eager-attention experiment retained exact dot and full-row softmax
+arithmetic and passed 48 native float-bit tests. Its warm kernel timings improved, but
+full model inference was substantially slower than the validated cache candidate.
+It was rejected and removed from the active source. The archived patch preserves that
+research, including its numerical test, without selecting it for normal inference.
+
+The rejected patch `cpu-lab/eager-fused-candidate-v2.patch` applies to a fresh fork
+checkout at `0f60f5361dc0e2fe4787d7a8aa4369853eddf530`; use opt bitmask 80
+(16 + 64) only to reproduce that failed experiment in an isolated build. Its
+per-case median slowdowns versus the validated cache were 43–60%.
