@@ -1,0 +1,5 @@
+{"kvLength":1,"bitwiseDifferent":0,"maxAbsError":0,"referenceUs":13.838,"cachedUs":14.998,"speedup":0.9227}
+{"kvLength":31,"bitwiseDifferent":0,"maxAbsError":0,"referenceUs":32.536,"cachedUs":17.742,"speedup":1.8339}
+{"kvLength":256,"bitwiseDifferent":0,"maxAbsError":0,"referenceUs":131.068,"cachedUs":17.467,"speedup":7.5036}
+{"kvLength":1024,"bitwiseDifferent":0,"maxAbsError":0,"referenceUs":594.128,"cachedUs":27.134,"speedup":21.8961}
+{"kvLength":2048,"bitwiseDifferent":0,"maxAbsError":0,"referenceUs":1366.158,"cachedUs":45.890,"speedup":29.7703}

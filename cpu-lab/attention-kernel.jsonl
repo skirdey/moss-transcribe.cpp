@@ -1,0 +1,5 @@
+{"kvLength":1,"maxAbsError":0,"rmsError":0,"referenceUs":15.684,"fusedUs":8.369,"speedup":1.8741}
+{"kvLength":31,"maxAbsError":4.76837158e-07,"rmsError":5.52041822e-08,"referenceUs":37.145,"fusedUs":11.119,"speedup":3.3407}
+{"kvLength":256,"maxAbsError":2.98023224e-07,"rmsError":4.19743381e-08,"referenceUs":138.606,"fusedUs":29.623,"speedup":4.6790}
+{"kvLength":1024,"maxAbsError":5.96046448e-08,"rmsError":1.15126598e-08,"referenceUs":591.347,"fusedUs":81.659,"speedup":7.2417}
+{"kvLength":2048,"maxAbsError":4.47034836e-08,"rmsError":1.03181834e-08,"referenceUs":1210.112,"fusedUs":147.415,"speedup":8.2089}

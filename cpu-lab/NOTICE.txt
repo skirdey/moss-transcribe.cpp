@@ -1,0 +1,4 @@
+CPU optimization experiments, regression harness, parser, API and remote client additions are distributed under the repository MIT license.
+Upstream source copyright and licensing are retained. ggml retains its own MIT license.
+Model weights are not included and retain their original license. VoxConverse benchmark data are not included and retain their CC BY 4.0 license and attribution.
+No private recordings, decoded transcripts, trained weights, API secrets, or application databases are distributed.

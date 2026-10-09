@@ -1,0 +1,22 @@
+[Unit]
+Description=Private MOSS transcription and diarization API
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/moss-api/service.env
+ExecStart=/usr/bin/python3 %h/hw-moss-api/moss_api.py
+WorkingDirectory=%h/hw-moss-api
+Restart=always
+RestartSec=5
+TimeoutStopSec=15
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+MemoryMax=8G
+TasksMax=64
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,48 @@
+Internal ctest changing into directory: /home/stan/hw-moss-cache-layout/build
+Test project /home/stan/hw-moss-cache-layout/build
+      Start  1: test_audio_io
+ 1/14 Test  #1: test_audio_io ....................   Passed    0.00 sec
+      Start  2: test_mel
+ 2/14 Test  #2: test_mel .........................***Skipped   0.00 sec
+      Start  3: test_whisper_encoder
+ 3/14 Test  #3: test_whisper_encoder .............***Skipped   0.00 sec
+      Start  4: test_audio_adaptor
+ 4/14 Test  #4: test_audio_adaptor ...............***Skipped   0.00 sec
+      Start  5: test_audio_path_e2e
+ 5/14 Test  #5: test_audio_path_e2e ..............***Skipped   0.00 sec
+      Start  6: test_tokenizer
+ 6/14 Test  #6: test_tokenizer ...................***Skipped   0.00 sec
+      Start  7: test_audio_span
+ 7/14 Test  #7: test_audio_span ..................***Skipped   0.00 sec
+      Start  8: test_qwen3_decoder
+ 8/14 Test  #8: test_qwen3_decoder ...............***Skipped   0.00 sec
+      Start  9: test_fusion
+ 9/14 Test  #9: test_fusion ......................***Skipped   0.00 sec
+      Start 10: test_generate_e2e
+10/14 Test #10: test_generate_e2e ................***Skipped   0.00 sec
+      Start 11: test_embed_lookup
+11/14 Test #11: test_embed_lookup ................   Passed    0.01 sec
+      Start 12: test_transcript_parser
+12/14 Test #12: test_transcript_parser ...........   Passed    0.00 sec
+      Start 13: test_subtitle_postprocess
+13/14 Test #13: test_subtitle_postprocess ........   Passed    0.00 sec
+      Start 14: test_subtitle_export
+14/14 Test #14: test_subtitle_export .............   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 14
+
+Label Time Summary:
+model    =   0.02 sec*proc (9 tests)
+
+Total Test time (real) =   0.04 sec
+
+The following tests did not run:
+	  2 - test_mel (Skipped)
+	  3 - test_whisper_encoder (Skipped)
+	  4 - test_audio_adaptor (Skipped)
+	  5 - test_audio_path_e2e (Skipped)
+	  6 - test_tokenizer (Skipped)
+	  7 - test_audio_span (Skipped)
+	  8 - test_qwen3_decoder (Skipped)
+	  9 - test_fusion (Skipped)
+	 10 - test_generate_e2e (Skipped)
