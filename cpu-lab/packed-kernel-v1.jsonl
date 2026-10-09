@@ -1,0 +1,12 @@
+{"threads":1,"K":1024,"N":1024,"M":1,"identicalInputWeightBytes":true,"floatBitDifferences":847,"maxAbsError":3.05175781e-05,"rmsError":5.47528186e-06,"eagerUs":153.734,"packedUs":42.455,"speedup":3.6211}
+{"threads":1,"K":1024,"N":1024,"M":16,"identicalInputWeightBytes":true,"floatBitDifferences":13622,"maxAbsError":3.05175781e-05,"rmsError":4.97918787e-06,"eagerUs":984.658,"packedUs":282.270,"speedup":3.4883}
+{"threads":1,"K":1024,"N":1024,"M":375,"identicalInputWeightBytes":true,"floatBitDifferences":317427,"maxAbsError":3.81469727e-05,"rmsError":4.89378666e-06,"eagerUs":22860.026,"packedUs":5412.277,"speedup":4.2237}
+{"threads":1,"K":3072,"N":1024,"M":1,"identicalInputWeightBytes":true,"floatBitDifferences":914,"maxAbsError":4.57763672e-05,"rmsError":1.32371655e-05,"eagerUs":313.004,"packedUs":170.620,"speedup":1.8345}
+{"threads":1,"K":3072,"N":1024,"M":16,"identicalInputWeightBytes":true,"floatBitDifferences":14673,"maxAbsError":0.000106811523,"rmsError":1.41156706e-05,"eagerUs":3457.832,"packedUs":649.487,"speedup":5.3239}
+{"threads":1,"K":3072,"N":1024,"M":375,"identicalInputWeightBytes":true,"floatBitDifferences":343607,"maxAbsError":0.000106811523,"rmsError":1.40632385e-05,"eagerUs":64582.993,"packedUs":16604.857,"speedup":3.8894}
+{"threads":16,"K":1024,"N":1024,"M":1,"identicalInputWeightBytes":true,"floatBitDifferences":847,"maxAbsError":3.05175781e-05,"rmsError":5.47528186e-06,"eagerUs":21.699,"packedUs":14.871,"speedup":1.4592}
+{"threads":16,"K":1024,"N":1024,"M":16,"identicalInputWeightBytes":true,"floatBitDifferences":13622,"maxAbsError":3.05175781e-05,"rmsError":4.97918787e-06,"eagerUs":90.491,"packedUs":33.747,"speedup":2.6815}
+{"threads":16,"K":1024,"N":1024,"M":375,"identicalInputWeightBytes":true,"floatBitDifferences":317427,"maxAbsError":3.81469727e-05,"rmsError":4.89378666e-06,"eagerUs":1801.380,"packedUs":428.922,"speedup":4.1998}
+{"threads":16,"K":3072,"N":1024,"M":1,"identicalInputWeightBytes":true,"floatBitDifferences":914,"maxAbsError":4.57763672e-05,"rmsError":1.32371655e-05,"eagerUs":41.860,"packedUs":27.422,"speedup":1.5265}
+{"threads":16,"K":3072,"N":1024,"M":16,"identicalInputWeightBytes":true,"floatBitDifferences":14673,"maxAbsError":0.000106811523,"rmsError":1.41156706e-05,"eagerUs":262.713,"packedUs":78.036,"speedup":3.3666}
+{"threads":16,"K":3072,"N":1024,"M":375,"identicalInputWeightBytes":true,"floatBitDifferences":343607,"maxAbsError":0.000106811523,"rmsError":1.40632385e-05,"eagerUs":5068.599,"packedUs":1324.655,"speedup":3.8264}

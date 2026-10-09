@@ -1,0 +1,817 @@
+{
+  "protocol": "Sequential fresh processes, 16 threads, pinned model, alternating variant order each round, warm filesystem cache. Production auto processing paused; API stays available. Wall includes load. Shared host; no hardware counter support.",
+  "modelSha256": "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c",
+  "binarySha256": {
+    "baseline": "90c7424f2e7b20403a92d6bdcc2130dbff6bba147169ffeeb21572e473484815",
+    "candidate": "d5fc7017924ddfd37884084de3f1bac2c6c450d0a7530057c18e4b52d297660a",
+    "cache-reference": "bb8bd09737c1063657f4bb0dde0c114bc63cde1a528518950c19007295387825"
+  },
+  "libraries": {
+    "/home/stan/hw-moss-packed-v1/build/third_party/ggml/src/libggml-base.so": "acd2782009ddf5e2987d4baf03fc1cad9d54ee1579fd80a6e3adeb0c538039c5",
+    "/home/stan/hw-moss-packed-v1/build/third_party/ggml/src/libggml-cpu.so": "64629020f4c0e7bf65952303f044aa1f3c1af82898261671c5f528e66b942fa3",
+    "/home/stan/hw-moss-packed-v1/build/third_party/ggml/src/libggml.so": "84bf38be8ae61c4fa788ba46c2ab3c4e7cbdce1ccaab1abff07d58bbd744de88"
+  },
+  "sourceCommit": "2dbe59e420b43c8112c00067c928391eecc6c3b1",
+  "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 57 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  32\nOn-line CPU(s) list:                     0-31\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Xeon(R) Gold 5416S\nCPU family:                              6\nModel:                                   143\nThread(s) per core:                      2\nCore(s) per socket:                      16\nSocket(s):                               1\nStepping:                                8\nCPU(s) scaling MHz:                      57%\nCPU max MHz:                             4000.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                4000.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cat_l2 cdp_l3 cdp_l2 ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb intel_pt avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local split_lock_detect user_shstk avx_vnni avx512_bf16 wbnoinvd dtherm ida arat pln pts hwp hwp_act_window hwp_pkg_req hfi vnmi avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid bus_lock_detect cldemote movdiri movdir64b enqcmd fsrm md_clear serialize tsxldtrk pconfig arch_lbr ibt amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities\nVirtualization:                          VT-x\nL1d cache:                               768 KiB (16 instances)\nL1i cache:                               512 KiB (16 instances)\nL2 cache:                                32 MiB (16 instances)\nL3 cache:                                30 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-31\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Vulnerable\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+  "runs": [
+    {
+      "case": "meeting-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 26.63839701283723,
+      "maxRssKiB": 1587356,
+      "hostLoadBefore": [
+        29.6357421875,
+        26.0771484375,
+        18.4169921875
+      ],
+      "hostLoadAfter": [
+        24.00244140625,
+        25.01123046875,
+        18.302734375
+      ],
+      "timing": {
+        "load": 0.582361,
+        "inference": 25.940477
+      },
+      "profile": {}
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 32.16564927017316,
+      "maxRssKiB": 1701948,
+      "hostLoadBefore": [
+        24.00244140625,
+        25.01123046875,
+        18.302734375
+      ],
+      "hostLoadAfter": [
+        27.794921875,
+        25.78857421875,
+        18.77197265625
+      ],
+      "timing": {
+        "load": 0.588718,
+        "inference": 31.408364
+      },
+      "profile": {
+        "prefill": 2.953184,
+        "embedding": 0.019643,
+        "decoder": 19.144027,
+        "logits": 2.130888
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "176",
+      "repeat": 0,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 29.738162502180785,
+      "maxRssKiB": 2568752,
+      "hostLoadBefore": [
+        27.794921875,
+        25.78857421875,
+        18.77197265625
+      ],
+      "hostLoadAfter": [
+        30.23681640625,
+        26.53662109375,
+        19.2431640625
+      ],
+      "timing": {
+        "load": 1.449736,
+        "inference": 28.081531
+      },
+      "profile": {
+        "prefill": 1.83316,
+        "embedding": 0.019206,
+        "decoder": 16.581022,
+        "logits": 2.149771
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 45.8039531619288,
+      "maxRssKiB": 1538856,
+      "hostLoadBefore": [
+        30.23681640625,
+        26.53662109375,
+        19.2431640625
+      ],
+      "hostLoadAfter": [
+        32.68212890625,
+        27.6923828125,
+        19.98095703125
+      ],
+      "timing": {
+        "load": 0.942802,
+        "inference": 44.690593
+      },
+      "profile": {}
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 39.77679182495922,
+      "maxRssKiB": 1652932,
+      "hostLoadBefore": [
+        32.68212890625,
+        27.6923828125,
+        19.98095703125
+      ],
+      "hostLoadAfter": [
+        33.990234375,
+        28.59521484375,
+        20.6083984375
+      ],
+      "timing": {
+        "load": 0.95812,
+        "inference": 38.681915
+      },
+      "profile": {
+        "prefill": 3.991143,
+        "embedding": 0.016095,
+        "decoder": 20.467713,
+        "logits": 1.940308
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "176",
+      "repeat": 0,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "eb3f5cf11ed72139d4fddde3f3c601449a8a1c7426ee8727d44c5732f1dbb963",
+      "returncode": 0,
+      "tokens": 435,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 28.998020593076944,
+      "maxRssKiB": 2515536,
+      "hostLoadBefore": [
+        33.990234375,
+        28.59521484375,
+        20.6083984375
+      ],
+      "hostLoadAfter": [
+        34.35986328125,
+        29.16845703125,
+        21.052734375
+      ],
+      "timing": {
+        "load": 1.451174,
+        "inference": 27.345453
+      },
+      "profile": {
+        "prefill": 2.041221,
+        "embedding": 0.012904,
+        "decoder": 15.358066,
+        "logits": 1.71909
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 79.4716672883369,
+      "maxRssKiB": 1545212,
+      "hostLoadBefore": [
+        34.35986328125,
+        29.16845703125,
+        21.052734375
+      ],
+      "hostLoadAfter": [
+        35.42529296875,
+        30.65234375,
+        22.24169921875
+      ],
+      "timing": {
+        "load": 0.958292,
+        "inference": 78.378096
+      },
+      "profile": {}
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 43.79181388113648,
+      "maxRssKiB": 1660500,
+      "hostLoadBefore": [
+        35.42529296875,
+        30.65234375,
+        22.24169921875
+      ],
+      "hostLoadAfter": [
+        35.27294921875,
+        31.25244140625,
+        22.8427734375
+      ],
+      "timing": {
+        "load": 0.959231,
+        "inference": 42.683884
+      },
+      "profile": {
+        "prefill": 3.906328,
+        "embedding": 0.014067,
+        "decoder": 24.577389,
+        "logits": 2.014972
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "176",
+      "repeat": 0,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "244aae65b0c3bd10e4d0d19c5caf2952ef153592c0d6a77fd4817281e72461ef",
+      "returncode": 0,
+      "tokens": 476,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 32.03200058499351,
+      "maxRssKiB": 2524848,
+      "hostLoadBefore": [
+        35.27294921875,
+        31.25244140625,
+        22.8427734375
+      ],
+      "hostLoadAfter": [
+        35.69677734375,
+        31.73974609375,
+        23.27294921875
+      ],
+      "timing": {
+        "load": 1.463171,
+        "inference": 30.353553
+      },
+      "profile": {
+        "prefill": 1.984112,
+        "embedding": 0.01297,
+        "decoder": 18.42698,
+        "logits": 1.846706
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "176",
+      "repeat": 1,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 43.17400820180774,
+      "maxRssKiB": 2568212,
+      "hostLoadBefore": [
+        35.69677734375,
+        31.73974609375,
+        23.27294921875
+      ],
+      "hostLoadAfter": [
+        35.66650390625,
+        32.2412109375,
+        23.84130859375
+      ],
+      "timing": {
+        "load": 1.542449,
+        "inference": 41.365573
+      },
+      "profile": {
+        "prefill": 2.065387,
+        "embedding": 0.021727,
+        "decoder": 28.353579,
+        "logits": 2.768714
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 50.109191816765815,
+      "maxRssKiB": 1701620,
+      "hostLoadBefore": [
+        35.66650390625,
+        32.2412109375,
+        23.84130859375
+      ],
+      "hostLoadAfter": [
+        35.97509765625,
+        32.853515625,
+        24.4921875
+      ],
+      "timing": {
+        "load": 0.969214,
+        "inference": 49.00242
+      },
+      "profile": {
+        "prefill": 3.770627,
+        "embedding": 0.019108,
+        "decoder": 30.358641,
+        "logits": 2.748589
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 107.48009575903416,
+      "maxRssKiB": 1586804,
+      "hostLoadBefore": [
+        35.97509765625,
+        32.853515625,
+        24.4921875
+      ],
+      "hostLoadAfter": [
+        36.330078125,
+        33.91796875,
+        25.7734375
+      ],
+      "timing": {
+        "load": 0.968361,
+        "inference": 106.366905
+      },
+      "profile": {}
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "176",
+      "repeat": 1,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "eb3f5cf11ed72139d4fddde3f3c601449a8a1c7426ee8727d44c5732f1dbb963",
+      "returncode": 0,
+      "tokens": 435,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 30.944984568282962,
+      "maxRssKiB": 2515776,
+      "hostLoadBefore": [
+        36.330078125,
+        33.91796875,
+        25.7734375
+      ],
+      "hostLoadAfter": [
+        35.81884765625,
+        33.9970703125,
+        26.0576171875
+      ],
+      "timing": {
+        "load": 1.369341,
+        "inference": 29.364773
+      },
+      "profile": {
+        "prefill": 2.049278,
+        "embedding": 0.01206,
+        "decoder": 17.319525,
+        "logits": 1.801491
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 39.94416915811598,
+      "maxRssKiB": 1652896,
+      "hostLoadBefore": [
+        35.81884765625,
+        33.9970703125,
+        26.0576171875
+      ],
+      "hostLoadAfter": [
+        35.5,
+        34.091796875,
+        26.42236328125
+      ],
+      "timing": {
+        "load": 0.963604,
+        "inference": 38.806639
+      },
+      "profile": {
+        "prefill": 3.765357,
+        "embedding": 0.012953,
+        "decoder": 20.873277,
+        "logits": 1.866515
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 76.91683034785092,
+      "maxRssKiB": 1538936,
+      "hostLoadBefore": [
+        35.5,
+        34.091796875,
+        26.42236328125
+      ],
+      "hostLoadAfter": [
+        35.73046875,
+        34.43310546875,
+        27.1728515625
+      ],
+      "timing": {
+        "load": 0.966282,
+        "inference": 75.776775
+      },
+      "profile": {}
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "176",
+      "repeat": 1,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "244aae65b0c3bd10e4d0d19c5caf2952ef153592c0d6a77fd4817281e72461ef",
+      "returncode": 0,
+      "tokens": 476,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 31.368590229190886,
+      "maxRssKiB": 2524800,
+      "hostLoadBefore": [
+        35.73046875,
+        34.43310546875,
+        27.1728515625
+      ],
+      "hostLoadAfter": [
+        35.732421875,
+        34.55322265625,
+        27.44482421875
+      ],
+      "timing": {
+        "load": 1.431767,
+        "inference": 29.692881
+      },
+      "profile": {
+        "prefill": 2.053127,
+        "embedding": 0.013402,
+        "decoder": 17.447407,
+        "logits": 1.867498
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 40.819372126832604,
+      "maxRssKiB": 1659852,
+      "hostLoadBefore": [
+        35.732421875,
+        34.55322265625,
+        27.44482421875
+      ],
+      "hostLoadAfter": [
+        35.2783203125,
+        34.54345703125,
+        27.7392578125
+      ],
+      "timing": {
+        "load": 0.965614,
+        "inference": 39.709197
+      },
+      "profile": {
+        "prefill": 3.776394,
+        "embedding": 0.013687,
+        "decoder": 21.887973,
+        "logits": 2.013745
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 78.1580527140759,
+      "maxRssKiB": 1545964,
+      "hostLoadBefore": [
+        35.2783203125,
+        34.54345703125,
+        27.7392578125
+      ],
+      "hostLoadAfter": [
+        35.79736328125,
+        34.7861328125,
+        28.38134765625
+      ],
+      "timing": {
+        "load": 0.957708,
+        "inference": 77.02519
+      },
+      "profile": {}
+    }
+  ],
+  "harnessSha256": "6e3d3be844cd93bde2cc655d429a43bc3c6a3abcd2b5e2194a8814fd4461a238",
+  "threads": 16,
+  "sourceSha256": {
+    "src/audio_adaptor.cpp": "d05d251cc7e7979d4f4e49b7005561a1daaa1daba967fff87e52ab130439ecb9",
+    "src/audio_adaptor.hpp": "28a869e7b61dca4d8714e666f42f522fabed02ee3548e17e3c3a43d7b2ca9ce5",
+    "src/audio_encoder.cpp": "e14d4e6ab81410c5935c9550634ea8a7136fe9b017c440e01ab987a759102275",
+    "src/audio_encoder.hpp": "e806d772246567aaef102ac6c0256beae0acf85dcc6cb2fe6c849bc4717a2c90",
+    "src/audio_io.cpp": "58afc26038a602f3f7776e5dbe347f2967a38dcb194a9272c55ddeb0333798e0",
+    "src/audio_io.hpp": "5c157587c0aae23a6b24cfce10c24affa30fe9b7d027ac044b97267b285ab281",
+    "src/audio_span.cpp": "3444e83c6b18406d4db40b822653985b8ac74392749284b62da5a3b81f163c6f",
+    "src/audio_span.hpp": "2aa9c7463f263f91b42bc381087aaebb2e724ec7ec491ebe5c73b69c6bee8b25",
+    "src/backend.cpp": "c7bcda5902a8c0a10acd8f8a51ca957664914c9ef4f9fc24eb4725aa82dadf39",
+    "src/backend.hpp": "76ed355d41f7ea35f53183daa1ac33b188e0ef1b84552d1e32e70c78a7fdfdb4",
+    "src/cli.cpp": "e459127552126f1d13eca4223dab70ae51e46afa7f8a9e6a808298ae5976c1a9",
+    "src/common.cpp": "6ed693a6dead299bb10622ea277ed9d07d5eced97f15cb1d3b89d68eebe4cefc",
+    "src/common.hpp": "af2b2b4f9b6528e534c6661bb05528d4e9f6bb1489226980c53fbf85a2998cb1",
+    "src/config.hpp": "010b0568cb664e34af6542bebbe750cdfb6ad9ded4feea307a403d3850927904",
+    "src/cpu_softmax.cpp": "f9bd82df53f4140756219516daf71f7c8c5e106ef77f7c369cd9e308cc776673",
+    "src/cpu_softmax.hpp": "fada005cbc7328f29cd018fc20aa107d1f167e32744705e44152a9bdadd42590",
+    "src/fft.cpp": "3ae3ad6260748d2c800bd580763bf205fc8ea27def1a8bcb8aea3482fc4cb71e",
+    "src/fft.hpp": "daa215fc289f14368c0c693c2efdcc2842437dd92edeac5bb19404efd57085e7",
+    "src/generate.cpp": "8343cd91983743d3a95c8e100870fc6446360ea2fdbcef74b930805fb0d0d067",
+    "src/generate.hpp": "22354fb77fc43f74955f0da44c78c36686ad4b400ad0eab4e605988deaf358a7",
+    "src/ggml_extend.hpp": "198f246cb40305b283a9498bdfa43290a8c35a50f59a512fe11b303edc381c0f",
+    "src/mel.cpp": "ffab34cac7454c81b555ff447c11c71ca2863635d682ced608b4977afe41f84c",
+    "src/mel.hpp": "4a93a68a966f9ff9308cee737ec30e0fc1931c2ac4a62aaaa83cf8750e6f0585",
+    "src/model_loader.cpp": "54bc3c1dbd57b937fad31fd24c093694270835b5ecb8c099dea3ba6bc966b8de",
+    "src/model_loader.hpp": "66914258ef30b019db8d475fb66cb28c45f4eec64b529596e209dd0e3e78f76f",
+    "src/moss_transcribe_capi.cpp": "5116d2e88b53ede36b2a332fd2b896a125b48fb6e53c2c357a6700100757fa36",
+    "src/qwen3.cpp": "601958fa1d2a3a1d4548de80603698c82e24bf6a1e04e4014646f7ba4885540a",
+    "src/qwen3.hpp": "0b4f260515741533c0408808cf0c040bf25d01f83b2e2c3acfe9e01f440bda81",
+    "src/qwen3_decoder.cpp": "f6d89f31ffc45bdf1852f0d3c1789b40b2eb3c533106c5e37392662621982d16",
+    "src/qwen3_decoder.hpp": "14fb8dccde78b569235fecc18a7eedbe7aa0705f41306d94209238cb55816df5",
+    "src/subtitle.cpp": "d9b47b76d366a2a4c7a8e78e45a54a50301d5437440738890392d0cce829cdda",
+    "src/subtitle.hpp": "24a6f1e18939f289b72fb64fefc2ffd7f54b78443df054bdb408f5383099b438",
+    "src/tokenizer.cpp": "2ab86907d56c8c5eeec6a7210674019834c2fc5216a27357ec099d9c0bfac637",
+    "src/tokenizer.hpp": "5220bfcaba7ea63089dd2573fa8797e3c4df9bf0ece23386e90a9fdab7c2403f",
+    "src/transcribe.cpp": "d80930ac6ee4d9d80489bc46333199562e018f729e1e0852988f15435caac901",
+    "src/transcribe.hpp": "25873e76e6649eef604bfaba491dc8b3a042121188281b210cd4045f559d9549",
+    "src/transcript_parser.cpp": "51c9b2c3e2b07475075b2dd7b576aceb3dcd87342978ae4373e8d01a2fcca0cd",
+    "src/transcript_parser.hpp": "3df79a9d2c6202c6609709d346c84e40ee6ea74e8ad1275110f1b20abcaea8bd",
+    "src/whisper_encoder.cpp": "ed5f88899463398a30baeb88a39e453269a815e06d1853ec465a2d72e15d4e91",
+    "src/whisper_encoder.hpp": "948798c44ba93af336c1a7e14eb7dfe46e664b176d6d20929b113bceb0587227",
+    "CMakeLists.txt": "3058be95dac9fbd4dd518c8fd80e7c5717229b5e14220032fe7f68bccbe86e90"
+  },
+  "referenceRoot": "/home/stan/hw-moss-softmax-v1",
+  "referenceOpt": 48,
+  "referenceLibraries": {
+    "/home/stan/hw-moss-softmax-v1/build/third_party/ggml/src/libggml-base.so": "42bd51826f227dbcb96a7552252bceb0bfd2e50a282406d4099cc78de1999166",
+    "/home/stan/hw-moss-softmax-v1/build/third_party/ggml/src/libggml-cpu.so": "dee88b8684c0380888314831b83016d309709cc7ff1b968961e5e85b262a0a79",
+    "/home/stan/hw-moss-softmax-v1/build/third_party/ggml/src/libggml.so": "3daebdf5d96b54a2a2016ca626cf02c2a5f22eb72a3bdff19eea44b2df4d6af8"
+  },
+  "productionLibraries": {
+    "/home/stan/hw-moss-api/lib/libggml-base.so": "0c8dd498fd349ba17bbc090afe4274fde3e65955caff4afd692e444f764a2523",
+    "/home/stan/hw-moss-api/lib/libggml-cpu.so": "c153ebcf094813a3c4daa3db594a5d6e14d1c9fc9772eb28ac22c17107e9262d",
+    "/home/stan/hw-moss-api/lib/libggml.so": "a6e942d5f8310743f9829d20967165302a0e18d123b7cd3e9ff46c8079fecff2"
+  },
+  "warmupDiscarded": true,
+  "ggmlCommit": "eced84c86f8b012c752c016f7fe789adea168e1e",
+  "physicalCoreAffinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "timeoutSeconds": 300.0,
+  "artifactGate": {
+    "passed": true,
+    "changed": []
+  },
+  "gate": {
+    "passed": false,
+    "failures": [
+      "dinner-60s/176: output or completion regression",
+      "vox-vmaiq-60s/176: output or completion regression"
+    ],
+    "comparisons": [
+      {
+        "case": "dinner-60s",
+        "variant": "176",
+        "repeats": 2,
+        "baselineSeconds": 61.36039175488986,
+        "candidateSeconds": 29.971502580679953,
+        "speedup": 2.047291142301408,
+        "exactOutputParity": false,
+        "maxRssKiB": 2515776,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 61.36039175488986,
+        "candidateSeconds": 39.8604804915376,
+        "speedup": 1.539379129358882,
+        "exactOutputParity": true,
+        "maxRssKiB": 1652932,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "176",
+        "repeats": 2,
+        "baselineSeconds": 67.0592463859357,
+        "candidateSeconds": 36.45608535199426,
+        "speedup": 1.8394527481066298,
+        "exactOutputParity": true,
+        "maxRssKiB": 2568752,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 67.0592463859357,
+        "candidateSeconds": 41.13742054346949,
+        "speedup": 1.6301276429103007,
+        "exactOutputParity": true,
+        "maxRssKiB": 1701948,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "176",
+        "repeats": 2,
+        "baselineSeconds": 78.8148600012064,
+        "candidateSeconds": 31.7002954070922,
+        "speedup": 2.486250017202471,
+        "exactOutputParity": false,
+        "maxRssKiB": 2524848,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 78.8148600012064,
+        "candidateSeconds": 42.30559300398454,
+        "speedup": 1.8629891322828933,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660500,
+        "speedPass": true
+      }
+    ]
+  },
+  "cacheReferenceGate": {
+    "passed": false,
+    "failures": [
+      "dinner-60s/176: output or completion regression",
+      "vox-vmaiq-60s/176: output or completion regression"
+    ],
+    "comparisons": [
+      {
+        "case": "dinner-60s",
+        "variant": "176",
+        "repeats": 2,
+        "baselineSeconds": 39.8604804915376,
+        "candidateSeconds": 29.971502580679953,
+        "speedup": 1.3299460173622466,
+        "exactOutputParity": false,
+        "maxRssKiB": 2515776,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "176",
+        "repeats": 2,
+        "baselineSeconds": 41.13742054346949,
+        "candidateSeconds": 36.45608535199426,
+        "speedup": 1.1284102543176415,
+        "exactOutputParity": true,
+        "maxRssKiB": 2568752,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "176",
+        "repeats": 2,
+        "baselineSeconds": 42.30559300398454,
+        "candidateSeconds": 31.7002954070922,
+        "speedup": 1.3345488570595356,
+        "exactOutputParity": false,
+        "maxRssKiB": 2524848,
+        "speedPass": true
+      }
+    ]
+  }
+}
