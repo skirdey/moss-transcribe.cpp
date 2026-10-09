@@ -77,6 +77,7 @@ def main():
     p.add_argument("--baseline",type=Path,default=Path("/home/stan/hw-moss-api/bin/moss-transcribe"))
     p.add_argument("--baseline-lib-dir",default="/home/stan/hw-moss-api/lib")
     p.add_argument("--threads",type=int,default=16)
+    p.add_argument("--profile",action="store_true",help="Collect numeric CPU phase/graph timings from instrumented candidates")
     args = p.parse_args()
     if args.repeats < 1 or args.threads < 1 or "baseline" not in args.variants or len(args.variants) < 2:
         p.error("Need at least one repeat, baseline, and a candidate")
@@ -104,9 +105,13 @@ def main():
               "cpu": subprocess.check_output(["lscpu"], text=True), "runs": []}
     report["harnessSha256"] = digest(Path(__file__))
     report["threads"] = args.threads
+    report["phaseProfiling"] = args.profile
     report["sourceSha256"] = {str(path.relative_to(root / "source")):digest(path)
                               for path in sorted((root / "source/src").glob("*")) if path.is_file()}
     report["sourceSha256"]["CMakeLists.txt"] = digest(root / "source/CMakeLists.txt")
+    for path in sorted((root / "source/third_party/pocketfft").glob("*")):
+        if path.is_file():
+            report["sourceSha256"][str(path.relative_to(root / "source"))] = digest(path)
     if "cache-reference" in args.variants:
         report["binarySha256"]["cache-reference"] = digest(reference)
         report["referenceRoot"] = str(args.reference_root.resolve())
@@ -136,7 +141,7 @@ def main():
     audio0 = args.audio_dir / (args.cases[0] + ".wav")
     for binary, opt, lib in ([] if args.skip_warmup else [configuration(v) for v in args.variants]):
         subprocess.run([str(binary), "transcribe", str(model), str(audio0), "--max-new", "4096"],
-                       env={**os.environ,**affinity,"MTD_DEVICE":"cpu","MTD_THREADS":str(args.threads),"OMP_NUM_THREADS":str(args.threads),"MTD_CPU_OPT":opt,"MTD_LOOP_GUARD":"1","MTD_REPETITION_PENALTY":"1.0","LD_LIBRARY_PATH":lib},
+                       env={**os.environ,**affinity,"MTD_PROFILE":"1" if args.profile else "0","MTD_DEVICE":"cpu","MTD_THREADS":str(args.threads),"OMP_NUM_THREADS":str(args.threads),"MTD_CPU_OPT":opt,"MTD_LOOP_GUARD":"1","MTD_REPETITION_PENALTY":"1.0","LD_LIBRARY_PATH":lib},
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=args.timeout)
     for repeat in range(args.repeats):
         for case in args.cases:
@@ -147,7 +152,7 @@ def main():
             for variant in variants:
                 key = f"{case}-{variant}-{repeat}"
                 binary, opt, lib = configuration(variant)
-                env = {**os.environ,**affinity,"MTD_DEVICE":"cpu","MTD_THREADS":str(args.threads),"OMP_NUM_THREADS":str(args.threads),"MTD_CPU_OPT":opt,"MTD_LOOP_GUARD":"1","MTD_REPETITION_PENALTY":"1.0","LD_LIBRARY_PATH":lib}
+                env = {**os.environ,**affinity,"MTD_PROFILE":"1" if args.profile else "0","MTD_DEVICE":"cpu","MTD_THREADS":str(args.threads),"OMP_NUM_THREADS":str(args.threads),"MTD_CPU_OPT":opt,"MTD_LOOP_GUARD":"1","MTD_REPETITION_PENALTY":"1.0","LD_LIBRARY_PATH":lib}
                 raw, log, timer = [results / (key + ext) for ext in (".txt", ".log", ".time")]
                 cmd = ["/usr/bin/time", "-f", "%M", "-o", str(timer), str(binary), "transcribe", str(model), str(audio), "--max-new", "4096"]
                 start = time.perf_counter()
@@ -180,7 +185,8 @@ def main():
                 row = {"case":case,"variant":variant,"repeat":repeat,"inputSha256":digest(audio),"duration":duration,"outputSha256":digest(raw),"returncode":rc,"tokens":tokens,"stop":stop,"complete":complete,"concurrentMoss":concurrent.is_set(),"wallSeconds":wall,"maxRssKiB":int(rss[-1]) if rss else 0,
                        "hostLoadBefore":load_before,"hostLoadAfter":os.getloadavg(),
                        "timing": {"load":float(timing[1]),"inference":float(timing[2])} if timing else None,
-                       "profile": {k:float(v) for k,v in re.findall(r"(prefill|embedding|decoder|logits)=([\d.]+)",stderr)}}
+                       "profile": {k:float(v) for k,v in re.findall(r"(prefill|embedding|decoder|logits)=([\d.]+)",stderr)},
+                       "phaseProfile": json.loads(phase_match[1]) if (phase_match := re.search(r"^CPU_PHASE_PROFILE (\{.*\})$", stderr, re.M)) else None}
                 report["runs"].append(row)
                 report_path.write_text(json.dumps(report,indent=2))
                 print(json.dumps(row),flush=True)
