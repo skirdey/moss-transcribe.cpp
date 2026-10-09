@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
         for (int threads : {1, 16}) for (int opt : {2048, 4096}) {
             ggml_backend_cpu_set_n_threads(backend, threads);
             std::vector<float> got; set_opt(opt); start = std::chrono::steady_clock::now();
-            mel.compute(input, got, M, T, /*experimental_fft=*/opt == 4096);
+            mel.compute(input, got, M, T, opt == 4096 ? mt::WhisperMel::Transform::ExperimentalFft : mt::WhisperMel::Transform::ParallelDft);
             const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
             if (got.size() != ref.size() || M != mels || T != frames) return 2;
             size_t bits = 0; double max_error = 0, sum_sq = 0;
