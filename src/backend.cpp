@@ -9,6 +9,7 @@
 #include "ggml.h"
 
 #include <atomic>
+#include <array>
 #include <cctype>
 #include <cstdint>
 #include <cstdlib>
@@ -25,6 +26,10 @@ ggml_backend_t  g_backend  = nullptr;
 ggml_gallocr_t  g_gallocr  = nullptr;
 std::string     g_name;
 std::once_flag  g_once;
+int g_current_threads = 0;
+std::array<int, static_cast<size_t>(CpuThreadPhase::Count)> g_phase_threads{};
+constexpr const char* thread_keys[] = {"MTD_THREADS_WHISPER", "MTD_THREADS_ADAPTOR",
+    "MTD_THREADS_PREFILL", "MTD_THREADS_DECODE", "MTD_THREADS_LOGITS"};
 
 std::string lower(const std::string& s) {
     std::string r = s;
@@ -123,6 +128,21 @@ void init() {
             if (nt <= 0) nt = (int) std::thread::hardware_concurrency();
             if (nt <= 0) nt = 4;
             ggml_backend_cpu_set_n_threads(g_backend, nt);
+            g_current_threads = nt;
+            g_phase_threads.fill(nt);
+            for (size_t i = 0; i < g_phase_threads.size(); ++i) {
+                const char* requested = std::getenv(thread_keys[i]);
+                if (!requested || !*requested) continue;
+                char* end = nullptr;
+                const long value = std::strtol(requested, &end, 10);
+                if (end == requested || *end || value < 1) {
+                    MT_LOGW("CPU thread budget %s is invalid; keeping %d", thread_keys[i], nt);
+                    continue;
+                }
+                g_phase_threads[i] = value > nt ? nt : static_cast<int>(value);
+                MT_LOGI("CPU thread budget %s=%d (startup maximum %d)",
+                    thread_keys[i], g_phase_threads[i], nt);
+            }
             // OpenMP already reuses workers; this reuses ggml's pool metadata.
             const char* opt = std::getenv("MTD_CPU_OPT");
             if (opt && (std::atoi(opt) & 1)) {
@@ -153,6 +173,28 @@ ggml_backend_t backend() {
 const char* backend_name() {
     std::call_once(g_once, init);
     return g_name.c_str();
+}
+
+int cpu_thread_count() {
+    backend();
+    return g_current_threads;
+}
+
+CpuThreadScope::CpuThreadScope(CpuThreadPhase phase) {
+    const auto index = static_cast<size_t>(phase);
+    if (!ggml_backend_is_cpu(backend()) || index >= g_phase_threads.size()) return;
+    previous_ = g_current_threads;
+    const int requested = g_phase_threads[index];
+    if (requested == previous_) return;
+    ggml_backend_cpu_set_n_threads(g_backend, requested);
+    g_current_threads = requested;
+    changed_ = true;
+}
+
+CpuThreadScope::~CpuThreadScope() {
+    if (!changed_) return;
+    ggml_backend_cpu_set_n_threads(g_backend, previous_);
+    g_current_threads = previous_;
 }
 
 bool compute_graph(ggml_cgraph* graph) {

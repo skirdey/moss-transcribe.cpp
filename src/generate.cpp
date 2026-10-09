@@ -303,13 +303,19 @@ std::vector<int32_t> greedy_generate(Qwen3Decoder& dec, ModelLoader& m,
     // Keep these logs private; publish aggregate replay statistics and hashes.
     const char* trace = std::getenv("MTD_TRACE_TOKENS");
     if (trace && std::strcmp(trace, "1") == 0) {
-        std::string values = "[";
-        for (size_t i = 0; i < ids.size(); ++i) {
-            if (i) values += ',';
-            values += std::to_string(ids[i]);
+        // The callback logger has a 2048-byte buffer. Even 128 ten-digit IDs
+        // plus metadata fit, so long generations cannot silently lose a tail.
+        constexpr size_t chunk = 128;
+        for (size_t offset = 0; offset < ids.size(); offset += chunk) {
+            std::string values = "[";
+            for (size_t i = offset; i < std::min(ids.size(), offset+chunk); ++i) {
+                if (i != offset) values += ',';
+                values += std::to_string(ids[i]);
+            }
+            values += ']';
+            MT_LOGI("BENCH_TOKEN_TRACE eos=%d total=%zu offset=%zu ids=%s",
+                eos, ids.size(), offset, values.c_str());
         }
-        values += ']';
-        MT_LOGI("BENCH_TOKEN_TRACE eos=%d ids=%s", eos, values.c_str());
     }
     return ids;
 }

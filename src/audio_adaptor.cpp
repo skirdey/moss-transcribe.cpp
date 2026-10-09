@@ -38,6 +38,7 @@ AudioAdaptor::AudioAdaptor(ModelLoader& m) {
 
 void AudioAdaptor::apply(const std::vector<float>& enc, int T, int D,
                          std::vector<float>& out, int& N, int& H) const {
+    CpuThreadScope threads(CpuThreadPhase::Adaptor);
     CpuPhaseScope phase(CpuPhase::Adaptor);
     CpuTimer build_timer;
     const int Ttrim = (T / merge_) * merge_;

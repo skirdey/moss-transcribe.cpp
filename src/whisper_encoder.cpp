@@ -81,6 +81,7 @@ WhisperEncoder::WhisperEncoder(ModelLoader& m) {
 
 void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_frames,
                             std::vector<float>& out, int& out_T, int& out_D) const {
+    CpuThreadScope threads(CpuThreadPhase::Whisper);
     CpuPhaseScope phase(CpuPhase::Whisper);
     CpuTimer build_timer;
     (void)n_mels;

@@ -36,6 +36,23 @@ ggml_backend_t backend();
 // Human-readable name of the active backend (e.g. "CUDA", "CPU").
 const char* backend_name();
 
+// Optional CPU scheduling budgets, parsed once when the backend initializes.
+// MTD_THREADS_{WHISPER,ADAPTOR,PREFILL,DECODE,LOGITS}; each is bounded by
+// startup MTD_THREADS so a persistent pool can never be indexed past its size.
+// This shares the existing serialized, process-wide backend/allocator lifetime.
+enum class CpuThreadPhase { Whisper, Adaptor, Prefill, Decode, Logits, Count };
+int cpu_thread_count();
+class CpuThreadScope {
+public:
+    explicit CpuThreadScope(CpuThreadPhase phase);
+    ~CpuThreadScope();
+    CpuThreadScope(const CpuThreadScope&) = delete;
+    CpuThreadScope& operator=(const CpuThreadScope&) = delete;
+private:
+    int previous_ = 0;
+    bool changed_ = false;
+};
+
 // Compute a graph on the active backend. Allocates intermediate tensors
 // on the backend's buffer using a lazily-created `ggml_gallocr_t`, then
 // dispatches the compute. Returns true on success.
