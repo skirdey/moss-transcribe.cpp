@@ -242,7 +242,8 @@ benchmark harness, API server, remote client, and deployment tooling are open so
 under the same license; see `cpu-lab/NOTICE.txt`. This is a research branch of the C++
 port, not a claim of full-corpus equivalence to the original PyTorch model.
 
-The validated optimization is `MTD_CPU_OPT=16`: store the F32 value cache transposed
+The fastest validated option is `MTD_CPU_OPT=48` (cache + parallel decode softmax;
+measurements and quality gates below). Bit 16 stores the F32 value cache transposed
 and append new values directly. It removes repeated copies of the growing cache while
 retaining reference attention matmul and softmax arithmetic. It is opt-in; unset/zero
 keeps the original layout. CPU was tested; GPU use with this experimental flag has not
@@ -254,7 +255,7 @@ git clone --recursive https://github.com/skirdey/moss-transcribe.cpp.git
 cd moss-transcribe.cpp
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=ON -DMT_BUILD_TESTS=ON
 cmake --build build -j 8
-MTD_DEVICE=cpu MTD_THREADS=16 OMP_NUM_THREADS=16 MTD_CPU_OPT=16 \
+MTD_DEVICE=cpu MTD_THREADS=16 OMP_NUM_THREADS=16 MTD_CPU_OPT=48 \
   ./build/moss-transcribe transcribe /path/to/moss-transcribe-q8_0.gguf /path/to/audio.wav --max-new 4096
 ctest --test-dir build --output-on-failure
 python3 -m unittest discover -s cpu-lab -p test_moss_cpu_regression.py
@@ -393,3 +394,13 @@ The rejected patch `cpu-lab/eager-fused-candidate-v2.patch` applies to a fresh f
 checkout at `0f60f5361dc0e2fe4787d7a8aa4369853eddf530`; use opt bitmask 80
 (16 + 64) only to reproduce that failed experiment in an isolated build. Its
 per-case median slowdowns versus the validated cache were 43–60%.
+
+
+### Tenfold performance research
+
+The [CPU research log](cpu-lab/tenfold-research.md) reviews recent lossless
+compression, persistent-kernel and verified-drafting papers against this specific
+CPU and Q8 checkpoint. The 10x end-to-end objective remains unachieved. The log
+contains the actual tensor/entropy audit, a rejected AMX packing experiment,
+an exact-order AVX-512 dot probe, limitations and reproduction commands.
+No new kernel from that research is selected in default or production inference.
