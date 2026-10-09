@@ -1,4 +1,5 @@
 import tempfile
+import json
 from pathlib import Path
 import unittest
 from moss_ngram_audit import draft, read_trace, replay
@@ -44,6 +45,26 @@ class DraftReplayTest(unittest.TestCase):
             tokens,eos,sha=read_trace(path)
             self.assertEqual(tokens,[1,2,99]);self.assertEqual(eos,99);self.assertEqual(len(sha),64)
             path.write_text('BENCH_GENERATION tokens=4 stop=eos\nBENCH_TOKEN_TRACE eos=99 ids=[1,2,99]\n')
+            with self.assertRaises(ValueError): read_trace(path)
+
+    def test_long_trace_chunks_preserve_all_tokens_and_require_contiguous_offsets(self):
+        values=list(range(600))+[100000]
+        records=['BENCH_GENERATION tokens=601 stop=eos']
+        for offset in range(0,len(values),128):
+            records.append('BENCH_TOKEN_TRACE eos=100000 total=601 offset='+str(offset)+' ids='+json.dumps(values[offset:offset+128]))
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'private.log'
+            path.write_text('\n'.join(records)+'\n')
+            self.assertEqual(read_trace(path)[0],values)
+            for broken in (records[:-1], records[:2]+records[3:], records+[records[1]],
+                           records[:2]+[records[2][:-5]]+records[3:]):
+                path.write_text('\n'.join(broken)+'\n')
+                with self.assertRaises(ValueError): read_trace(path)
+
+    def test_logger_truncation_is_rejected_even_if_the_generation_count_is_complete(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'private.log'
+            path.write_text('BENCH_GENERATION tokens=3 stop=eos\nBENCH_TOKEN_TRACE eos=99 ids=[1,2,')
             with self.assertRaises(ValueError): read_trace(path)
 
 

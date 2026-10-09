@@ -69,11 +69,24 @@ def replay(tokens, eos, maximum=8, minimum_ngram=2, maximum_ngram=16):
 
 def read_trace(path):
     contents = Path(path).read_bytes()
-    matches = re.findall(rb'BENCH_TOKEN_TRACE eos=(\d+) ids=(\[[0-9, -]*\])', contents)
+    chunks = re.findall(rb'BENCH_TOKEN_TRACE eos=(\d+) total=(\d+) offset=(\d+) ids=(\[[0-9, -]*\])', contents)
+    legacy = re.findall(rb'BENCH_TOKEN_TRACE eos=(\d+) ids=(\[[0-9, -]*\])', contents)
     generation = re.findall(rb'BENCH_GENERATION tokens=(\d+) stop=(\w+)', contents)
-    if len(matches) != 1 or len(generation) != 1:
-        raise ValueError('Need exactly one token trace and generation record')
-    eos = int(matches[0][0]); tokens = json.loads(matches[0][1])
+    record_count = len(re.findall(rb'BENCH_TOKEN_TRACE ', contents))
+    if len(generation) != 1 or record_count != len(chunks)+len(legacy):
+        raise ValueError('Truncated trace or missing/duplicate generation record')
+    if chunks:
+        if legacy: raise ValueError('Mixed trace formats')
+        eos = int(chunks[0][0]); total = int(chunks[0][1]); tokens = []
+        for chunk_eos, chunk_total, offset, values in chunks:
+            decoded = json.loads(values)
+            if int(chunk_eos)!=eos or int(chunk_total)!=total or int(offset)!=len(tokens) or not decoded:
+                raise ValueError('Missing, reordered, duplicate or inconsistent trace chunks')
+            tokens.extend(decoded)
+        if len(tokens)!=total: raise ValueError('Incomplete trace tail')
+    else:
+        if len(legacy)!=1: raise ValueError('Need one complete token trace')
+        eos = int(legacy[0][0]); tokens = json.loads(legacy[0][1])
     if not isinstance(tokens,list) or any(type(token) is not int or token < 0 for token in tokens):
         raise ValueError('Token IDs must be nonnegative integers')
     if generation[0][1] != b'eos' or len(tokens) != int(generation[0][0]):

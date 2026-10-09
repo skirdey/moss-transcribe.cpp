@@ -38,11 +38,13 @@ def variant_settings(variant, default_threads):
     return match[1], threads, bool(match[3])
 
 
-def run_environment(base, affinity, opt, threads, lib, profile=False, passive=False):
+def run_environment(base, affinity, opt, threads, lib, profile=False, passive=False, phase_threads=None):
     env = {**base, **affinity}
     # A named default is reproducible even if the invoking shell tuned libgomp.
     for key in ("OMP_WAIT_POLICY", "GOMP_SPINCOUNT", "OMP_DYNAMIC", "OMP_THREAD_LIMIT"):
         env.pop(key, None)
+    for phase in ("WHISPER", "ADAPTOR", "PREFILL", "DECODE", "LOGITS"):
+        env.pop("MTD_THREADS_"+phase, None)
     env.update({"MTD_PROFILE": "1" if profile else "0", "MTD_TRACE_TOKENS": "0", "MTD_DEVICE": "cpu",
                 "MTD_THREADS": str(threads), "OMP_NUM_THREADS": str(threads),
                 "OMP_DYNAMIC": "FALSE", "MTD_CPU_OPT": opt,
@@ -50,6 +52,8 @@ def run_environment(base, affinity, opt, threads, lib, profile=False, passive=Fa
                 "LD_LIBRARY_PATH": lib})
     if passive:
         env.update({"OMP_WAIT_POLICY": "PASSIVE", "GOMP_SPINCOUNT": "0"})
+    for phase, count in (phase_threads or {}).items():
+        env["MTD_THREADS_"+phase.upper()] = str(count)
     return env
 
 
@@ -104,22 +108,25 @@ def main():
     p.add_argument("--baseline",type=Path,default=Path("/home/stan/hw-moss-api/bin/moss-transcribe"))
     p.add_argument("--baseline-lib-dir",default="/home/stan/hw-moss-api/lib")
     p.add_argument("--threads",type=int,default=16)
+    p.add_argument("--decode-threads",type=int,default=0,help="Candidate-only decode budget; zero keeps startup threads")
+    p.add_argument("--logits-threads",type=int,default=0,help="Candidate-only logits budget; zero keeps startup threads")
     p.add_argument("--profile",action="store_true",help="Collect numeric CPU phase/graph timings from instrumented candidates")
     args = p.parse_args()
-    if args.repeats < 1 or args.threads < 1 or "baseline" not in args.variants or len(args.variants) < 2:
+    if args.repeats < 1 or args.threads < 1 or args.decode_threads < 0 or args.logits_threads < 0 or "baseline" not in args.variants or len(args.variants) < 2:
         p.error("Need at least one repeat, baseline, and a candidate")
     root = args.root.resolve()
     results = root / args.name
     results.mkdir(parents=True, exist_ok=True)
     model, baseline = args.model.resolve(), args.baseline.resolve()
     reference = args.reference_root.resolve() / "build/moss-transcribe"
+    phase_threads = {phase:count for phase,count in (("decode",args.decode_threads),("logits",args.logits_threads)) if count}
     def configuration(variant):
         if variant == "baseline":
-            return baseline, "0", args.baseline_lib_dir, args.threads, False
+            return baseline, "0", args.baseline_lib_dir, args.threads, False, {}
         if variant == "cache-reference":
-            return reference, str(args.reference_opt), "", args.threads, False
+            return reference, str(args.reference_opt), "", args.threads, False, {}
         opt, threads, passive = variant_settings(variant, args.threads)
-        return candidate, opt, "", threads, passive
+        return candidate, opt, "", threads, passive, phase_threads
     candidate = root / "build/moss-transcribe"
     report_path = results / "report.json"
     if report_path.exists():
@@ -132,7 +139,8 @@ def main():
     report["harnessSha256"] = digest(Path(__file__))
     report["threads"] = args.threads
     report["variantSettings"] = {v: {"opt": int(configuration(v)[1]), "threads": configuration(v)[3],
-                                       "waitPolicy": "passive" if configuration(v)[4] else "default"}
+                                       "waitPolicy": "passive" if configuration(v)[4] else "default",
+                                       "phaseThreads": configuration(v)[5]}
                                  for v in args.variants}
     report["protocol"] += " Candidate OPT@THREADS labels override per-run threads; -passive sets OMP_WAIT_POLICY=PASSIVE/GOMP_SPINCOUNT=0. Default variants clear inherited wait/dynamic/thread-limit settings."
     report["phaseProfiling"] = args.profile
@@ -170,9 +178,9 @@ def main():
     report["timeoutSeconds"] = args.timeout
     # One discarded warmup for each binary, with full inference.
     audio0 = args.audio_dir / (args.cases[0] + ".wav")
-    for binary, opt, lib, threads, passive in ([] if args.skip_warmup else [configuration(v) for v in args.variants]):
+    for binary, opt, lib, threads, passive, budgets in ([] if args.skip_warmup else [configuration(v) for v in args.variants]):
         subprocess.run([str(binary), "transcribe", str(model), str(audio0), "--max-new", "4096"],
-                       env=run_environment(os.environ, affinity, opt, threads, lib, args.profile, passive),
+                       env=run_environment(os.environ, affinity, opt, threads, lib, args.profile, passive, budgets),
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=args.timeout)
     for repeat in range(args.repeats):
         for case in args.cases:
@@ -182,8 +190,8 @@ def main():
             variants = args.variants if repeat % 2 == 0 else list(reversed(args.variants))
             for variant in variants:
                 key = f"{case}-{variant}-{repeat}"
-                binary, opt, lib, threads, passive = configuration(variant)
-                env = run_environment(os.environ, affinity, opt, threads, lib, args.profile, passive)
+                binary, opt, lib, threads, passive, budgets = configuration(variant)
+                env = run_environment(os.environ, affinity, opt, threads, lib, args.profile, passive, budgets)
                 raw, log, timer = [results / (key + ext) for ext in (".txt", ".log", ".time")]
                 cmd = ["/usr/bin/time", "-f", "%M", "-o", str(timer), str(binary), "transcribe", str(model), str(audio), "--max-new", "4096"]
                 start = time.perf_counter()
@@ -213,7 +221,7 @@ def main():
                 tokens, stop = (int(generation[1]), generation[2]) if generation else (None, None)
                 complete = stop == "eos" and tokens < 4096 and (rc == 0 or (rc == 1 and not raw.read_text().strip()))
                 rss = re.findall(r"^\d+$", timer.read_text(), re.M)
-                row = {"case":case,"variant":variant,"repeat":repeat,"threads":threads,"waitPolicy":"passive" if passive else "default","inputSha256":digest(audio),"duration":duration,"outputSha256":digest(raw),"returncode":rc,"tokens":tokens,"stop":stop,"complete":complete,"concurrentMoss":concurrent.is_set(),"wallSeconds":wall,"maxRssKiB":int(rss[-1]) if rss else 0,
+                row = {"case":case,"variant":variant,"repeat":repeat,"threads":threads,"phaseThreads":budgets,"waitPolicy":"passive" if passive else "default","inputSha256":digest(audio),"duration":duration,"outputSha256":digest(raw),"returncode":rc,"tokens":tokens,"stop":stop,"complete":complete,"concurrentMoss":concurrent.is_set(),"wallSeconds":wall,"maxRssKiB":int(rss[-1]) if rss else 0,
                        "hostLoadBefore":load_before,"hostLoadAfter":os.getloadavg(),
                        "timing": {"load":float(timing[1]),"inference":float(timing[2])} if timing else None,
                        "profile": {k:float(v) for k,v in re.findall(r"(prefill|embedding|decoder|logits)=([\d.]+)",stderr)},

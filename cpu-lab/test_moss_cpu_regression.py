@@ -71,6 +71,18 @@ class RegressionGateTest(unittest.TestCase):
         self.assertEqual(passive["GOMP_SPINCOUNT"], "0")
         self.assertEqual(passive["MTD_THREADS"], "4")
 
+    def test_reference_cannot_inherit_candidate_phase_budgets(self):
+        env = run_environment({"MTD_THREADS_DECODE":"4", "MTD_THREADS_WHISPER":"2"}, {}, "48", 16, "")
+        self.assertNotIn("MTD_THREADS_DECODE",env)
+        self.assertNotIn("MTD_THREADS_WHISPER",env)
+
+    def test_phase_budget_preserves_startup_cap_and_is_explicit(self):
+        env = run_environment({}, {}, "48", 16, "", phase_threads={"decode":8,"logits":8})
+        self.assertEqual(env["MTD_THREADS"],"16")
+        self.assertEqual(env["MTD_THREADS_DECODE"],"8")
+        self.assertEqual(env["MTD_THREADS_LOGITS"],"8")
+        self.assertNotIn("MTD_THREADS_PREFILL",env)
+
 
 if __name__ == "__main__":
     unittest.main()
