@@ -123,7 +123,7 @@ void identify_graph(ggml_cgraph* graph, Capture* identity,
 }
 bool same_graph(const Capture& a, const Capture& b) {
     return a.nodes == b.nodes && a.graph_metadata == b.graph_metadata &&
-           a.callback_identities == b.callback_identities;
+           a.callback_identities == b.callback_identities && a.leaf_cache_roles == b.leaf_cache_roles;
 }
 void require_same_graph(const Capture& a, const Capture& b, const char* message) {
     if (same_graph(a,b)) return;
@@ -169,6 +169,9 @@ int audit_metadata() {
     auto* gx = graph(x); auto* gy = graph(y);
     auto identity = [&](ggml_cgraph* g) { Capture r; r.nodes = ggml_graph_n_nodes(g); identify_graph(g,&r); return r; };
     const auto baseline = identity(gx);
+    ggml_set_name(a,"metadata-scores-changed");
+    require(!same_graph(baseline,identity(gx)),"leaf-label difference rejected");
+    ggml_set_name(a,"metadata-scores");
     ggml_map_custom2_op_params params; std::memcpy(&params,y->op_params,sizeof(params));
     std::memset(y->op_params,0xa5,sizeof(y->op_params));
     std::memcpy(reinterpret_cast<uint8_t*>(y->op_params)+offsetof(ggml_map_custom2_op_params,fun),&params.fun,sizeof(params.fun));
@@ -194,7 +197,7 @@ int audit_metadata() {
     ggml_mul_mat_set_prec(m2,GGML_PREC_F32);
     require(!same_graph(identity(graph(m1)),identity(graph(m2))),"precision difference rejected");
     std::printf("{\"record\":\"metadataControl\",\"taskCountRejected\":true,\"callbackIdentityRejected\":true,"
-                "\"userdataRejected\":true,\"strideRejected\":true,\"shapeRejected\":true,\"precisionRejected\":true}\n");
+                "\"userdataRejected\":true,\"strideRejected\":true,\"shapeRejected\":true,\"precisionRejected\":true,\"leafLabelRejected\":true}\n");
     return 0;
 }
 const ggml_tensor* storage(const ggml_tensor* t) {
@@ -283,6 +286,10 @@ private:
         ggml_backend_tensor_set(to,raw.data(),0,raw.size());
         ggml_backend_tensor_get(to,check.data(),0,check.size());
         require(raw == check, "cache clone byte readback");
+        // GGML gives unnamed leaves labels when their first graph is expanded.
+        // A prefilling state and a freshly loaded clone have different histories.
+        // Copy this descriptive metadata too, keeping label equality checked.
+        ggml_set_name(to,ggml_get_name(from));
     }
     static std::vector<std::array<ggml_tensor*,StageCount>> discover(const Qwen3Decoder& d, ggml_cgraph* graph) {
         std::vector<std::array<ggml_tensor*,StageCount>> result(d.hp_.n_layers);
