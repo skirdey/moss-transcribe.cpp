@@ -38,6 +38,7 @@ target_link_libraries(moss_target_batch_gate PRIVATE moss-transcribe)
 # Model-backed paired append/full-logit timing; requires the complete state gate
 # before execution and stays outside default CTest.
 add_executable(moss_causal_context_bench ${CMAKE_SOURCE_DIR}/cpu-lab/moss_causal_context_bench.cpp)
+target_include_directories(moss_causal_context_bench PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(moss_causal_context_bench PRIVATE moss-transcribe)
 add_executable(moss_target_batch_trace ${CMAKE_SOURCE_DIR}/cpu-lab/moss_target_batch_trace.cpp)
 target_include_directories(moss_target_batch_trace PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
