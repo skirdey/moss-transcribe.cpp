@@ -490,3 +490,47 @@ Its earlier warm graph ratios are withdrawn. The guarded build passed twelve
 native CTests and 28 Python checks; the negative audit restores the original
 flags and checks both weights and activations. The separate owned-vector dot
 probe and fresh-process full-model latency rejection remain distinct evidence.
+
+### Shared conversion in actual model graphs
+
+The [actual-model report](cpu-lab/shared-model.md) adds guarded, explicit
+research switches for Qwen Q/K/V and gate/up conversion reuse (8192) and
+Whisper Q/K/V (16384). They retain ordinary weights and matrix operations and
+are off by default. Thirteen native CTests, including real Qwen layer/cache
+float-bit comparisons, and 33 Python gate/parser tests pass on hp-fury.
+
+All [72 paired full-input runs](cpu-lab/shared-model-pilot-v2.json) completed
+with identical output/count/EOS; the 48 numeric runs also match complete
+same-build token hashes. Artifact and observed-route checks pass. The trial
+still rejects promotion: combined reuse was 5.31% slower than same-build opt48
+on German speech, and real-empty speech failed production for every opt48
+control/candidate. Both frozen attempts and the fixture repair are retained.
+The host was busy; no quiet-host or tenfold gain is established. Production
+keeps its validated binary and original configuration.
+
+### Exact-dot decode projection fusion
+
+The [projection fusion report](cpu-lab/fused-projection.md) adds one guarded
+CPU operation per eligible Qwen Q/K/V or gate/up decode group. Research bit
+32768 is off by default. Original weights and pinned converter/dot arithmetic
+are retained; prefill and unsupported shapes use ordinary operations. Fifteen
+native CTests, actual layer/cache float-bit checks and 34 Python checks pass.
+
+All [48 paired full-input runs](cpu-lab/fused-projection-pilot-v1.json) pass
+output, EOS, artifact, route, complete-token and three latency gates. Speech
+medians improve only 0.2–2.7% against same-build opt48 under changing host load;
+this two-repeat pilot establishes neither quiet-host confidence nor a tenfold
+gain. Protected 16-thread graph probes observe 1.21x Q/K/V and 1.18x gate/up,
+including input conversion. Production remains its validated binary.
+
+### Sparse AMX exact arithmetic probe
+
+The [AMX probe report](cpu-lab/amx-lanes.md) preserves a standalone native INT8
+experiment that loads original Q8 weight rows and retains the pinned SIMD dot's
+eight accumulation groups. All 96 arithmetic and 144 protected timing cases
+match float bits, including signed-code and half-scale extremes. Fifteen native
+CTests and 34 Python checks pass. Representative 16-worker widths are 2.4–3.0x
+slower than pinned SIMD, so this version is rejected for model integration.
+Complete numeric evidence includes all controls and the lone tiny-shape 1.013x
+ratio. It adds no MOSS route; panel construction is timed, while quantization,
+loading and full generation are excluded. Production remains unchanged.
