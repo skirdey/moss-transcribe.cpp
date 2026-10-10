@@ -2,6 +2,7 @@
 #include "backend.hpp"
 #include "cpu_softmax.hpp"
 #include "cpu_activation.hpp"
+#include "cpu_projection.hpp"
 #include "ggml-cpu.h"
 
 #include <cmath>
@@ -77,16 +78,22 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
     // ---- attention pre-norm ----
     struct ggml_tensor* xn = rms_norm(ctx, x, w.attn_norm, eps);
     const bool shared_projection = layout_opt && (std::atoi(layout_opt) & 8192);
-    if (shared_projection) {
+    const bool fused_projection = layout_opt && (std::atoi(layout_opt) & 32768);
+    ggml_tensor* qkv_weights[] = {w.attn_q,w.attn_k,w.attn_v};
+    auto qkv = fused_projection ? cpu_decode_q8_projections(ctx,xn,qkv_weights,3) : nullptr;
+    if (!qkv && shared_projection) {
         ggml_tensor* weights[] = {w.attn_q,w.attn_k,w.attn_v};
         xn=cpu_shared_projection_input(ctx,xn,weights,3,
             n_tokens*n_batch>=256 ? CpuSharedActivationMode::Cast : CpuSharedActivationMode::Blocks);
     }
 
     // ---- q, k, v (no bias in Qwen3) ----
-    struct ggml_tensor* q = ggml_mul_mat(ctx, w.attn_q, xn);
-    struct ggml_tensor* k = ggml_mul_mat(ctx, w.attn_k, xn);
-    struct ggml_tensor* v = ggml_mul_mat(ctx, w.attn_v, xn);
+    struct ggml_tensor* q = qkv ? ggml_view_2d(ctx,qkv,w.attn_q->ne[1],1,qkv->nb[1],0)
+        : ggml_mul_mat(ctx, w.attn_q, xn);
+    struct ggml_tensor* k = qkv ? ggml_view_2d(ctx,qkv,w.attn_k->ne[1],1,qkv->nb[1],w.attn_q->ne[1]*sizeof(float))
+        : ggml_mul_mat(ctx, w.attn_k, xn);
+    struct ggml_tensor* v = qkv ? ggml_view_2d(ctx,qkv,w.attn_v->ne[1],1,qkv->nb[1],(w.attn_q->ne[1]+w.attn_k->ne[1])*sizeof(float))
+        : ggml_mul_mat(ctx, w.attn_v, xn);
 
     // Reshape to [hd, n_h, seq, batch] and [hd, n_kv_h, seq, batch].
     q = ggml_reshape_4d(ctx, q, hd, n_h,    n_tokens, n_batch);
@@ -183,13 +190,17 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
 
     // ---- FFN: SwiGLU = down( silu(gate(x)) * up(x) ) ----
     struct ggml_tensor* hn = rms_norm(ctx, h, w.ffn_norm, eps);
-    if (shared_projection) {
+    ggml_tensor* gu_weights[] = {w.ffn_gate,w.ffn_up};
+    auto gu = fused_projection ? cpu_decode_q8_projections(ctx,hn,gu_weights,2) : nullptr;
+    if (!gu && shared_projection) {
         ggml_tensor* weights[] = {w.ffn_gate,w.ffn_up};
         hn=cpu_shared_projection_input(ctx,hn,weights,2,
             n_tokens*n_batch>=256 ? CpuSharedActivationMode::Cast : CpuSharedActivationMode::Blocks);
     }
-    struct ggml_tensor* g  = ggml_mul_mat(ctx, w.ffn_gate, hn);
-    struct ggml_tensor* u  = ggml_mul_mat(ctx, w.ffn_up,   hn);
+    struct ggml_tensor* g = gu ? ggml_view_2d(ctx,gu,w.ffn_gate->ne[1],1,gu->nb[1],0)
+        : ggml_mul_mat(ctx, w.ffn_gate, hn);
+    struct ggml_tensor* u = gu ? ggml_view_2d(ctx,gu,w.ffn_up->ne[1],1,gu->nb[1],w.ffn_gate->ne[1]*sizeof(float))
+        : ggml_mul_mat(ctx, w.ffn_up, hn);
     const char* opt = std::getenv("MTD_CPU_OPT");
     // One AVX-512/AVX2 pass instead of two passes and two graph barriers.
     // The fused kernel uses the same vector SiLU and multiply primitives.
