@@ -589,3 +589,13 @@ checks pass. The three encoder-shaped matrices improve1.30–1.35× over ordinar
 prequantized GGML. All six post-warmup samples are retained for every timed
 variant. F32 conversion and full inference remain separate gates; no model
 route or production change is added, and the full-input10× goal is unachieved.
+
+### Exact F32-input VNNI graph integration
+
+The [F32 graph report](cpu-lab/vnni-f32.md) includes quantization, per-callback
+scratch allocation, packing, worker barriers and cleanup. Existing GGML workers
+run both custom traversals. All78 arithmetic/111 protected records,2,097,152 half
+conversions,15 CTests and34 Python checks pass with exact ordinary F32 GGML
+output and quantized bytes. Large encoder matrices improve1.29–1.41×; small
+projections regress. Actual encoder routing and complete-model gates remain;
+production is unchanged and the original full-input10× goal is unachieved.
