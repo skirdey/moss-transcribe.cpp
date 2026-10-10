@@ -16,6 +16,7 @@ target_include_directories(test_cpu_q8 PRIVATE ${CMAKE_SOURCE_DIR}/third_party/g
 add_test(NAME test_cpu_q8_input_lifetime COMMAND test_cpu_q8 --audit-unretained-input)
 set_tests_properties(test_cpu_q8_input_lifetime PROPERTIES SKIP_RETURN_CODE 77)
 mt_add_test(test_cpu_activation)
+mt_add_test(test_cpu_shared_layer)
 target_include_directories(test_cpu_activation PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 
 # Research executable, deliberately outside CTest: it reports arithmetic drift
