@@ -579,3 +579,13 @@ paired totals; the encoder expansion is 1.22× faster than ordinary GGML while
 contraction remains 19.6% slower. Exact-binary disassembly confirms converter
 calls and vector stack traffic are absent from the new inner block loop. It
 adds no model route; the original full-input tenfold goal remains unachieved.
+
+### Exact VNNI cache traversal
+
+The [cache traversal report](cpu-lab/vnni-cache.md) changes input/weight tile
+order within each worker's identical weight partition. All78 arithmetic and
+111 protected benchmark records,2,097,152 half conversions,15 CTests and34 Python
+checks pass. The three encoder-shaped matrices improve1.30–1.35× over ordinary
+prequantized GGML. All six post-warmup samples are retained for every timed
+variant. F32 conversion and full inference remain separate gates; no model
+route or production change is added, and the full-input10× goal is unachieved.
