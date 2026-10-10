@@ -1,0 +1,313 @@
+{
+  "sourceReportSha256": "917b76d1659f5717b5aa7d4b37de9ec6a76eb13952293a738c52e5ca39a380b7",
+  "sourceCommit": "f2176e6fab24c9ea0b32e85fa98a7c814ba93e05",
+  "sourceTree": "c2f63127427b6732cd5240ea42e9940d47570bce",
+  "variant": "48",
+  "samples": 12,
+  "records": [
+    {
+      "case": "dinner-60s",
+      "samples": 2,
+      "durationSeconds": 60.0,
+      "wallSeconds": 15.141673319973052,
+      "loadSeconds": 0.8236509999999999,
+      "inferenceSeconds": 14.1696405,
+      "hostLoadRange": [
+        16.013671875,
+        26.18115234375
+      ],
+      "phases": {
+        "mel": {
+          "totalSeconds": 0.6832163665,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "totalSeconds": 6.0679747375,
+          "buildSeconds": 0.002427796,
+          "allocateSeconds": 0.000291941,
+          "computeSeconds": 6.0565498315
+        },
+        "adaptor": {
+          "totalSeconds": 0.021209283,
+          "buildSeconds": 2.6896e-05,
+          "allocateSeconds": 2.0371e-05,
+          "computeSeconds": 0.0178311515
+        },
+        "prefill": {
+          "totalSeconds": 1.9510322900000001,
+          "buildSeconds": 0.0002277535,
+          "allocateSeconds": 0.0002770525,
+          "computeSeconds": 1.9469934355
+        },
+        "decode": {
+          "totalSeconds": 4.297300568,
+          "buildSeconds": 0.091437658,
+          "allocateSeconds": 0.110215349,
+          "computeSeconds": 4.094358858
+        },
+        "logits": {
+          "totalSeconds": 0.704557768,
+          "buildSeconds": 0.0064535805,
+          "allocateSeconds": 0.0041473445000000005,
+          "computeSeconds": 0.6499203490000001
+        }
+      }
+    },
+    {
+      "case": "empty-real-60s",
+      "samples": 2,
+      "durationSeconds": 60.0,
+      "wallSeconds": 8.537161145592108,
+      "loadSeconds": 0.6430525,
+      "inferenceSeconds": 7.7720765,
+      "hostLoadRange": [
+        15.2021484375,
+        16.3271484375
+      ],
+      "phases": {
+        "mel": {
+          "totalSeconds": 0.3906521595,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "totalSeconds": 5.440046937,
+          "buildSeconds": 0.001786772,
+          "allocateSeconds": 0.0002045405,
+          "computeSeconds": 5.4307325644999995
+        },
+        "adaptor": {
+          "totalSeconds": 0.014045664999999999,
+          "buildSeconds": 2.42715e-05,
+          "allocateSeconds": 1.7041500000000003e-05,
+          "computeSeconds": 0.010915739
+        },
+        "prefill": {
+          "totalSeconds": 1.7323863844999998,
+          "buildSeconds": 0.00015248699999999998,
+          "allocateSeconds": 0.000170039,
+          "computeSeconds": 1.7292963135
+        },
+        "decode": {
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "logits": {
+          "totalSeconds": 0.0016189935000000002,
+          "buildSeconds": 2.1183e-05,
+          "allocateSeconds": 1.4891e-05,
+          "computeSeconds": 0.001477213
+        }
+      }
+    },
+    {
+      "case": "meeting-120s",
+      "samples": 2,
+      "durationSeconds": 120.0,
+      "wallSeconds": 32.956166736315936,
+      "loadSeconds": 0.6340985,
+      "inferenceSeconds": 32.214837,
+      "hostLoadRange": [
+        16.41943359375,
+        21.35546875
+      ],
+      "phases": {
+        "mel": {
+          "totalSeconds": 0.773132712,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "totalSeconds": 10.599573724999999,
+          "buildSeconds": 0.002165485,
+          "allocateSeconds": 0.0003476965,
+          "computeSeconds": 10.589421892499999
+        },
+        "adaptor": {
+          "totalSeconds": 0.025429149499999998,
+          "buildSeconds": 2.5055e-05,
+          "allocateSeconds": 1.9485e-05,
+          "computeSeconds": 0.021438732500000002
+        },
+        "prefill": {
+          "totalSeconds": 4.5765139895,
+          "buildSeconds": 0.000150295,
+          "allocateSeconds": 0.010807187499999999,
+          "computeSeconds": 4.5530594319999995
+        },
+        "decode": {
+          "totalSeconds": 13.8691456225,
+          "buildSeconds": 0.20807725900000001,
+          "allocateSeconds": 0.26218251049999997,
+          "computeSeconds": 13.395441173
+        },
+        "logits": {
+          "totalSeconds": 1.8105521740000001,
+          "buildSeconds": 0.016659528,
+          "allocateSeconds": 0.0105162905,
+          "computeSeconds": 1.662002673
+        }
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "samples": 2,
+      "durationSeconds": 60.0,
+      "wallSeconds": 17.7540731865447,
+      "loadSeconds": 0.8167665,
+      "inferenceSeconds": 16.801358999999998,
+      "hostLoadRange": [
+        15.8017578125,
+        28.44970703125
+      ],
+      "phases": {
+        "mel": {
+          "totalSeconds": 0.6836231465,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "totalSeconds": 6.082142296000001,
+          "buildSeconds": 0.0020593525,
+          "allocateSeconds": 0.0002734295,
+          "computeSeconds": 6.071491953
+        },
+        "adaptor": {
+          "totalSeconds": 0.0156691105,
+          "buildSeconds": 2.7112e-05,
+          "allocateSeconds": 1.9132e-05,
+          "computeSeconds": 0.012017495
+        },
+        "prefill": {
+          "totalSeconds": 1.9898630924999998,
+          "buildSeconds": 0.0002369335,
+          "allocateSeconds": 0.0002882655,
+          "computeSeconds": 1.9860007005
+        },
+        "decode": {
+          "totalSeconds": 6.480874953000001,
+          "buildSeconds": 0.13684356250000002,
+          "allocateSeconds": 0.164642223,
+          "computeSeconds": 6.177382078
+        },
+        "logits": {
+          "totalSeconds": 1.0346952605,
+          "buildSeconds": 0.009428490000000001,
+          "allocateSeconds": 0.0062929974999999996,
+          "computeSeconds": 0.9537549679999999
+        }
+      }
+    },
+    {
+      "case": "silence-60s",
+      "samples": 2,
+      "durationSeconds": 60.0,
+      "wallSeconds": 8.608481865376234,
+      "loadSeconds": 0.6227214999999999,
+      "inferenceSeconds": 7.865036999999999,
+      "hostLoadRange": [
+        16.72998046875,
+        18.0126953125
+      ],
+      "phases": {
+        "mel": {
+          "totalSeconds": 0.3906526975,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "totalSeconds": 5.400559813,
+          "buildSeconds": 0.0017642615,
+          "allocateSeconds": 0.00020437800000000001,
+          "computeSeconds": 5.3913193795
+        },
+        "adaptor": {
+          "totalSeconds": 0.014006803,
+          "buildSeconds": 2.372e-05,
+          "allocateSeconds": 1.76405e-05,
+          "computeSeconds": 0.010955989
+        },
+        "prefill": {
+          "totalSeconds": 1.745509762,
+          "buildSeconds": 0.00014796999999999998,
+          "allocateSeconds": 0.00017042849999999998,
+          "computeSeconds": 1.7424208860000001
+        },
+        "decode": {
+          "totalSeconds": 0.0985890915,
+          "buildSeconds": 0.001907834,
+          "allocateSeconds": 0.0023672915000000003,
+          "computeSeconds": 0.09428390950000001
+        },
+        "logits": {
+          "totalSeconds": 0.018058955,
+          "buildSeconds": 0.000162351,
+          "allocateSeconds": 0.000115785,
+          "computeSeconds": 0.016550297
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "samples": 2,
+      "durationSeconds": 60.0,
+      "wallSeconds": 15.73480095807463,
+      "loadSeconds": 0.822583,
+      "inferenceSeconds": 14.736779,
+      "hostLoadRange": [
+        14.36376953125,
+        29.8076171875
+      ],
+      "phases": {
+        "mel": {
+          "totalSeconds": 0.691983035,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "computeSeconds": 0.0
+        },
+        "whisper": {
+          "totalSeconds": 6.115530071,
+          "buildSeconds": 0.002309281,
+          "allocateSeconds": 0.0003071795,
+          "computeSeconds": 6.103853399
+        },
+        "adaptor": {
+          "totalSeconds": 0.01733168,
+          "buildSeconds": 2.8040000000000003e-05,
+          "allocateSeconds": 2.0227500000000002e-05,
+          "computeSeconds": 0.0140311755
+        },
+        "prefill": {
+          "totalSeconds": 1.984883209,
+          "buildSeconds": 0.000233825,
+          "allocateSeconds": 0.00026982950000000003,
+          "computeSeconds": 1.9806889394999998
+        },
+        "decode": {
+          "totalSeconds": 4.7086012015000005,
+          "buildSeconds": 0.0989524685,
+          "allocateSeconds": 0.1180759355,
+          "computeSeconds": 4.4901588805
+        },
+        "logits": {
+          "totalSeconds": 0.763539193,
+          "buildSeconds": 0.006923759,
+          "allocateSeconds": 0.0045714445,
+          "computeSeconds": 0.7047545749999999
+        }
+      }
+    }
+  ],
+  "protocol": "Medians of existing paired fresh-process report, two samples per case; phase timings can overlap and medians are not additive.",
+  "quietBaseline": false,
+  "newInferenceRun": false,
+  "tenfoldAchieved": false
+}

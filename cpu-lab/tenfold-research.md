@@ -523,3 +523,32 @@ The original quiet opt48 reference and tenfold objective remain unchanged,
 active and unachieved. Next isolate layout/scale/gather overhead before proposing
 a concrete new arithmetic version. Any actual-model integration requires all
 protected layer/cache, complete output/token/EOS and matched latency gates.
+
+## Dense AMX matrix batches, 2026-10-09
+
+The [multi-row report](amx-batch.md) extends the exact four-code method to two
+original weight rows and sixteen input rows using dense activation panels.
+An ordinary prequantized GGML graph is an additional protected control; all
+operands have stable owned storage and raw-byte immutability checks. Native
+GCC AMX compilation, 15 CTests and 34 Python checks pass. All 74 arithmetic
+and 109 protected benchmark records match output float bits and packed input
+bytes. Of those 109 records, 28 normal controls are timed and 81 edge controls
+are arithmetic-only. Packing/configuration/output scatter are timed; activation
+quantization, audio, model loading and generation are excluded.
+
+Twenty-one of 28 normal controls are slower than ordinary GGML. All actual-width
+controls are slower; the seven higher ratios occur only in small K32/96 cases
+with graph worker-dispatch overhead and remain slower than the standalone dot
+loop. At 16 workers the K1024/N1024/M1500 encoder-shaped matrix takes 12.956 ms
+versus 2.896 ms for ordinary GGML, about 4.47x slower. Reject this version for
+model routing and retain the numeric evidence. No full-input gain is claimed.
+
+A reproducible audit of twelve existing same-build opt48 phase samples finds
+about 6.1 s in the encoder and 2.0 s in prefill for the 60 s speech cases. These
+two-sample shared-host medians do not replace the quiet opt48 baseline. The
+report also records a deeper HiNa-MoE activation-layout review and the BF16/GPU
+compression limits of ZipServ, with primary links. Neither paper establishes
+exact Q8 or10x gains here. Automatic processing and API identity/health are
+restored. The goal remains active/unachieved. Next test dense exact VNNI batches
+in vector registers to remove tile zero/store/reload cost, then require actual
+layer/cache/token/output/EOS and matched full-input gates for any viable route.
