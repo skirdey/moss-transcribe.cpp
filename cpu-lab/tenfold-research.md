@@ -635,3 +635,41 @@ illustrates F16C conversion lowering; it does not prove our converter parity.
 dependency/resource scheduling with phase-specific inference. Its GPTQ-W4A16
 Qwen/L20GPU throughput tests are not exact Q8 CPU or tenfold latency evidence.
 Transfer static scheduling and measured phase controls, preserving our arithmetic.
+
+## Cache traversal and recent primary research, 2026-10-09
+
+The standalone cache probe changes only traversal within each worker's weight
+partition, preserving the previous tile arithmetic and panel construction. It
+compares six variants, retains all six post-warmup samples, and checks identical
+worker ownership as well as float bits, operands and panel bytes. Native results
+are recorded in [the cache report](vnni-cache.md); model routing is a later gate.
+
+[Space Filling Curves, April 7 2026 revision](https://arxiv.org/html/2601.16294v2)
+uses Hilbert traversal of output tiles and optional K partitioning/replicated
+outputs to reduce communication. Evaluation uses BF16 on several many-core CPUs;
+the Llama-3-8B case measures prefill at batches8–64 and input lengths1024–4096.
+Its up-to5.5× individual GEMM gain and up-to1.85× prefill gain are not our exact
+Q8 CPU or full-input latency result. Inference: traversal without K splitting
+can improve locality while preserving each output's accumulation order; partial
+K reductions need a separate exactness proof. Our simple loop interchange does
+not implement the paper's Hilbert algorithm.
+
+[WACT, August 25 2026](https://www.mdpi.com/2079-9292/15/17/3811)
+uses frozen per-tensor codec policies and strict RAW fallback after counting
+metadata and alignment. Modes include bit-width packing, delta/Rice, significance
+maps and zero runs. Five CNNs yield1.801× occupied-packet compression with exact
+INT8 reconstruction; software evaluates the full policy, hardware implements
+only single-tile Rice paths. This is compression-interface evidence, not measured
+Xeon latency. Quantize/dequantize accuracy differs from original FP32 accuracy,
+so codec losslessness does not mean lossless quantization. Transfer the complete
+byte accounting, frozen policies and reinjection checks, preserving existing
+MOSS Q8 codes and scales; measure decoder cost before claiming any latency win.
+
+Cache native outcome: all189 shape records and2097152 half conversions are
+exact, including identical worker ownership.15 CTests22.65s/34Python pass.
+All threeM1500 matrices are1.30–1.35× faster thanordinary prequantizedGGML;
+the prior contraction regression is removed (1.6092× versuspriorinline).
+23/30cases beatGGML;21/30beatpriorinline. Retained six-sample distributions
+include losses and outliers. The next F32 graph gate must include quantization
+and callback overhead and compare against ordinary F32 GGML's selected route.
+No actual-model route, full-input measurement or tenfold achievement follows.

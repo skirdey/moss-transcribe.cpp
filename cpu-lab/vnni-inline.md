@@ -95,7 +95,8 @@ Current weight-row-first scheduling rescans the entire activation panel buffer
 for each weight tile. Test input-tile-first traversal within each worker's same
 contiguous weight-row partition to reuse a panel and the worker's weight subset
 in cache. Retain the old schedule as a paired control with the same exactness
-and allocation/packing boundaries. This is unimplemented and not a speed claim.
+and allocation/packing boundaries. The [cache traversal probe](vnni-cache.md) now records this experiment;
+its results have their own paired timing and exactness boundaries.
 A viable schedule then needs actual F32 conversion/graph callback, layer/cache,
 complete token/output/EOS and matched full-input latency gates.
 
