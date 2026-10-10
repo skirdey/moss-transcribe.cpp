@@ -85,6 +85,18 @@ endif()
 
 mt_add_test(test_mel_cpu)
 
+# Paired serial/single-team packing experiment; outside default CTest.
+add_executable(moss_vnni_q8_parallel ${CMAKE_SOURCE_DIR}/cpu-lab/moss_vnni_q8_parallel.cpp)
+target_include_directories(moss_vnni_q8_parallel PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
+target_link_libraries(moss_vnni_q8_parallel PRIVATE moss-transcribe)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(moss_vnni_q8_parallel PRIVATE -march=native -ffp-contract=off)
+  find_package(OpenMP)
+  if(OpenMP_CXX_FOUND)
+    target_link_libraries(moss_vnni_q8_parallel PRIVATE OpenMP::OpenMP_CXX)
+  endif()
+endif()
+
 mt_add_test(test_mel)
 set_tests_properties(test_mel PROPERTIES LABELS "model")
 
