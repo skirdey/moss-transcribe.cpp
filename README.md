@@ -621,3 +621,13 @@ A direct pair gate against same-build65584 passes; incremental point estimates
 range0.22% slower to0.37% faster, providing no convincing additional latency win.
 The full numeric artifact retains all timings, RSS and counters. This remains
 opt-in research; production is unchanged and the original10× goal is unachieved.
+
+### Stateful target-batch gate
+
+The [model-backed state audit](cpu-lab/target-batch.md) compares sequential decode
+with batched append across96 cases, all hidden/full-logit/active-KV bits, immutable
+inputs/weights, and changed-token rollback with a poisoned discarded cache suffix.
+Default17 native CTests/40 Python checks pass; the strict batch probe rejects8
+cases despite matching greedy choices. T1/T2 controls are exact in this matrix.
+The complete numeric evidence is public. Timing is blocked, no production batch
+API is exposed, and the original full-input10× goal remains unachieved.
