@@ -546,3 +546,14 @@ normal controls are slower; the 1500-row encoder-shaped matrix is about 4.47x
 slower than ordinary GGML at 16 workers. This version is rejected for model
 integration. Source, all numeric records, provenance and a reproducible audit
 of existing full-model phases are retained. The 10x goal remains unachieved.
+
+### Exact dense VNNI batches
+
+The [VNNI report](cpu-lab/vnni-batch.md) retains a register-based four-code
+matrix experiment, protected pinned-dot/ordinary GGML controls, and both frozen
+build attempts. The corrected native build passes 15 CTests and 34 Python
+checks; all 74 arithmetic and 109 protected benchmark records match float bits
+and panel codes/scales. Sixteen of 28 normal timing controls improve, including
+1.15x for a 4096-wide projection at 16 workers, but the 1500-row encoder-shaped
+control is 26.6% slower. It adds no MOSS route or production change. Full numeric
+evidence, the initial link-target failure and its exact repair are public.

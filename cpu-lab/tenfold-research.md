@@ -552,3 +552,30 @@ exact Q8 or10x gains here. Automatic processing and API identity/health are
 restored. The goal remains active/unachieved. Next test dense exact VNNI batches
 in vector registers to remove tile zero/store/reload cost, then require actual
 layer/cache/token/output/EOS and matched full-input gates for any viable route.
+
+## Dense VNNI matrix batches, 2026-10-09
+
+The [register-based batch probe](vnni-batch.md) preserves original Q8 weight
+bytes, eight four-code floating chains and PSIGNB wrapped-negation behavior
+without AMX tile zero/store/reload work. Protected pinned-dot and ordinary GGML
+graph controls retain all operands. V1 had a wrong CMake link target and stopped
+before arithmetic; its source, exact reverse patch and failure hashes are
+retained. V2 fixes only that link. Native GCC vector code, 15 CTests and 34
+Python checks pass. All 74 arithmetic and 109 protected benchmark records
+match raw output float bits and dense activation panel codes/scales. The
+benchmark has 28 normal timed and 81 arithmetic-only edge controls.
+
+Sixteen of 28 normal controls are faster and twelve slower than ordinary GGML.
+All actual-width controls improve at one worker, while most multiworker cases
+regress. K1024/N4096/M64 observes 1.1525x at 16 workers, but the encoder-shaped
+K1024/N1024/M1500 takes 3.660 ms versus 2.892 ms (26.6% slower). Candidate
+allocation/serial packing/sign/reduction/scatter are included; input conversion
+and full inference are excluded. No actual model route or full-input gain is
+claimed. Automatic processing and authenticated API identity/health are restored.
+
+Pinned GGML source already contains blocked Q8 SGEMM schedules. The next
+experiment isolates dense panel construction and tries single-team parallel
+packing at large row counts, preserving initialized padding and all byte/float
+guards. Then test actual F32 graph conversion/callback and full-model gates for
+any successful version. No unchanged trial replay. The quiet opt48 baseline
+and 10x target remain active and unachieved.
