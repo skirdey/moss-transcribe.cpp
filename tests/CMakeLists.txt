@@ -38,6 +38,7 @@ target_include_directories(moss_target_batch_trace PRIVATE ${CMAKE_SOURCE_DIR}/s
 target_link_libraries(moss_target_batch_trace PRIVATE moss-transcribe)
 add_test(NAME moss_target_batch_trace_metadata COMMAND moss_target_batch_trace --audit-metadata)
 add_test(NAME moss_target_batch_context_layout COMMAND moss_target_batch_trace --audit-context-layout)
+add_test(NAME moss_target_batch_capture_allocation COMMAND moss_target_batch_trace --audit-allocation)
 target_include_directories(test_cpu_projection PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 target_include_directories(test_cpu_activation PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 
