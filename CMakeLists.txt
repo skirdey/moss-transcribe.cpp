@@ -44,6 +44,7 @@ set(MT_SRC
   src/cpu_softmax.cpp
   src/cpu_q8.cpp
   src/cpu_activation.cpp
+  src/cpu_projection.cpp
   src/cpu_profile.cpp
   src/qwen3_decoder.cpp
   src/generate.cpp

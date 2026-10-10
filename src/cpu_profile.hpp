@@ -11,6 +11,7 @@ void cpu_profile_reset();
 void cpu_profile_print();
 void cpu_profile_record(CpuStage stage, double seconds);
 void cpu_profile_record_shared_q8(bool cast, unsigned long long consumers);
+void cpu_profile_record_fused_q8(unsigned long long consumers);
 class CpuTimer {
 public:
     CpuTimer();

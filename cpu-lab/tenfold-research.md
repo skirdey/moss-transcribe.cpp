@@ -474,3 +474,28 @@ The report adds three primary papers with explicit hardware/numerical limits.
 Next test one exact-dot CPU operation per decode projection group with
 ordinary weights and private per-worker conversion; preserve prefill fallback,
 actual layer/cache bits, complete token sequences and all three latency gates.
+
+## Exact-dot projection fusion, 2026-10-09
+
+The [projection fusion report](fused-projection.md) combines eligible one-row
+Qwen Q/K/V and gate/up operations while retaining ordinary Q8 weights and the
+pinned converter/dot routines. Private per-worker activation conversion avoids
+a custom barrier or shared mutable scratch. Research bit 32768 is off by default;
+prefill and unsupported shapes fall back. Fifteen native CTests and 34 Python
+checks pass. Protected projection and actual layer/cache tests preserve float
+bits and operands across repeated input updates. At 16 workers, valid protected
+graph probes observe 1.208x Q/K/V and 1.183x gate/up; slower 8-worker cases remain.
+
+The [48-run full-input pilot](fused-projection-pilot-v1.json) passes complete
+outputs, EOS, artifacts, observed routes, complete same-build token hashes and
+all three latency controls. Speech medians are only 0.2–2.7% faster than same-build
+opt48. Two repeats and shared host load 14.36–30.01 establish neither statistical
+confidence nor quiet-host causality. Silence is 0.29% slower than frozen opt48,
+within the fixed five-percent rejection gate. Production remains unchanged,
+automatic processing was restored and API identity/health verified. The quiet
+opt48 reference and tenfold objective remain unchanged, active and unachieved.
+
+Next arithmetic probe: sparse AMX columns preserve eight separate four-code
+integer sums, original float FMA chains and the final horizontal-add tree.
+Require supported-hardware exact arithmetic and protected timing before any
+actual-model integration. Full-model gates remain mandatory for a new route.

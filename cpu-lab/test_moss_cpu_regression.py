@@ -2,7 +2,7 @@
 import unittest
 import tempfile
 from pathlib import Path
-from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference, token_fingerprint, evaluate_token_traces, evaluate_shared_activation
+from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference, token_fingerprint, evaluate_token_traces, evaluate_shared_activation, evaluate_fused_projections
 
 
 class RegressionGateTest(unittest.TestCase):
@@ -156,6 +156,16 @@ class RegressionGateTest(unittest.TestCase):
             self.assertTrue(evaluate_shared_activation([row],settings)["passed"])
             if variant!="48":
                 self.assertFalse(evaluate_shared_activation([{**row,"phaseProfile":None}],settings)["passed"])
+
+    def test_fused_path_requires_observed_decode_but_allows_first_token_eos(self):
+        settings={"32816":{"opt":32816},"48":{"opt":48}}
+        row=self.row("32816",repeat=0,phaseProfile={"decode":{"graphs":99,"fusedQ8Nodes":198,"fusedQ8Consumers":495}})
+        self.assertTrue(evaluate_fused_projections([row],settings)["passed"])
+        for profile in (None,{"decode":{"graphs":99}},{"decode":{"graphs":0}}):
+            self.assertFalse(evaluate_fused_projections([{**row,"phaseProfile":profile}],settings)["passed"])
+        eos={**row,"tokens":1,"phaseProfile":{"decode":{"graphs":0,"fusedQ8Nodes":0}}}
+        gate=evaluate_fused_projections([eos],settings)
+        self.assertTrue(gate["passed"]);self.assertEqual(gate["singleEosRunsWithoutDecode"],1)
 
 
 if __name__ == "__main__":

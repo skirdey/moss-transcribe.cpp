@@ -9,6 +9,7 @@ namespace {
 struct Counters {
     unsigned long long calls = 0, graphs = 0;
     unsigned long long shared_q8 = 0, shared_q8_cast = 0, shared_q8_consumers = 0;
+    unsigned long long fused_q8 = 0, fused_q8_consumers = 0;
     double total = 0, build = 0, allocate = 0, input = 0, compute = 0;
 };
 thread_local std::array<Counters, static_cast<size_t>(CpuPhase::Count)> counters;
@@ -54,10 +55,15 @@ void cpu_profile_print() {
     std::fputs("CPU_PHASE_PROFILE {", stderr);
     for (size_t i = 0; i < counters.size(); ++i) {
         const auto& c = counters[i];
-        std::fprintf(stderr, "%s\"%s\":{\"calls\":%llu,\"graphs\":%llu,\"totalSeconds\":%.9f,\"buildSeconds\":%.9f,\"allocateSeconds\":%.9f,\"inputSeconds\":%.9f,\"computeSeconds\":%.9f,\"sharedQ8Nodes\":%llu,\"sharedQ8CastNodes\":%llu,\"sharedQ8Consumers\":%llu}",
+        std::fprintf(stderr, "%s\"%s\":{\"calls\":%llu,\"graphs\":%llu,\"totalSeconds\":%.9f,\"buildSeconds\":%.9f,\"allocateSeconds\":%.9f,\"inputSeconds\":%.9f,\"computeSeconds\":%.9f,\"sharedQ8Nodes\":%llu,\"sharedQ8CastNodes\":%llu,\"sharedQ8Consumers\":%llu,\"fusedQ8Nodes\":%llu,\"fusedQ8Consumers\":%llu}",
             i ? "," : "", names[i], c.calls, c.graphs, c.total, c.build, c.allocate, c.input, c.compute,
-            c.shared_q8,c.shared_q8_cast,c.shared_q8_consumers);
+            c.shared_q8,c.shared_q8_cast,c.shared_q8_consumers,c.fused_q8,c.fused_q8_consumers);
     }
     std::fputs("}\n", stderr);
+}
+void cpu_profile_record_fused_q8(unsigned long long consumers) {
+    if (!cpu_profile_enabled()) return;
+    auto& c=counters[static_cast<size_t>(current)];
+    ++c.fused_q8;c.fused_q8_consumers+=consumers;
 }
 } // namespace mt
