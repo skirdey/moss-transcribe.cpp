@@ -447,3 +447,30 @@ gate/up paths, retaining ordinary weights and reference matrix operations.
 Use matched production, frozen fastest opt48 and same-build opt48 controls,
 including long speech/silence and full text/speaker/timestamp/token/EOS gates.
 The original quiet reference and tenfold objective remain unchanged and active.
+
+## Actual-model shared conversion, 2026-10-09
+
+The [full report](shared-model.md) integrates shape-aware block/cast reuse
+into actual Qwen and Whisper projections without weight copies or new matrix
+arithmetic. Research bits8192/16384 are off by default. Native validation
+passed all 13 CTests and 33 Python gate/parser tests on hp-fury; the actual
+Qwen layer/cache fixture has zero float-bit differences across decode and
+prefill at 1/16 workers. The failed CPY/DUP fixture attempt is retained with
+an exact source reverse patch and build/test provenance.
+
+The [72-run paired pilot](shared-model-pilot-v2.json) includes production,
+frozen fastest opt48, same-build opt48, decoder reuse, encoder reuse and both.
+All output hashes, counts and EOS match; all 48 numeric runs match complete
+same-build token hashes. Artifact and route gates pass. The original runner
+exited1: combined reuse failed German latency against frozen opt48 (+5.98%)
+and same-build opt48 (+5.31%). Real-empty speech failed production for every
+opt48 control/candidate (+15.87% to +20.20%). No candidate passes all controls
+or is promoted. Shared host load spans 23.59-32.44, and unchanged phases
+also vary; the apparent isolated encoder improvement cannot establish causality.
+
+Production and automatic processing were restored and health verified. The
+quiet opt48 baseline and tenfold objective are unchanged, active and unachieved.
+The report adds three primary papers with explicit hardware/numerical limits.
+Next test one exact-dot CPU operation per decode projection group with
+ordinary weights and private per-worker conversion; preserve prefill fallback,
+actual layer/cache bits, complete token sequences and all three latency gates.
