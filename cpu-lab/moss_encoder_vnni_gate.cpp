@@ -25,6 +25,9 @@ void opt(const char* v) {
 int main(int argc,char** argv) {
     try {
         require(argc>=3,"usage: moss_encoder_vnni_gate MODEL AUDIO...");
+        const char* candidate=std::getenv("MTD_ENCODER_GATE_OPT");
+        if(!candidate)candidate="65584";
+        require(!std::strcmp(candidate,"65584") || !std::strcmp(candidate,"196656"),"supported gate candidate");
         if(!mt::CpuEncoderQ8::supported())return 77;
         mt::ModelLoader model;require(model.load(argv[1]),"model load");model.promote_small_f16_to_f32();
         mt::WhisperMel mel(model);mt::WhisperEncoder encoder(model);
@@ -38,7 +41,7 @@ int main(int argc,char** argv) {
                 const auto saved_feat=feat;std::vector<float> ref,got;int rt=0,rd=0,ct=0,cd=0;
                 opt("48");auto start=std::chrono::steady_clock::now();encoder.encode(feat,m,t,ref,rt,rd);
                 const double ref_seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
-                mt::cpu_profile_reset();opt("65584");start=std::chrono::steady_clock::now();encoder.encode(feat,m,t,got,ct,cd);
+                mt::cpu_profile_reset();opt(candidate);start=std::chrono::steady_clock::now();encoder.encode(feat,m,t,got,ct,cd);
                 const double candidate_seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
                 mt::cpu_profile_print();
                 require(!ref.empty() && got.size()==ref.size() && rt==ct && rd==cd,"encoder shape");
@@ -48,7 +51,7 @@ int main(int argc,char** argv) {
                 }
                 require(!std::memcmp(feat.data(),saved_feat.data(),feat.size()*sizeof(float)),"mel immutable");
                 total_bits+=bits;++chunks;
-                std::printf("{\"audioIndex\":%d,\"chunk\":%zu,\"T\":%d,\"D\":%d,\"elements\":%zu,\"floatBitDifferences\":%zu,\"referenceEncoderSeconds\":%.9f,\"candidateEncoderSeconds\":%.9f,\"melUnchanged\":true,\"fullInputLatency\":false}\n",index-2,off/chunk_size,ct,cd,got.size(),bits,ref_seconds,candidate_seconds);
+                std::printf("{\"audioIndex\":%d,\"chunk\":%zu,\"candidateOpt\":%d,\"T\":%d,\"D\":%d,\"elements\":%zu,\"floatBitDifferences\":%zu,\"referenceEncoderSeconds\":%.9f,\"candidateEncoderSeconds\":%.9f,\"melUnchanged\":true,\"fullInputLatency\":false}\n",index-2,off/chunk_size,std::atoi(candidate),ct,cd,got.size(),bits,ref_seconds,candidate_seconds);
                 std::fflush(stdout);require(!bits,"real-weight encoder bit parity");
             }
         }

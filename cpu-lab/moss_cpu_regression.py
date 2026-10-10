@@ -118,6 +118,21 @@ def evaluate_candidate_reference(runs, reference):
     return evaluate([r for r in runs if r["variant"] not in ("baseline","cache-reference")],baseline=reference)
 
 
+def evaluate_pair_reference(runs, reference, candidate):
+    """Isolate a declared pair without treating older controls as candidates."""
+    if reference==candidate:
+        return {"passed":False,"failures":["Pair variants must differ"],"comparisons":[]}
+    selected=[r for r in runs if r["variant"] in (reference,candidate)]
+    gate=evaluate(selected,baseline=reference)
+    for case in sorted({r["case"] for r in runs}):
+        labels={r["variant"] for r in selected if r["case"]==case}
+        if labels!={reference,candidate}:
+            gate["failures"].append(case+": missing declared pair measurements")
+    gate["passed"]=not gate["failures"]
+    gate["reference"]=reference;gate["candidate"]=candidate
+    return gate
+
+
 def token_fingerprint(path):
     tokens,eos,_ = read_trace(path)
     if not tokens or tokens[-1] != eos or eos in tokens[:-1]:
@@ -189,6 +204,27 @@ def evaluate_encoder_q8(runs, settings):
     return {"passed":not failures,"failures":failures,"exercisedRuns":exercised}
 
 
+def evaluate_encoder_qkv(runs, settings):
+    failures=[];exercised=0
+    for r in runs:
+        opt=settings.get(r["variant"],{}).get("opt",0)
+        if not opt & 131072:continue
+        p=(r.get("phaseProfile") or {}).get("whisper") or {}
+        graphs=p.get("graphs",0);qkv=p.get("encoderQkvNodes",0)
+        nodes=p.get("encoderQ8Nodes",0);consumers=p.get("encoderQ8Consumers",0)
+        # The pinned MOSS encoder has 24 layers, three grouped projections and
+        # optionally three additional custom linear operations in each layer.
+        expected_nodes=graphs*(96 if opt & 65536 else 24)
+        if (graphs<=0 or qkv!=24*graphs or p.get("encoderQkvExecutions")!=qkv
+            or nodes!=expected_nodes or p.get("encoderQ8Executions")!=nodes
+            or consumers!=nodes+2*qkv or p.get("encoderQ8ConsumerExecutions")!=consumers
+            or p.get("encoderQ8Failures")!=0 or p.get("encoderQ8MinWorkers")!=16
+            or p.get("encoderQ8MaxWorkers")!=16):
+            failures.append(f'{r["case"]}/{r["variant"]}/{r["repeat"]}: grouped QKV callbacks/consumers/actual workers not verified')
+        else:exercised+=1
+    return {"passed":not failures,"failures":failures,"exercisedRuns":exercised}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", type=Path, required=True)
@@ -203,6 +239,8 @@ def main():
     p.add_argument("--reference-root",type=Path,default=Path("/home/stan/hw-moss-cache-layout"),help="Fixed validated reference build; variant cache-reference uses --reference-opt")
     p.add_argument("--reference-opt",type=int,default=16,help="Opt bitmask of the fixed reference (48 for validated parallel softmax)")
     p.add_argument("--candidate-reference",help="Numeric variant label in this same compiled binary; additionally reject regression against this control")
+    p.add_argument("--pair-reference",help="Additional same-build reference used only for the explicitly declared pair")
+    p.add_argument("--pair-candidate",help="Numeric same-build candidate compared against --pair-reference")
     p.add_argument("--model",type=Path,default=Path("/home/stan/hw-audio-bench/models/moss-transcribe-q8_0.gguf"))
     p.add_argument("--audio-dir",type=Path,default=Path("/home/stan/hw-audio-bench/audio"))
     p.add_argument("--baseline",type=Path,default=Path("/home/stan/hw-moss-api/bin/moss-transcribe"))
@@ -220,6 +258,10 @@ def main():
         p.error("Candidate reference must be a numeric variant with another same-build candidate")
     if args.trace_tokens and not args.candidate_reference:
         p.error("Token parity needs an explicit same-build candidate reference")
+    if bool(args.pair_reference)!=bool(args.pair_candidate) or (args.pair_reference and
+        (args.pair_reference not in candidates or args.pair_candidate not in candidates
+         or args.pair_reference==args.pair_candidate)):
+        p.error("Pair gate needs two distinct selected numeric variants")
     root = args.root.resolve()
     results = root / args.name
     results.mkdir(parents=True, exist_ok=True)
@@ -358,6 +400,7 @@ def main():
     report["sharedActivationGate"] = evaluate_shared_activation(report["runs"],report["variantSettings"])
     report["fusedProjectionGate"] = evaluate_fused_projections(report["runs"],report["variantSettings"])
     report["encoderQ8Gate"] = evaluate_encoder_q8(report["runs"],report["variantSettings"])
+    report["encoderQkvGate"] = evaluate_encoder_qkv(report["runs"],report["variantSettings"])
     report["gate"] = evaluate(report["runs"])
     if "cache-reference" in args.variants:
         compared = [r for r in report["runs"] if r["variant"] != "baseline"]
@@ -367,12 +410,14 @@ def main():
         report["candidateReferenceGate"] = evaluate_candidate_reference(report["runs"],args.candidate_reference)
     if args.trace_tokens:
         report["tokenTraceGate"] = evaluate_token_traces(report["runs"],args.candidate_reference)
+    if args.pair_reference:
+        report["pairGate"] = evaluate_pair_reference(report["runs"],args.pair_reference,args.pair_candidate)
     report_path.write_text(json.dumps(report,indent=2))
     print(json.dumps(report["gate"],indent=2))
     if args.candidate_reference:
         print(json.dumps({"candidateReferenceGate":report["candidateReferenceGate"]},indent=2))
     return 0 if all(report.get(g,{"passed":True})["passed"] for g in
-        ("artifactGate","storageGate","sharedActivationGate","fusedProjectionGate","encoderQ8Gate","gate","cacheReferenceGate","candidateReferenceGate","tokenTraceGate")) else 1
+        ("artifactGate","storageGate","sharedActivationGate","fusedProjectionGate","encoderQ8Gate","encoderQkvGate","gate","cacheReferenceGate","candidateReferenceGate","tokenTraceGate","pairGate")) else 1
 
 
 if __name__ == "__main__":
