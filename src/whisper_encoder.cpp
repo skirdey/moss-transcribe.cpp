@@ -3,6 +3,7 @@
 #include "backend.hpp"
 #include "cpu_profile.hpp"
 #include "cpu_activation.hpp"
+#include "cpu_encoder_q8.hpp"
 #include "common.hpp"
 #include "ggml_extend.hpp"
 
@@ -122,6 +123,13 @@ void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_fra
     const float kq_scale = 1.0f / std::sqrt((float)hd);
     const char* cpu_opt=std::getenv("MTD_CPU_OPT");
     const bool shared_projection=cpu_opt && (std::atoi(cpu_opt) & 16384);
+    const bool encoder_q8=cpu_opt && (std::atoi(cpu_opt) & 65536);
+    CpuEncoderQ8 encoder_contexts;
+    auto encoder_linear = [&](ggml_tensor* weight, ggml_tensor* bias, ggml_tensor* input) {
+        auto* y=encoder_q8 ? encoder_contexts.mul_mat(ctx,weight,input) : nullptr;
+        if (!y) return linear(ctx,weight,bias,input);
+        return bias ? ggml_add(ctx,y,bias) : y;
+    };
 
     for (int il = 0; il < n_layers_; ++il) {
         const WhisperLayer& L = layers_[il];
@@ -133,9 +141,9 @@ void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_fra
             x=cpu_shared_projection_input(ctx,x,weights,3,CpuSharedActivationMode::Cast);
         }
 
-        ggml_tensor* q = linear(ctx, L.q_w, L.q_b, x);       // [d, T]
-        ggml_tensor* k = linear(ctx, L.k_w, nullptr, x);     // [d, T] (no bias)
-        ggml_tensor* v = linear(ctx, L.v_w, L.v_b, x);       // [d, T]
+        ggml_tensor* q = encoder_linear(L.q_w, L.q_b, x);       // [d, T]
+        ggml_tensor* k = encoder_linear(L.k_w, nullptr, x);     // [d, T] (no bias)
+        ggml_tensor* v = encoder_linear(L.v_w, L.v_b, x);       // [d, T]
 
         // [d,T] -> [hd,H,T] -> [hd,T,H]
         ggml_tensor* Q = ggml_permute(ctx, ggml_reshape_3d(ctx, q, hd, H, T), 0, 2, 1, 3);
@@ -152,14 +160,14 @@ void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_fra
         ggml_tensor* merged = ggml_permute(ctx, KQV, 0, 2, 1, 3);  // [hd, H, T]
         x = ggml_cont_2d(ctx, merged, d, T);                 // [d, T]
 
-        x   = linear(ctx, L.o_w, L.o_b, x);
+        x   = encoder_linear(L.o_w, L.o_b, x);
         cur = ggml_add(ctx, res, x);
 
         ggml_tensor* res2 = cur;
         x = layer_norm(ctx, cur, L.ffn_ln_w, L.ffn_ln_b, 1e-5f);
-        x = linear(ctx, L.fc1_w, L.fc1_b, x);
+        x = encoder_linear(L.fc1_w, L.fc1_b, x);
         x = ggml_gelu_erf(ctx, x);
-        x = linear(ctx, L.fc2_w, L.fc2_b, x);
+        x = encoder_linear(L.fc2_w, L.fc2_b, x);
         cur = ggml_add(ctx, res2, x);
     }
 
@@ -172,7 +180,8 @@ void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_fra
     const bool ok = compute_graph_with_inputs(gf, [&]() {
         ggml_backend_tensor_set(mel_in, mel.data(), 0, mel.size() * sizeof(float));
     });
-    if (!ok) {
+    encoder_contexts.record_profile();
+    if (!ok || !encoder_contexts.ok()) {
         MT_LOGE("whisper_encoder: graph compute failed");
         out.clear();
         out_T = out_D = 0;
