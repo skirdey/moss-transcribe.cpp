@@ -31,6 +31,7 @@ void env(const char* key, const char* value) {
 }
 using Bits = std::vector<uint32_t>;
 bool inspect_context_operations = false;
+size_t operation_control_failures = 0;
 enum Stage { Norm,Q,K,V,QNorm,KNorm,QRope,KRope,Scores,Probabilities,
              Context,AttentionProjection,Residual,FfnNorm,Gate,Up,Activation,Down,LayerOutput,StageCount };
 constexpr const char* names[] = {"attentionNorm","queryProjection","keyProjection","valueProjection",
@@ -144,6 +145,36 @@ int audit_context_layout() {
     std::printf("{\"record\":\"contextLayoutControl\",\"cases\":%d,\"distinctMarkersExact\":true,"
                 "\"gqaGroupingExact\":true,\"invalidQueryRejected\":true,\"invalidHeadGroupingRejected\":true,"
                 "\"invalidStorageSizeRejected\":true}\n",cases);
+    return 0;
+}
+int audit_allocation() {
+    env("MTD_DEVICE","cpu"); env("MTD_THREADS","1");
+    require(std::string(mt::backend_name()) == "CPU", "allocation control CPU backend");
+    auto run = [&](bool capture, bool fresh) {
+        auto* ctx = ggml_init({1024*1024,nullptr,true}); require(ctx,"allocation control context");
+        auto* a = ggml_new_tensor_1d(ctx,GGML_TYPE_F32,64);
+        auto* b = ggml_new_tensor_1d(ctx,GGML_TYPE_F32,64);
+        ggml_set_input(a); ggml_set_input(b);
+        auto* middle = ggml_add(ctx,a,b); auto* output = ggml_mul(ctx,middle,b);
+        if (capture) ggml_set_output(middle);
+        ggml_set_output(output);
+        auto* graph = ggml_new_graph(ctx); ggml_build_forward_expand(graph,output);
+        std::vector<float> av(64,1.0f),bv(64,2.0f),actual(64),final(64);
+        require(mt::compute_graph_with_inputs(graph,[&]() {
+            ggml_backend_tensor_set(a,av.data(),0,av.size()*sizeof(float));
+            ggml_backend_tensor_set(b,bv.data(),0,bv.size()*sizeof(float));
+        },fresh),"allocation control compute");
+        ggml_backend_tensor_get(middle,actual.data(),0,actual.size()*sizeof(float));
+        ggml_backend_tensor_get(output,final.data(),0,final.size()*sizeof(float));
+        require(std::all_of(final.begin(),final.end(),[](float x){return x==6.0f;}),"quiet final result preserved");
+        size_t wrong = std::count_if(actual.begin(),actual.end(),[](float x){return x!=3.0f;});
+        ggml_free(ctx); return wrong;
+    };
+    (void)run(false,false);
+    const auto stale = run(true,false), repaired = run(true,true);
+    require(stale==64 && repaired==0,"changed output flags require fresh allocation plan");
+    std::printf("{\"record\":\"allocationControl\",\"elements\":64,\"stalePlanWrongIntermediateElements\":%zu,"
+                "\"freshPlanWrongIntermediateElements\":%zu,\"finalResultsExact\":true,\"freshPlanControlPassed\":true}\n",stale,repaired);
     return 0;
 }
 void identify_graph(ggml_cgraph* graph, Capture* identity,
@@ -518,6 +549,8 @@ size_t inspect_operations(int mode, int prefix, const std::vector<Capture>& seri
     size_t nonfinite = 0;
     for (const auto* d : {&raw_delta,&serial_copy,&batch_copy,&serial_full,&batch_full,&batch_valid_serial,&full_valid,
                          &key_inputs,&value_inputs,&serial_k_store,&serial_v_store,&batch_k_store,&batch_v_store}) nonfinite += d->nonfinite;
+    operation_control_failures += bool(serial_copy.bits || batch_copy.bits || serial_full.bits || batch_full.bits ||
+        serial_k_store.bits || serial_v_store.bits || batch_k_store.bits || batch_v_store.bits || nonfinite);
     std::printf("{\"record\":\"contextOperations\",\"mode\":%d,\"prefix\":%d,\"appendTokens\":%d,\"layer\":%d,"
         "\"rawMatmulBitDifferences\":%zu,\"rawMatmulMaxAbs\":%.17g,\"serialPermutationCopyBitDifferences\":%zu,"
         "\"batchPermutationCopyBitDifferences\":%zu,\"serialFullLengthReplayBitDifferences\":%zu,\"serialFullLengthReplayMaxAbs\":%.17g,"
@@ -540,6 +573,7 @@ int main(int argc, char** argv) {
     try {
         if (argc == 2 && !std::strcmp(argv[1],"--audit-metadata")) return audit_metadata();
         if (argc == 2 && !std::strcmp(argv[1],"--audit-context-layout")) return audit_context_layout();
+        if (argc == 2 && !std::strcmp(argv[1],"--audit-allocation")) return audit_allocation();
         require(argc == 2 || (argc == 3 && !std::strcmp(argv[2],"--context-operations")),
                 "usage: moss_target_batch_trace MODEL [--context-operations]");
         inspect_context_operations = argc == 3;
@@ -664,7 +698,10 @@ int main(int argc, char** argv) {
             std::vector<uint8_t> actual(w.bytes.size()); ggml_backend_tensor_get(w.t,actual.data(),0,actual.size());
             for (size_t i = 0; i < actual.size(); ++i) changed_weights += actual[i] != w.bytes[i];
         }
-        const bool valid = complete == 26 && !capture_changes && !future_nonzero && !nonfinite && !changed_weights;
+        const bool valid = complete == 26 && !capture_changes && !future_nonzero && !nonfinite && !changed_weights && !operation_control_failures;
+        if (inspect_context_operations)
+            std::printf("{\"record\":\"contextOperationsSummary\",\"operationRecords\":%zu,\"operationControlFailures\":%zu,"
+                        "\"expandedAttributionEligible\":%s}\n",complete*cfg.text_layers,operation_control_failures,valid?"true":"false");
         std::printf("{\"record\":\"summary\",\"cases\":%zu,\"stageRecords\":%zu,\"quietDriftCases\":%zu,\"captureChangedCases\":%zu,"
             "\"futureProbabilityNonzeroElements\":%zu,\"nonfiniteElements\":%zu,\"modelWeightBytesChecked\":%zu,\"modelWeightByteChanges\":%zu,"
             "\"traceAttributionEligible\":%s,\"timingPerformed\":false,\"productionPromoted\":false}\n",
