@@ -75,10 +75,18 @@ std::vector<Panel> pack_input(const std::vector<block_q8_0>& input, int k, int m
 // Two weight rows and sixteen input rows. Each VNNI instruction reduces only four
 // codes, so all eight original floating accumulation chains remain separate.
 // Outputs have the actual GGML layout y[input_row * N + weight_row].
+inline float inline_half(ggml_half h, bool round_down) {
+    // The pinned software converter subtracts equal positive values for half
+    // +0. Under downward rounding that produces -0; F16C alone produces +0.
+    if (h == 0 && round_down) return -0.0f;
+    return _cvtsh_ss(h);
+}
+
 template<int R, bool InlineHalf = false>
 __attribute__((noinline))
 void tile(const block_q8_0* weights, const Panel* panels, int blocks,
           int n, int columns, float* output) {
+    const bool round_down = InlineHalf && ((_mm_getcsr() & 0x6000u) == 0x2000u);
     __m512 acc[R][8];
     for (auto& row : acc) for (auto& a : row) a = _mm512_setzero_ps();
     const __mmask16 active = static_cast<__mmask16>((1u << columns) - 1);
@@ -90,7 +98,7 @@ void tile(const block_q8_0* weights, const Panel* panels, int blocks,
         __m512 scales[R];
         for (int r = 0; r < R; ++r) {
             const auto h = weights[r * blocks + b].d;
-            const float converted = InlineHalf ? _cvtsh_ss(h) : ggml_fp16_to_fp32(h);
+            const float converted = InlineHalf ? inline_half(h, round_down) : ggml_fp16_to_fp32(h);
             scales[r] = _mm512_mul_ps(xs, _mm512_set1_ps(converted));
         }
         #pragma GCC unroll 8
@@ -142,7 +150,7 @@ void half_conversion_audit() {
                    ((flags & 1) ? 0x8000u : 0) | ((flags & 2) ? 0x40u : 0));
         for (unsigned code = 0; code < 65536; ++code) {
             const float reference = ggml_fp16_to_fp32(static_cast<ggml_half>(code));
-            const float converted = _cvtsh_ss(static_cast<unsigned short>(code));
+            const float converted = inline_half(static_cast<ggml_half>(code), round == 1);
             bit_differences += std::memcmp(&reference, &converted, sizeof(float)) != 0;
         }
     }
