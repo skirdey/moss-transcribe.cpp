@@ -1,0 +1,22 @@
+{
+  "schema": "vnni-batch-build-failure-v1",
+  "sourceCommit": "b7a9f7ed0d08d4c8a32b32335f6100d39dc67cd9",
+  "publicExactSourceCommit": "7b8be65463c07a7d3ad1a2d50ae614746143af85",
+  "sourceTree": "eaad3a502cdf914767a5486ca2ac8cc6eb043513",
+  "sourceClean": true,
+  "sourceSha256": {
+    "cpu-lab/moss_vnni_q8_batch.cpp": "8fbafbb6d7a95329f20288b8f626382649354da4998dfa520de3bb1e8e90ec1b",
+    "tests/CMakeLists.txt": "86a3b6be90d924ec2e0a3736c3c5a7157065c9ef2009ffec4096381bd24e8081"
+  },
+  "buildLogSha256": "b9c403c367a301a2dff8a2ef644cf070be3f5a8d71b7d659a9c1f424af37b08b",
+  "failure": "Target linked nonexistent moss library rather than actual moss-transcribe; missing transitive ggml.h include. Build stopped before native arithmetic or timing.",
+  "buildTerminalExit": 2,
+  "controllerTerminalExit": 1,
+  "controllerSha256": "9eb09e189b84e6b670b6ac7b7b43240a75ca4b21ac69277eaf7b6f8926063c49",
+  "controllerLogSha256": "63e6b24ec25078f860a409d2622df75e62bbe2fa8cc8b4ae84745862d3906ede",
+  "restoredAutomaticProcessing": "1",
+  "authenticatedApiHealth": "ok",
+  "arithmeticRan": false,
+  "timingRan": false,
+  "reverseLinkPatchSha256": "78e98924d8cd7fe6348579688cba4354b7ddbd8f2badb83b13093a256b7716e4"
+}
