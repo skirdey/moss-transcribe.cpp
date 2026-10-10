@@ -579,3 +579,31 @@ packing at large row counts, preserving initialized padding and all byte/float
 guards. Then test actual F32 graph conversion/callback and full-model gates for
 any successful version. No unchanged trial replay. The quiet opt48 baseline
 and 10x target remain active and unachieved.
+
+## Single-team VNNI panel packing, 2026-10-09
+
+The [parallel packing probe](vnni-parallel.md) keeps serial packing and ordinary
+prequantized GGML as paired controls. Original Q8 codes, half scales, wrapped
+negation and pinned eight-chain FMA order remain intact. Candidate workers fully
+initialize panels/tails/padding, then compute after the packing barrier in one
+team. Native15 CTests/34 Python checks pass; all78 arithmetic/111 protected
+benchmark records are exact (30 normal timed,81 arithmetic-only edges). Twelve
+of30 timed cases improve versus serial,16 versus ordinary GGML. Encoder-shaped
+K/N1024/1024,1024/4096,4096/1024 M1500 improve3–8% in speed ratio versus serial
+but remain14.8–24.8% slower than ordinary GGML. No actual-model route/promotion.
+
+Separate stage diagnostics reduce allocation/packing overhead but execution
+remains larger. Diagnostic barriers/timers are absent from paired primary totals
+and stage medians are not additive. Exact-binary disassembly shows two
+`ggml_fp16_to_fp32@plt` calls per Q8 block and accumulator stack spills around
+them. Next test inline F16C only after exhaustive65536 half-bit-pattern parity,
+then preserve all paired controls before F32 graph/layer/full-input gates. No
+unchanged timing replay or causal spill-latency claim. All records and frozen
+source/artifact/compiler/log hashes remain public; production identity unchanged
+and automatic processing restored. The quiet opt48 target remains unachieved.
+
+[Is INT8 Portable?, September14 2026](https://arxiv.org/html/2609.16085) compares
+per-input predictions while holding quantized artifacts/scales fixed. Its
+vision-model cross-kernel observations reinforce individual-output validation;
+they do not prove exact GGML arithmetic, lossless Q8 compression or tenfold MOSS
+latency. The next kernel must keep exact controls irrespective of average quality.
