@@ -845,3 +845,38 @@ with scalar FMA tails. The next default-off CPU candidate must preserve the
 per-query length and pass the full state/logit/rollback gate before timing.
 This evidence changes the next kernel action; it does not reduce measured
 full-input latency or achieve the original tenfold goal.
+
+## Exact causal-context kernel and measured batch work (October 10, 2026 UTC)
+
+The [implemented kernel and reports](causal-context.md) use default-off bit262144
+and pinned per-query valid-length F32 dots on existing GGML workers. All384
+actual single-query matmul oracle cases match,3840 invalid layouts reject,
+21 native CTests and40 Python checks pass, and all96 full model-state/logit/KV/
+rewind/poison cases now match opt48 serial decode exactly. Ordinary opt48
+baseline records remain identical to the eight-failure original matrix.
+
+Only after that gate, a standalone benchmark linked against unchanged validated
+runtime libraries measures append plus every vocabulary logit. Twelve fixtures
+have one discarded warmup pair and five alternating measured pairs each; all60
+measured pairs retain complete hidden/logit/activeKV bits and weight bytes.
+Eleven median-time ratios improve1.17–2.45x; prefix1024/T2 is0.963x.
+Full reports retain timings, ranges, source/artifact/model hashes and shared-host
+observations. Prefix setup/reset, loading, drafting, rollback and audio work are
+excluded. This is measured batch verification work, not a full-input gain.
+
+The next milestone is strict greedy-verified integration with actual acceptance
+and all proposal/verification/rejection costs, followed by identical complete
+audio outputs, silence controls and the fixed corpus score. Long-prefix small
+batches need a measured fallback. Encoder work and the immutable full-input
+reference remain necessary; the original10x goal is active and unachieved.
+
+Two additional primary abstracts were checked on October10:
+
+| Source | Finding | Consequence here |
+|---|---|---|
+| [Speculative Decoding: Performance or Illusion?, March18 2026 revision](https://arxiv.org/abs/2601.11580v2) | A vLLM study finds target verification dominates and accepted length varies with token position, request and dataset. | Our known-row benchmark omits drafting and acceptance. Measure actual complete requests and position-dependent acceptance before claiming speculative gains. |
+| [Nucleus Speculative Decoding, submitted October6 2026](https://arxiv.org/abs/2610.07822v1) | Relaxed acceptance adds target-nucleus plausibility and explicitly permits distributional deviation; reported throughput reaches5.16x over autoregressive decoding. | Relaxed acceptance cannot establish our exact greedy/token/state requirement. Keep strict verification; these throughput figures are not CPU MOSS or full-audio evidence. |
+
+These are abstract-level reviews, not imported implementations or measured
+MOSS results. All new source/evidence stays MIT; private audio, token IDs,
+transcripts, model values and credentials are excluded.

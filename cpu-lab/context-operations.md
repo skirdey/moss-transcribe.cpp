@@ -93,6 +93,11 @@ observations found no overlapping MOSS process; host load ranged 5.74–10.82.
 Shorter overlaps are not excluded and other host jobs remained running.
 Automatic processing and the authenticated production API were restored.
 
+A later [causal-context kernel and full-state gate](causal-context.md) implement
+the proposed valid-length dots and pass all 96 state/logit/rollback fixtures.
+Its separate paired append/full-logit timings retain every sample and a slower
+long-prefix T2 fixture; they do not measure full audio latency.
+
 ## Reproduce
 
 Build the pinned source and GGML revision with Release CPU flags as in the
