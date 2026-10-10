@@ -13,6 +13,7 @@ struct Counters {
     unsigned long long fused_q8 = 0, fused_q8_consumers = 0;
     unsigned long long encoder_q8 = 0, encoder_q8_executions = 0, encoder_q8_failures = 0;
     int encoder_q8_min_workers = 0, encoder_q8_max_workers = 0;
+    unsigned long long encoder_consumers=0, encoder_consumer_executions=0, encoder_qkv=0, encoder_qkv_executions=0;
     double total = 0, build = 0, allocate = 0, input = 0, compute = 0;
 };
 thread_local std::array<Counters, static_cast<size_t>(CpuPhase::Count)> counters;
@@ -58,10 +59,11 @@ void cpu_profile_print() {
     std::fputs("CPU_PHASE_PROFILE {", stderr);
     for (size_t i = 0; i < counters.size(); ++i) {
         const auto& c = counters[i];
-        std::fprintf(stderr, "%s\"%s\":{\"calls\":%llu,\"graphs\":%llu,\"totalSeconds\":%.9f,\"buildSeconds\":%.9f,\"allocateSeconds\":%.9f,\"inputSeconds\":%.9f,\"computeSeconds\":%.9f,\"sharedQ8Nodes\":%llu,\"sharedQ8CastNodes\":%llu,\"sharedQ8Consumers\":%llu,\"fusedQ8Nodes\":%llu,\"fusedQ8Consumers\":%llu,\"encoderQ8Nodes\":%llu,\"encoderQ8Executions\":%llu,\"encoderQ8Failures\":%llu,\"encoderQ8MinWorkers\":%d,\"encoderQ8MaxWorkers\":%d}",
+        std::fprintf(stderr, "%s\"%s\":{\"calls\":%llu,\"graphs\":%llu,\"totalSeconds\":%.9f,\"buildSeconds\":%.9f,\"allocateSeconds\":%.9f,\"inputSeconds\":%.9f,\"computeSeconds\":%.9f,\"sharedQ8Nodes\":%llu,\"sharedQ8CastNodes\":%llu,\"sharedQ8Consumers\":%llu,\"fusedQ8Nodes\":%llu,\"fusedQ8Consumers\":%llu,\"encoderQ8Nodes\":%llu,\"encoderQ8Executions\":%llu,\"encoderQ8Failures\":%llu,\"encoderQ8MinWorkers\":%d,\"encoderQ8MaxWorkers\":%d,\"encoderQ8Consumers\":%llu,\"encoderQ8ConsumerExecutions\":%llu,\"encoderQkvNodes\":%llu,\"encoderQkvExecutions\":%llu}",
             i ? "," : "", names[i], c.calls, c.graphs, c.total, c.build, c.allocate, c.input, c.compute,
             c.shared_q8,c.shared_q8_cast,c.shared_q8_consumers,c.fused_q8,c.fused_q8_consumers,
-            c.encoder_q8,c.encoder_q8_executions,c.encoder_q8_failures,c.encoder_q8_min_workers,c.encoder_q8_max_workers);
+            c.encoder_q8,c.encoder_q8_executions,c.encoder_q8_failures,c.encoder_q8_min_workers,c.encoder_q8_max_workers,
+            c.encoder_consumers,c.encoder_consumer_executions,c.encoder_qkv,c.encoder_qkv_executions);
     }
     std::fputs("}\n", stderr);
 }
@@ -71,9 +73,13 @@ void cpu_profile_record_fused_q8(unsigned long long consumers) {
     ++c.fused_q8;c.fused_q8_consumers+=consumers;
 }
 void cpu_profile_record_encoder_q8(unsigned long long nodes, unsigned long long executions,
-                                   unsigned long long failures, int min_workers, int max_workers) {
+                                   unsigned long long failures, int min_workers, int max_workers,
+                                   unsigned long long consumers, unsigned long long consumer_executions,
+                                   unsigned long long qkv_nodes, unsigned long long qkv_executions) {
     if (!cpu_profile_enabled()) return;
     auto& c=counters[static_cast<size_t>(current)];
+    c.encoder_consumers+=consumers; c.encoder_consumer_executions+=consumer_executions;
+    c.encoder_qkv+=qkv_nodes; c.encoder_qkv_executions+=qkv_executions;
     c.encoder_q8+=nodes; c.encoder_q8_executions+=executions; c.encoder_q8_failures+=failures;
     if (min_workers) c.encoder_q8_min_workers=c.encoder_q8_min_workers ?
         std::min(c.encoder_q8_min_workers,min_workers) : min_workers;

@@ -13,7 +13,9 @@ void cpu_profile_record(CpuStage stage, double seconds);
 void cpu_profile_record_shared_q8(bool cast, unsigned long long consumers);
 void cpu_profile_record_fused_q8(unsigned long long consumers);
 void cpu_profile_record_encoder_q8(unsigned long long nodes, unsigned long long executions,
-                                   unsigned long long failures, int min_workers, int max_workers);
+                                   unsigned long long failures, int min_workers, int max_workers,
+                                   unsigned long long consumers, unsigned long long consumer_executions,
+                                   unsigned long long qkv_nodes, unsigned long long qkv_executions);
 class CpuTimer {
 public:
     CpuTimer();
