@@ -1,6 +1,7 @@
 #include "qwen3.hpp"
 #include "backend.hpp"
 #include "cpu_softmax.hpp"
+#include "cpu_context.hpp"
 #include "cpu_activation.hpp"
 #include "cpu_projection.hpp"
 #include "ggml-cpu.h"
@@ -178,7 +179,10 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
 
     struct ggml_tensor* v_t = transposed_v ? v_used
         : maybe_cont(ctx, ggml_transpose(ctx, v_p));  // [seq_kv, hd, n_kv, b]
-    o = ggml_mul_mat(ctx, v_t, attn);
+    if (cpu_opt && (std::atoi(cpu_opt) & 262144) && transposed_v && mask &&
+        past_seq>0 && n_tokens>1 && n_batch==1)
+        o = cpu_causal_context(ctx,v_t,attn);
+    if (!o) o = ggml_mul_mat(ctx, v_t, attn);
 
     o = ggml_permute(ctx, o, 0, 2, 1, 3);
     }
