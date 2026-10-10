@@ -13,7 +13,9 @@
 #include <random>
 #include <vector>
 
-int main() {
+int main(int argc,char** argv) {
+    const bool audit=argc==2 && !std::strcmp(argv[1],"--audit-unretained-input");
+    if(argc>1 && !audit) return 2;
     if (!mt::cpu_exact_q8_supported()) return 77;
     auto backend = ggml_backend_cpu_init();
     const auto* traits = ggml_get_type_traits_cpu(GGML_TYPE_Q8_0);
@@ -46,6 +48,9 @@ int main() {
             auto w = ggml_new_tensor_2d(ctx, GGML_TYPE_Q8_0, k, n);
             auto x = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, k, 1);
             ggml_set_input(w); ggml_set_input(x);
+            // INPUT allocates early but permits reuse after the last consumer.
+            // Preserve these synthetic buffers across the timed subgraphs.
+            if(!audit) { ggml_set_output(w); ggml_set_output(x); }
             auto start = std::chrono::steady_clock::now();
             auto pack = mt::cpu_pack_q8(w, raw.data());
             const double packing_us = std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count()*1e6;
@@ -63,6 +68,16 @@ int main() {
             ggml_backend_tensor_set(w, raw.data(), 0, raw.size()*sizeof(block_q8_0));
             ggml_backend_tensor_set(x, input.data(), 0, input.size()*sizeof(float));
             if (ggml_backend_graph_compute(backend, graph) != GGML_STATUS_SUCCESS) return 2;
+            if(audit) {
+                std::vector<float> after(input.size());
+                ggml_backend_tensor_get(x,after.data(),0,after.size()*sizeof(float));
+                const bool mutated=std::memcmp(input.data(),after.data(),input.size()*sizeof(float));
+                std::printf("{\"auditUnretainedInput\":true,\"threads\":%d,\"K\":%d,\"N\":%d,\"inputMutatedAfterFirstGraph\":%s,\"timingRan\":false}\n",
+                    threads,k,n,mutated ? "true":"false");
+                ggml_gallocr_free(alloc);ggml_free(ctx);
+                if(mutated) {ggml_backend_free(backend);return 0;}
+                continue;
+            }
             std::vector<float> a(n), b(n), c(n);
             ggml_backend_tensor_get(reference, a.data(), 0, a.size()*sizeof(float));
             ggml_backend_tensor_get(shared, b.data(), 0, b.size()*sizeof(float));
@@ -94,8 +109,27 @@ int main() {
                 std::sort(rtimes.begin(), rtimes.end()); std::sort(ctimes.begin(), ctimes.end());
                 rt = rtimes[2]; ct = ctimes[2];
             }
+            // Check the operands again after repeated graph execution, and
+            // recompute all variants with the same bytes. A single initial
+            // output comparison cannot validate a mutated timed input.
+            std::vector<float> input_after(input.size());
+            std::vector<block_q8_0> weight_after(raw.size());
+            ggml_backend_tensor_get(x,input_after.data(),0,input_after.size()*sizeof(float));
+            ggml_backend_tensor_get(w,weight_after.data(),0,weight_after.size()*sizeof(block_q8_0));
+            const bool operands_exact=!std::memcmp(input.data(),input_after.data(),input.size()*sizeof(float))
+                && !std::memcmp(raw.data(),weight_after.data(),raw.size()*sizeof(block_q8_0));
+            passed &= operands_exact;
+            if (ggml_backend_graph_compute(backend,graph)!=GGML_STATUS_SUCCESS) return 2;
+            ggml_backend_tensor_get(reference,a.data(),0,a.size()*sizeof(float));
+            ggml_backend_tensor_get(shared,b.data(),0,b.size()*sizeof(float));
+            ggml_backend_tensor_get(separate,c.data(),0,c.size()*sizeof(float));
+            for(int row=0;row<n;++row) {
+                passed &= std::isfinite(a[row]) && std::isfinite(b[row]) && std::isfinite(c[row]);
+                passed &= !std::memcmp(&a[row],&b[row],sizeof(float)) && !std::memcmp(&a[row],&c[row],sizeof(float));
+            }
             std::printf("{\"threads\":%d,\"K\":%d,\"N\":%d,\"M\":1,\"distribution\":\"%s\",\"activationQuantizationExact\":%s,\"floatBitDifferences\":%zu,\"packingUs\":%.3f,\"referenceGraphUs\":%.3f,\"candidateGraphUs\":%.3f,\"speedup\":%.4f}\n",
                 threads,k,n,distribution,conversion_exact ? "true" : "false",differences,packing_us,rt,ct,ct ? rt/ct : 0);
+            if(!operands_exact)std::fprintf(stderr,"Q8 graph operands mutated after warm timing\n");
             ggml_gallocr_free(alloc); ggml_free(ctx);
         }
         }
@@ -111,5 +145,5 @@ int main() {
         ggml_free(ctx);
     }
     ggml_backend_free(backend);
-    return passed ? 0 : 1;
+    return !audit && passed ? 0 : 1;
 }
