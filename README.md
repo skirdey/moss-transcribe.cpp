@@ -629,8 +629,9 @@ with batched append across96 cases, all hidden/full-logit/active-KV bits, immuta
 inputs/weights, and changed-token rollback with a poisoned discarded cache suffix.
 Default17 native CTests/40 Python checks pass; the strict batch probe rejects8
 cases despite matching greedy choices. T1/T2 controls are exact in this matrix.
-The complete numeric evidence is public. Timing is blocked, no production batch
-API is exposed, and the original full-input10× goal remains unachieved.
+The complete numeric evidence is public. Ordinary batch matmul remains rejected;
+the opt-in causal-context candidate below passes the complete gate. No production
+batch API is exposed, and the original full-input10× goal remains unachieved.
 
 
 ### Protected target-batch stage attribution
@@ -648,3 +649,19 @@ final-state-exact controls also show small intermediate drift. Failed observer
 builds and metadata repairs are retained with exact source and artifact hashes.
 This diagnostic adds no layer math, batch API, timing result or production
 promotion. The original full-input tenfold goal remains unachieved.
+
+### Exact causal context and paired append timing
+
+[Research bit262144](cpu-lab/causal-context.md) calls the pinned CPU F32 dot at
+each query's valid causal length, using existing GGML workers and guarded
+transposed-cache/GQA layouts. It is off by default; ordinary opt48, prefill and
+single-token decode keep their paths. Native21CTest/40Python checks pass;
+384 native single-query matmul oracle cases match every bit, with3840 rejected
+unsupported-layout controls. All96 full hidden/logit/KV/rewind cases now match
+the serial reference, including the eight ordinary-batch failures.
+
+Sixty alternating measured pairs plus twelve warmups preserve every state/logit
+bit and weight byte. Append plus all vocabulary logits is1.17–2.45× faster in
+eleven fixtures; T2 at prefix1024 is0.963×. Complete numeric reports retain every
+sample and provenance. These timings exclude drafting, rollback, load, prefix
+setup and audio processing; full-input performance and the10× goal remain open.
