@@ -795,3 +795,25 @@ evaluation are different from exact CPU arithmetic and the original single-input
 load-included denominator. See the protocol for the limited method inference and
 the complementary consumer-hardware verification-cost study. There is no new
 performance win or tenfold claim from this audit; production remains unchanged.
+
+
+## Protected target-batch attribution research (October 10, 2026 UTC)
+
+[The actual decoder stage trace](target-batch-trace.md) separates repeatability,
+observation correctness, and candidate parity. It retains the failed graph guard
+and tests semantic metadata changes before using intermediate values. Numeric
+native results and exact frozen source revisions belong to that report; no new
+full-input speed claim follows from locating a numerical failure.
+
+[Vosti, September 30, 2026](https://arxiv.org/abs/2609.38981), motivates separating
+logical-prefix KV ownership from kernel invariance. Its GPU verification does
+not prove these CPU fixtures or their performance. Our next kernel change must
+preserve both the accepted state and each corresponding logical output position.
+
+[Thinking Machines, September 10, 2025](https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/),
+shows why repeated fixed-shape determinism does not establish invariance across
+batch shapes. Stage comparisons test the first changed arithmetic boundary.
+
+[LLM-42, January 30, 2026 revision](https://arxiv.org/abs/2601.17768), offers
+fixed-shape verification/rollback as an alternative. Verification, discarded work
+and cache correction must all be included in any speculative latency trial.
