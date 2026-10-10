@@ -10,6 +10,7 @@ endmacro()
 
 mt_add_test(test_audio_io)
 mt_add_test(test_cpu_softmax)
+mt_add_test(test_cpu_context)
 mt_add_test(test_cpu_threads)
 mt_add_test(test_cpu_q8)
 target_include_directories(test_cpu_q8 PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
