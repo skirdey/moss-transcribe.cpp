@@ -82,13 +82,11 @@ cannot be excluded; unrelated jobs remain active. Source/evidence is MIT with
 dependency licenses retained; private audio, text, raw tokens, weights and
 credentials are absent.
 
-## Next complete-model gate
+## Complete-model follow-up
 
-Port the validated callback into a separate opt-in encoder helper with explicit
-per-encode ownership of every callback context. Keep ordinary GGML as fallback
-for incompatible backend, ISA, type, dimensions and layout. Scope the first
-route to large dense Q8 encoder linear operations; preserve biases, attention
-and reductions. Compare actual encoder output bits on real weights, then every
-complete output/token/EOS on matched full inputs before measuring full-input
-latency including model loading. Any route must identify itself in retained
-metadata. The quiet opt48 full-input10× goal remains active and unachieved.
+The [selective encoder report](encoder-vnni.md) adds per-encode callback context
+ownership and an opt-in actual model route. All14 real-weight encoder chunks
+match float bits, and48 fresh full-input runs pass complete-output/token/EOS,
+artifact, actual execution and all three latency gates. Speech gains are only
+1.022–1.032× over the same-build control. Production is unchanged; the quiet
+opt48 full-input10× goal remains active and unachieved.
