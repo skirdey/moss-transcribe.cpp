@@ -534,3 +534,15 @@ slower than pinned SIMD, so this version is rejected for model integration.
 Complete numeric evidence includes all controls and the lone tiny-shape 1.013x
 ratio. It adds no MOSS route; panel construction is timed, while quantization,
 loading and full generation are excluded. Production remains unchanged.
+
+### Dense multi-row AMX batches
+
+The [matrix batch report](cpu-lab/amx-batch.md) tests original Q8 weights against
+dense activation panels, with both pinned-dot and ordinary GGML graph controls.
+All 74 native arithmetic and 109 protected benchmark records match float bits
+and panel codes/scales; 15 CTests and 34 Python checks pass. The benchmark has
+28 normal timed controls and 81 arithmetic-only edge controls. All actual-width
+normal controls are slower; the 1500-row encoder-shaped matrix is about 4.47x
+slower than ordinary GGML at 16 workers. This version is rejected for model
+integration. Source, all numeric records, provenance and a reproducible audit
+of existing full-model phases are retained. The 10x goal remains unachieved.
