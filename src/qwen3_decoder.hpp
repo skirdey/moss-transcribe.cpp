@@ -54,6 +54,8 @@ public:
     int  past_len() const { return past_len_; }
 
 private:
+    // Standalone CPU research probe only; no production batch/rewind API.
+    friend class CpuTargetBatchAudit;
     bool run(const std::vector<float>& embeds, int T, std::vector<float>* out_hidden);
 
     Qwen3Hparams hp_{};

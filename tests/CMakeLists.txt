@@ -27,6 +27,12 @@ target_include_directories(test_cpu_encoder_qkv PRIVATE ${CMAKE_SOURCE_DIR}/thir
 add_executable(moss_encoder_vnni_gate ${CMAKE_SOURCE_DIR}/cpu-lab/moss_encoder_vnni_gate.cpp)
 target_include_directories(moss_encoder_vnni_gate PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(moss_encoder_vnni_gate PRIVATE moss-transcribe)
+
+# Model-backed state/bit audit, deliberately outside CTest. A mismatch returns
+# failure and forbids timing; synthetic fixtures do not establish audio parity.
+add_executable(moss_target_batch_gate ${CMAKE_SOURCE_DIR}/cpu-lab/moss_target_batch_gate.cpp)
+target_include_directories(moss_target_batch_gate PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(moss_target_batch_gate PRIVATE moss-transcribe)
 target_include_directories(test_cpu_projection PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 target_include_directories(test_cpu_activation PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 

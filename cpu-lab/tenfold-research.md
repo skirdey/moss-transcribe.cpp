@@ -775,3 +775,23 @@ length boundaries, prove rewind and changed-token recovery, then measure actual
 append+all-logits totals with matched workers and retained samples. The current
 T>1 masked path can alter reduction order versusT1; any bit drift prevents timing.
 Past-only ngram replay does not prove batched execution, latency or rollback.
+
+## Stateful batched target verification, 2026-10-09
+
+The [model-backed protocol and failed native matrix](target-batch.md) now implement
+the proposed stateful gate. Frozen source ade6b8b/tree7388780 uses the existing
+private T>1 run through a standalone friend accessor; no production decoder API
+or math changes. All96 cases and980,917,056 immutable model bytes are checked.
+Default17 CTests/40 Python checks pass;24 T1 and24 T2 cases are exact, but2 T4
+and6 T8 cases differ in hidden/logit/KV state, sometimes persisting after rewind
+and a changed token. All456 greedy/EOS decisions agree and outputs remain finite.
+The strict gate therefore exits1 and timing is blocked. This finite T2 observation
+cannot replace a separately declared candidate gate or actual audio/full-input
+validation. Preserve the failed attempt and isolate first differing operators.
+
+[SpecStream (27 September2026)](https://arxiv.org/abs/2609.33184) motivates separating
+committed history from rejected candidate state. Its GPU offloading and throughput
+evaluation are different from exact CPU arithmetic and the original single-input,
+load-included denominator. See the protocol for the limited method inference and
+the complementary consumer-hardware verification-cost study. There is no new
+performance win or tenfold claim from this audit; production remains unchanged.
