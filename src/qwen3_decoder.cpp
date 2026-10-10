@@ -89,7 +89,7 @@ void Qwen3Decoder::reset() {
 }
 
 bool Qwen3Decoder::run(const std::vector<float>& embeds, int T,
-                       std::vector<float>* out_hidden) {
+                       std::vector<float>* out_hidden, const AuditHook* audit) {
     CpuThreadScope threads(T > 1 ? CpuThreadPhase::Prefill : CpuThreadPhase::Decode);
     CpuPhaseScope phase(T > 1 ? CpuPhase::Prefill : CpuPhase::Decode);
     CpuTimer build_timer;
@@ -149,11 +149,13 @@ bool Qwen3Decoder::run(const std::vector<float>& embeds, int T,
     };
 
     cpu_profile_record(CpuStage::Build, build_timer.seconds());
+    if (audit) (*audit)(gf, true);
     if (!compute_graph_with_inputs(gf, set_inputs)) return false;
 
     past_len_ = kv;
     out_hidden->resize((size_t)H * T);
     ggml_backend_tensor_get(y, out_hidden->data(), 0, (size_t)H * T * sizeof(float));
+    if (audit) (*audit)(gf, false);
     return true;
 }
 

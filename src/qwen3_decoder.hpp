@@ -20,6 +20,7 @@
 #include "ggml-backend.h"    // ggml_backend_buffer_t
 
 #include <cstdint>
+#include <functional>
 #include <vector>
 
 namespace mt {
@@ -56,7 +57,11 @@ public:
 private:
     // Standalone CPU research probe only; no production batch/rewind API.
     friend class CpuTargetBatchAudit;
-    bool run(const std::vector<float>& embeds, int T, std::vector<float>* out_hidden);
+    // The friend may observe the built graph before allocation and after compute.
+    // Production callers supply no hook. Captures must own their copied values.
+    using AuditHook = std::function<void(ggml_cgraph*, bool before_compute)>;
+    bool run(const std::vector<float>& embeds, int T, std::vector<float>* out_hidden,
+             const AuditHook* audit = nullptr);
 
     Qwen3Hparams hp_{};
     std::vector<Qwen3Layer> layers_;

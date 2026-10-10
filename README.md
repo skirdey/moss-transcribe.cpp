@@ -631,3 +631,15 @@ Default17 native CTests/40 Python checks pass; the strict batch probe rejects8
 cases despite matching greedy choices. T1/T2 controls are exact in this matrix.
 The complete numeric evidence is public. Timing is blocked, no production batch
 API is exposed, and the original full-input10× goal remains unachieved.
+
+
+### Protected target-batch stage attribution
+
+The [decoder trace report](cpu-lab/target-batch-trace.md) preserves all 13,832
+native stage records across 26 diagnostic/control fixtures, with unchanged quiet
+hidden/KV results under capture and 18 CTests/40 Python checks passing. All eight
+known batch failures first differ at captured layer-0 attention context; five
+final-state-exact controls also show small intermediate drift. Failed observer
+builds and metadata repairs are retained with exact source and artifact hashes.
+This diagnostic adds no layer math, batch API, timing result or production
+promotion. The original full-input tenfold goal remains unachieved.
