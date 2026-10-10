@@ -51,6 +51,9 @@ struct Capture {
     int nodes = 0, tokens = 0, kv = 0, heads = 0;
     std::vector<std::array<std::vector<float>,StageCount>> layers;
     std::vector<uint8_t> graph_metadata;
+    std::vector<uint8_t> metadata_without_leaf_names;
+    std::vector<std::string> leaf_names;
+    std::vector<int> leaf_cache_roles;
     std::vector<ggml_custom2_op_t> callback_identities;
     std::vector<std::array<uint8_t,GGML_MAX_OP_PARAMS>> raw_custom_parameters;
 };
@@ -64,11 +67,19 @@ std::vector<float> row(const std::vector<float>& x, int i, int width) {
     require(i >= 0 && (size_t)(i+1)*width <= x.size(), "row bounds");
     return {x.begin()+(size_t)i*width,x.begin()+(size_t)(i+1)*width};
 }
-void identify_graph(ggml_cgraph* graph, Capture* identity) {
+void identify_graph(ggml_cgraph* graph, Capture* identity,
+                    const std::unordered_map<const ggml_tensor*,int>* cache_roles = nullptr) {
     identity->graph_metadata.clear(); identity->callback_identities.clear();
+    identity->metadata_without_leaf_names.clear(); identity->leaf_names.clear(); identity->leaf_cache_roles.clear();
     identity->raw_custom_parameters.clear();
     uint64_t hash = 14695981039346656037ull;
     auto bytes = [&](const void* ptr, size_t size) {
+        const auto* p = static_cast<const uint8_t*>(ptr);
+        for (size_t i = 0; i < size; ++i) { hash ^= p[i]; hash *= 1099511628211ull; }
+        identity->graph_metadata.insert(identity->graph_metadata.end(),p,p+size);
+        identity->metadata_without_leaf_names.insert(identity->metadata_without_leaf_names.end(),p,p+size);
+    };
+    auto label_bytes = [&](const void* ptr, size_t size) {
         const auto* p = static_cast<const uint8_t*>(ptr);
         for (size_t i = 0; i < size; ++i) { hash ^= p[i]; hash *= 1099511628211ull; }
         identity->graph_metadata.insert(identity->graph_metadata.end(),p,p+size);
@@ -102,7 +113,9 @@ void identify_graph(ggml_cgraph* graph, Capture* identity) {
             if (src && source == -1) {
                 bytes(src->ne,sizeof(src->ne)); bytes(&src->type,sizeof(src->type));
                 const char* name = ggml_get_name(src); const size_t size = std::strlen(name);
-                bytes(&size,sizeof(size)); bytes(name,size);
+                label_bytes(&size,sizeof(size)); label_bytes(name,size);
+                identity->leaf_names.emplace_back(name);
+                identity->leaf_cache_roles.push_back(cache_roles && cache_roles->count(src) ? cache_roles->at(src) : -1);
             }
         }
     }
@@ -111,6 +124,26 @@ void identify_graph(ggml_cgraph* graph, Capture* identity) {
 bool same_graph(const Capture& a, const Capture& b) {
     return a.nodes == b.nodes && a.graph_metadata == b.graph_metadata &&
            a.callback_identities == b.callback_identities;
+}
+void require_same_graph(const Capture& a, const Capture& b, const char* message) {
+    if (same_graph(a,b)) return;
+    size_t cache_labels = 0, other_labels = 0;
+    const bool roles_equal = a.leaf_cache_roles == b.leaf_cache_roles;
+    if (a.leaf_names.size() == b.leaf_names.size()) {
+        for (size_t i = 0; i < a.leaf_names.size(); ++i) {
+            if (a.leaf_names[i] == b.leaf_names[i]) continue;
+            if (roles_equal && a.leaf_cache_roles[i] >= 0) ++cache_labels;
+            else ++other_labels;
+        }
+    }
+    std::printf("{\"record\":\"graphMismatch\",\"nodesExact\":%s,\"metadataWithoutLeafNamesExact\":%s,"
+                "\"callbackIdentitiesExact\":%s,\"leafCountsExact\":%s,\"leafCacheRolesExact\":%s,"
+                "\"cacheLeafNameDifferences\":%zu,\"otherLeafNameDifferences\":%zu}\n",
+                a.nodes==b.nodes?"true":"false",a.metadata_without_leaf_names==b.metadata_without_leaf_names?"true":"false",
+                a.callback_identities==b.callback_identities?"true":"false",a.leaf_names.size()==b.leaf_names.size()?"true":"false",
+                roles_equal?"true":"false",cache_labels,other_labels);
+    std::fflush(stdout);
+    require(false,message);
 }
 size_t raw_custom_differences(const Capture& a, const Capture& b) {
     require(a.raw_custom_parameters.size() == b.raw_custom_parameters.size(),"same custom node count");
@@ -213,10 +246,14 @@ public:
                 tokens <= d.max_seq_-d.past_len_, "append dimensions");
         result->tokens = tokens; result->kv = d.past_len_+tokens; result->heads = d.hp_.n_heads;
         std::vector<std::array<ggml_tensor*,StageCount>> tensors;
+        std::unordered_map<const ggml_tensor*,int> cache_roles;
+        for (int l = 0; l < d.hp_.n_layers; ++l) {
+            cache_roles[d.k_cache_[l]] = 2*l; cache_roles[d.v_cache_[l]] = 2*l+1;
+        }
         Qwen3Decoder::AuditHook hook = [&](ggml_cgraph* graph, bool before) {
             if (before) {
                 result->nodes = ggml_graph_n_nodes(graph);
-                identify_graph(graph,result);
+                identify_graph(graph,result,&cache_roles);
                 if (!capture) return;
                 tensors = discover(d,graph);
                 for (const auto& layer : tensors)
@@ -367,12 +404,12 @@ int main(int argc, char** argv) {
             require(mt::CpuTargetBatchAudit::append(batch,append_x,c.count,false,&quiet_group,&quiet_batch), "quiet batch append");
             for (int i = 0; i < c.count; ++i) {
                 std::vector<float> h; require(mt::CpuTargetBatchAudit::append(traced_serial,row(append_x,i,hidden),1,true,&captured_steps[i],&h), "captured serial append");
-                require(same_graph(quiet_steps[i],captured_steps[i]),"same serial semantic graph/callback identities");
+                require_same_graph(quiet_steps[i],captured_steps[i],"same serial semantic graph/callback identities");
                 ignored_metadata_bytes += raw_custom_differences(quiet_steps[i],captured_steps[i]);
                 captured_serial.insert(captured_serial.end(),h.begin(),h.end());
             }
             require(mt::CpuTargetBatchAudit::append(traced_batch,append_x,c.count,true,&captured_group,&captured_batch), "captured batch append");
-            require(same_graph(quiet_group,captured_group),"same batch semantic graph/callback identities");
+            require_same_graph(quiet_group,captured_group,"same batch semantic graph/callback identities");
             ignored_metadata_bytes += raw_custom_differences(quiet_group,captured_group);
             Delta quiet_delta,serial_capture,batch_capture;
             quiet_delta.add(quiet_serial,quiet_batch); serial_capture.add(quiet_serial,captured_serial); batch_capture.add(quiet_batch,captured_batch);
