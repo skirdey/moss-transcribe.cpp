@@ -2,10 +2,12 @@
 #include "backend.hpp"
 #include "generate.hpp"
 #include "qwen3_decoder.hpp"
+#include "ggml-impl.h" // Pinned custom-op field layout; exclude padding/pointers from hashing.
 
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -48,6 +50,9 @@ struct Capture {
     uint64_t graph_fingerprint = 0;
     int nodes = 0, tokens = 0, kv = 0, heads = 0;
     std::vector<std::array<std::vector<float>,StageCount>> layers;
+    std::vector<uint8_t> graph_metadata;
+    std::vector<ggml_custom2_op_t> callback_identities;
+    std::vector<std::array<uint8_t,GGML_MAX_OP_PARAMS>> raw_custom_parameters;
 };
 size_t differences(const Bits& a, const Bits& b) {
     require(a.size() == b.size(), "cache shape");
@@ -59,11 +64,14 @@ std::vector<float> row(const std::vector<float>& x, int i, int width) {
     require(i >= 0 && (size_t)(i+1)*width <= x.size(), "row bounds");
     return {x.begin()+(size_t)i*width,x.begin()+(size_t)(i+1)*width};
 }
-uint64_t fingerprint(ggml_cgraph* graph) {
+void identify_graph(ggml_cgraph* graph, Capture* identity) {
+    identity->graph_metadata.clear(); identity->callback_identities.clear();
+    identity->raw_custom_parameters.clear();
     uint64_t hash = 14695981039346656037ull;
     auto bytes = [&](const void* ptr, size_t size) {
         const auto* p = static_cast<const uint8_t*>(ptr);
         for (size_t i = 0; i < size; ++i) { hash ^= p[i]; hash *= 1099511628211ull; }
+        identity->graph_metadata.insert(identity->graph_metadata.end(),p,p+size);
     };
     std::unordered_map<const ggml_tensor*,int> index;
     const int count = ggml_graph_n_nodes(graph);
@@ -72,17 +80,89 @@ uint64_t fingerprint(ggml_cgraph* graph) {
         const auto* t = ggml_graph_node(graph,i);
         bytes(&t->op,sizeof(t->op)); bytes(&t->type,sizeof(t->type));
         bytes(t->ne,sizeof(t->ne)); bytes(t->nb,sizeof(t->nb));
-        bytes(t->op_params,sizeof(t->op_params));
+        if (t->op == GGML_OP_MAP_CUSTOM2) {
+            ggml_map_custom2_op_params params;
+            std::memcpy(&params,t->op_params,sizeof(params));
+            require(params.fun && !params.userdata,"supported null-userdata custom callback");
+            identity->callback_identities.push_back(params.fun);
+            // The ggml constructor copies a C struct containing padding. Hash
+            // only semantic fields, and compare function identities separately.
+            bytes(&params.n_tasks,sizeof(params.n_tasks));
+            std::array<uint8_t,GGML_MAX_OP_PARAMS> raw{};
+            std::memcpy(raw.data(),t->op_params,raw.size());
+            identity->raw_custom_parameters.push_back(raw);
+        } else {
+            require(t->op != GGML_OP_MAP_CUSTOM1 && t->op != GGML_OP_MAP_CUSTOM3 &&
+                    t->op != GGML_OP_CUSTOM,"unsupported custom metadata");
+            bytes(t->op_params,sizeof(t->op_params));
+        }
         for (const auto* src : t->src) {
             const int source = !src ? -2 : index.count(src) ? index.at(src) : -1;
             bytes(&source,sizeof(source));
             if (src && source == -1) {
                 bytes(src->ne,sizeof(src->ne)); bytes(&src->type,sizeof(src->type));
-                const char* name = ggml_get_name(src); bytes(name,std::strlen(name));
+                const char* name = ggml_get_name(src); const size_t size = std::strlen(name);
+                bytes(&size,sizeof(size)); bytes(name,size);
             }
         }
     }
-    return hash;
+    identity->graph_fingerprint = hash;
+}
+bool same_graph(const Capture& a, const Capture& b) {
+    return a.nodes == b.nodes && a.graph_metadata == b.graph_metadata &&
+           a.callback_identities == b.callback_identities;
+}
+size_t raw_custom_differences(const Capture& a, const Capture& b) {
+    require(a.raw_custom_parameters.size() == b.raw_custom_parameters.size(),"same custom node count");
+    size_t count = 0;
+    for (size_t i = 0; i < a.raw_custom_parameters.size(); ++i)
+        for (size_t j = 0; j < GGML_MAX_OP_PARAMS; ++j)
+            count += a.raw_custom_parameters[i][j] != b.raw_custom_parameters[i][j];
+    return count;
+}
+void metadata_noop(ggml_tensor*,const ggml_tensor*,const ggml_tensor*,int,int,void*) {}
+void metadata_other_noop(ggml_tensor*,const ggml_tensor*,const ggml_tensor*,int,int,void*) {}
+int audit_metadata() {
+    auto ctx = mt::make_ctx(ggml_tensor_overhead()*32+ggml_graph_overhead_custom(32,false)*8+4096,true);
+    require(bool(ctx),"metadata context");
+    auto* a = ggml_new_tensor_2d(ctx.get(),GGML_TYPE_F32,16,1);
+    auto* b = ggml_new_tensor_2d(ctx.get(),GGML_TYPE_F32,128,1);
+    ggml_set_name(a,"metadata-scores"); ggml_set_name(b,"metadata-query");
+    auto* x = ggml_map_custom2(ctx.get(),a,b,metadata_noop,16,nullptr);
+    auto* y = ggml_map_custom2(ctx.get(),a,b,metadata_noop,16,nullptr);
+    auto graph = [&](ggml_tensor* t) {
+        auto* g = ggml_new_graph_custom(ctx.get(),32,false); ggml_build_forward_expand(g,t); return g;
+    };
+    auto* gx = graph(x); auto* gy = graph(y);
+    auto identity = [&](ggml_cgraph* g) { Capture r; r.nodes = ggml_graph_n_nodes(g); identify_graph(g,&r); return r; };
+    const auto baseline = identity(gx);
+    ggml_map_custom2_op_params params; std::memcpy(&params,y->op_params,sizeof(params));
+    std::memset(y->op_params,0xa5,sizeof(y->op_params));
+    std::memcpy(reinterpret_cast<uint8_t*>(y->op_params)+offsetof(ggml_map_custom2_op_params,fun),&params.fun,sizeof(params.fun));
+    std::memcpy(reinterpret_cast<uint8_t*>(y->op_params)+offsetof(ggml_map_custom2_op_params,n_tasks),&params.n_tasks,sizeof(params.n_tasks));
+    std::memcpy(reinterpret_cast<uint8_t*>(y->op_params)+offsetof(ggml_map_custom2_op_params,userdata),&params.userdata,sizeof(params.userdata));
+    const auto padded = identity(gy);
+    require(same_graph(baseline,padded) && raw_custom_differences(baseline,padded)>0,"padding cannot change semantics");
+    std::printf("{\"record\":\"metadataControl\",\"paddingIgnored\":true,\"ignoredRawBytes\":%zu}\n",raw_custom_differences(baseline,padded));
+    params.n_tasks = 7; std::memcpy(y->op_params,&params,sizeof(params));
+    require(!same_graph(baseline,identity(gy)),"task-count difference rejected");
+    params.n_tasks = 16; params.fun = metadata_other_noop; std::memcpy(y->op_params,&params,sizeof(params));
+    require(!same_graph(baseline,identity(gy)),"callback-identity difference rejected");
+    params.fun = metadata_noop; params.userdata = y; std::memcpy(y->op_params,&params,sizeof(params));
+    bool rejected = false; try { (void)identity(gy); } catch (const std::runtime_error&) { rejected = true; }
+    require(rejected,"non-null userdata rejected");
+    params.userdata = nullptr; std::memcpy(y->op_params,&params,sizeof(params));
+    const auto stride = y->nb[1]; y->nb[1] += sizeof(float);
+    require(!same_graph(baseline,identity(gy)),"stride difference rejected"); y->nb[1] = stride;
+    ++y->ne[1]; require(!same_graph(baseline,identity(gy)),"shape difference rejected"); --y->ne[1];
+    auto* w = ggml_new_tensor_2d(ctx.get(),GGML_TYPE_F32,128,16);
+    ggml_set_name(w,"metadata-weight");
+    auto* m1 = ggml_mul_mat(ctx.get(),w,b); auto* m2 = ggml_mul_mat(ctx.get(),w,b);
+    ggml_mul_mat_set_prec(m2,GGML_PREC_F32);
+    require(!same_graph(identity(graph(m1)),identity(graph(m2))),"precision difference rejected");
+    std::printf("{\"record\":\"metadataControl\",\"taskCountRejected\":true,\"callbackIdentityRejected\":true,"
+                "\"userdataRejected\":true,\"strideRejected\":true,\"shapeRejected\":true,\"precisionRejected\":true}\n");
+    return 0;
 }
 const ggml_tensor* storage(const ggml_tensor* t) {
     while (t && t->view_src) t = t->view_src;
@@ -136,7 +216,7 @@ public:
         Qwen3Decoder::AuditHook hook = [&](ggml_cgraph* graph, bool before) {
             if (before) {
                 result->nodes = ggml_graph_n_nodes(graph);
-                result->graph_fingerprint = fingerprint(graph);
+                identify_graph(graph,result);
                 if (!capture) return;
                 tensors = discover(d,graph);
                 for (const auto& layer : tensors)
@@ -229,6 +309,7 @@ std::vector<float> stage_row(const Capture& c, int layer, Stage stage, int query
 
 int main(int argc, char** argv) {
     try {
+        if (argc == 2 && !std::strcmp(argv[1],"--audit-metadata")) return audit_metadata();
         require(argc == 2, "usage: moss_target_batch_trace MODEL");
         env("MTD_DEVICE","cpu"); env("MTD_CPU_OPT","48"); env("MTD_THREADS","16");
         env("OMP_NUM_THREADS","16"); env("OMP_DYNAMIC","FALSE");
@@ -277,6 +358,7 @@ int main(int argc, char** argv) {
             for (auto* d : {&batch,&traced_serial,&traced_batch}) require(initial == mt::CpuTargetBatchAudit::cache(*d,c.prefix), "copied prefix state");
             std::vector<float> quiet_serial,quiet_batch,captured_serial,captured_batch;
             std::vector<Capture> quiet_steps(c.count), captured_steps(c.count);
+            size_t ignored_metadata_bytes = 0;
             for (int i = 0; i < c.count; ++i) {
                 std::vector<float> h; require(mt::CpuTargetBatchAudit::append(serial,row(append_x,i,hidden),1,false,&quiet_steps[i],&h), "quiet serial append");
                 quiet_serial.insert(quiet_serial.end(),h.begin(),h.end());
@@ -285,13 +367,13 @@ int main(int argc, char** argv) {
             require(mt::CpuTargetBatchAudit::append(batch,append_x,c.count,false,&quiet_group,&quiet_batch), "quiet batch append");
             for (int i = 0; i < c.count; ++i) {
                 std::vector<float> h; require(mt::CpuTargetBatchAudit::append(traced_serial,row(append_x,i,hidden),1,true,&captured_steps[i],&h), "captured serial append");
-                require(quiet_steps[i].nodes == captured_steps[i].nodes &&
-                        quiet_steps[i].graph_fingerprint == captured_steps[i].graph_fingerprint, "same serial graph topology/parameters");
+                require(same_graph(quiet_steps[i],captured_steps[i]),"same serial semantic graph/callback identities");
+                ignored_metadata_bytes += raw_custom_differences(quiet_steps[i],captured_steps[i]);
                 captured_serial.insert(captured_serial.end(),h.begin(),h.end());
             }
             require(mt::CpuTargetBatchAudit::append(traced_batch,append_x,c.count,true,&captured_group,&captured_batch), "captured batch append");
-            require(quiet_group.nodes == captured_group.nodes && quiet_group.graph_fingerprint == captured_group.graph_fingerprint,
-                    "same batch graph topology/parameters");
+            require(same_graph(quiet_group,captured_group),"same batch semantic graph/callback identities");
+            ignored_metadata_bytes += raw_custom_differences(quiet_group,captured_group);
             Delta quiet_delta,serial_capture,batch_capture;
             quiet_delta.add(quiet_serial,quiet_batch); serial_capture.add(quiet_serial,captured_serial); batch_capture.add(quiet_batch,captured_batch);
             const auto serial_cache = mt::CpuTargetBatchAudit::cache(serial,c.prefix+c.count);
@@ -337,10 +419,11 @@ int main(int argc, char** argv) {
                 "\"quietHiddenBitDifferences\":%zu,\"quietKvBitDifferences\":%zu,\"serialCaptureHiddenBitDifferences\":%zu,\"batchCaptureHiddenBitDifferences\":%zu,"
                 "\"serialCaptureKvBitDifferences\":%zu,\"batchCaptureKvBitDifferences\":%zu,\"capturePreservesQuietResults\":%s,"
                 "\"batchGraphFingerprint\":\"%016llx\",\"batchGraphNodes\":%d,\"futureProbabilityNonzeroElements\":%zu,"
+                "\"ignoredCustomMetadataByteDifferences\":%zu,\"semanticGraphMetadataExact\":true,\"callbackIdentitiesExact\":true,"
                 "\"prefixAndInputsUnchanged\":true,\"positionStateExact\":true,\"timingPerformed\":false}\n",
                 c.mode,c.prefix,c.count,first_layer,first_stage,quiet_delta.bits,quiet_kv,serial_capture.bits,batch_capture.bits,
                 serial_capture_kv,batch_capture_kv,unchanged_capture?"true":"false",
-                (unsigned long long)quiet_group.graph_fingerprint,quiet_group.nodes,case_future_nonzero);
+                (unsigned long long)quiet_group.graph_fingerprint,quiet_group.nodes,case_future_nonzero,ignored_metadata_bytes);
             std::fflush(stdout);
         }
         size_t changed_weights = 0;
