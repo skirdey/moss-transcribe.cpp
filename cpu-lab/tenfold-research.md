@@ -607,3 +607,31 @@ per-input predictions while holding quantized artifacts/scales fixed. Its
 vision-model cross-kernel observations reinforce individual-output validation;
 they do not prove exact GGML arithmetic, lossless Q8 compression or tenfold MOSS
 latency. The next kernel must keep exact controls irrespective of average quality.
+
+## Exact inline half conversion, 2026-10-09
+
+The [inline F16C probe](vnni-inline.md) preserves the serial and original
+parallel VNNI controls. Initial V1 native compilation/15 CTests/34 Python checks
+pass, then exhaustive half auditing rejects four signed-zero differences under
+downward rounding before matrix timing. Its exact public source/failure is
+retained. V2 adds that precise half+0 compatibility case and reads MXCSR once per
+tile. Every65536 halfpayload under16rounding/FTZ/DAZmodes matches (2097152
+comparisons across both invocations), and originalMXCSRrestores. All78arithmetic
+and111protected shape records are exact;15 CTests22.34s and34Python pass.
+
+Twenty-three of30paired totals improve versus originalparallel;21 versusordinary
+GGML. Encoder K/N1024/1024 M1500 observes1.0636× and1024/4096 observes1.2187×
+overGGML, while4096/1024 remains19.6%slower. Inputquantization/model/audiofull
+generation excluded. Exactbinaryinlineblockloop retainsaccumulatorsinregisters
+with0convertercalls/0vectorstackaccesses; outside-loopstackstores andstackguard
+remain. No causal latency attribution orfull-inputgainclaim. No model route.
+Next test input-tile-first traversal within eachworker'ssameweightpartition,
+retainingoldpairedschedule; then requireF32graph/layer/fulltoken/EOS/latencygates.
+Allcases/source/artifact/loghashes retained. Production unchanged andautomatic1.
+
+[Intel compiler guidance](https://www.intel.com/content/www/us/en/developer/articles/technical/whats-new-in-llvm-for-4th-gen-intel-xeon-processor.html)
+illustrates F16C conversion lowering; it does not prove our converter parity.
+[Ada-MK, May12 2026](https://arxiv.org/html/2605.11581) uses static offline
+dependency/resource scheduling with phase-specific inference. Its GPTQ-W4A16
+Qwen/L20GPU throughput tests are not exact Q8 CPU or tenfold latency evidence.
+Transfer static scheduling and measured phase controls, preserving our arithmetic.
