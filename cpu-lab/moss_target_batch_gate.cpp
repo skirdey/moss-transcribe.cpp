@@ -1,6 +1,7 @@
 // MIT. Model-backed target-batch arithmetic/state audit. Numeric output only.
 // This executable owns all decoder states and serializes every backend call.
 #include "backend.hpp"
+#include "cpu_context.hpp"
 #include "generate.hpp"
 #include "qwen3_decoder.hpp"
 
@@ -144,7 +145,11 @@ private:
 
 int main(int argc, char** argv) {
     try {
-        require(argc == 2, "usage: moss_target_batch_gate MODEL");
+        require(argc == 2 || (argc == 3 && !std::strcmp(argv[2],"--causal-context")),
+                "usage: moss_target_batch_gate MODEL [--causal-context]");
+        const bool causal_context = argc == 3;
+        if (causal_context) std::printf("{\"record\":\"configuration\",\"referenceCpuOpt\":48,"
+            "\"candidateCpuOpt\":262192,\"candidateScope\":\"batchAppendOnly\"}\n");
         env("MTD_DEVICE", "cpu"); env("MTD_CPU_OPT", "48"); env("MTD_THREADS", "16");
         env("OMP_NUM_THREADS", "16"); env("OMP_DYNAMIC", "FALSE");
         for (const char* name : {"MTD_THREADS_WHISPER", "MTD_THREADS_ADAPTOR",
@@ -208,8 +213,19 @@ int main(int argc, char** argv) {
                         require(h.size() == (size_t)hidden, "sequential decode shape");
                         serial_hidden.insert(serial_hidden.end(), h.begin(), h.end());
                     }
+                    const auto before_context = mt::cpu_causal_context_counts();
+                    if (causal_context) env("MTD_CPU_OPT","262192");
                     require(mt::CpuTargetBatchAudit::append(batch, append_x, count, &batch_hidden),
                             "batch append");
+                    if (causal_context) env("MTD_CPU_OPT","48");
+                    const auto after_context = mt::cpu_causal_context_counts();
+                    const uint64_t context_ops = causal_context && count>1 ? cfg.text_layers : 0;
+                    require(after_context.built-before_context.built == context_ops &&
+                            after_context.executed-before_context.executed == context_ops,
+                            "actual candidate context dispatch count");
+                    if (causal_context) std::printf("{\"record\":\"dispatchAudit\",\"mode\":%d,\"prefix\":%d,"
+                        "\"appendTokens\":%d,\"contextOpsBuilt\":%llu,\"contextOpsExecuted\":%llu}\n",
+                        mode,prefix,count,(unsigned long long)context_ops,(unsigned long long)context_ops);
                     require(serial.past_len() == prefix+count && batch.past_len() == prefix+count,
                             "append position state");
                     FloatDiff hdiff, ldiff;
