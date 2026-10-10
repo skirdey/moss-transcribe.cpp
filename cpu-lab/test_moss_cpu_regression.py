@@ -1,6 +1,8 @@
 """Meaningful failure-mode tests for the optimization acceptance gate."""
 import unittest
-from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference
+import tempfile
+from pathlib import Path
+from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference, token_fingerprint, evaluate_token_traces, evaluate_shared_activation
 
 
 class RegressionGateTest(unittest.TestCase):
@@ -107,6 +109,53 @@ class RegressionGateTest(unittest.TestCase):
         self.assertEqual([c["variant"] for c in same["comparisons"]],["4144"])
         rows[-1]=self.row("4144",wallSeconds=9.8)
         self.assertTrue(evaluate_candidate_reference(rows,"48")["passed"])
+
+    def test_private_trace_hash_requires_unique_eos_and_complete_chunks(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/"private.log"
+            prefix="BENCH_GENERATION tokens=3 stop=eos\nBENCH_TOKEN_TRACE eos=99 total=3 offset=0 ids="
+            path.write_text(prefix+"[1,2,99]\n")
+            first=token_fingerprint(path)
+            self.assertEqual(first["count"],3)
+            self.assertNotIn("tokens",first)
+            path.write_text(prefix+"[1,3,99]\n")
+            self.assertNotEqual(first["sha256"],token_fingerprint(path)["sha256"])
+            for broken in ("[99,2,99]", "[1,2,98]", "[1,2]", "[1,2,"):
+                path.write_text(prefix+broken+"\n")
+                with self.assertRaises(ValueError): token_fingerprint(path)
+
+    def test_same_text_and_count_cannot_hide_changed_token_ids(self):
+        trace={"sha256":"canonical-token-sequence","count":100}
+        rows=[self.row("48",tokenTrace=trace),self.row("8240",tokenTrace=trace)]
+        self.assertTrue(evaluate_token_traces(rows,"48")["passed"])
+        rows[-1]=self.row("8240",tokenTrace={**trace,"sha256":"different-ids"})
+        self.assertTrue(evaluate_candidate_reference(rows,"48")["passed"])
+        self.assertFalse(evaluate_token_traces(rows,"48")["passed"])
+
+    def test_missing_trace_tail_and_unstable_token_control_are_rejected(self):
+        trace={"sha256":"fixed","count":100}
+        for bad in (None,{"error":"truncated"},{**trace,"count":99}):
+            rows=[self.row("48",tokenTrace=trace),self.row("8240",tokenTrace=bad)]
+            self.assertFalse(evaluate_token_traces(rows,"48")["passed"])
+        rows=[self.row("48",tokenTrace=trace),self.row("48",tokenTrace={**trace,"sha256":"other"}),self.row("8240",tokenTrace=trace)]
+        self.assertFalse(evaluate_token_traces(rows,"48")["passed"])
+        self.assertFalse(evaluate_token_traces([],"48")["passed"])
+
+    def test_trace_scope_keeps_older_binary_support_and_clears_inherited_trace(self):
+        trace={"sha256":"fixed","count":100}
+        rows=[self.row(),self.row("cache-reference"),self.row("48",tokenTrace=trace),self.row("8240",tokenTrace=trace)]
+        self.assertTrue(evaluate_token_traces(rows,"48")["passed"])
+        self.assertEqual(run_environment({"MTD_TRACE_TOKENS":"1"},{},"48",16,"")["MTD_TRACE_TOKENS"],"0")
+        self.assertEqual(run_environment({}, {}, "48",16,"",trace_tokens=True)["MTD_TRACE_TOKENS"],"1")
+
+    def test_requested_shared_activation_cannot_silently_use_reference(self):
+        settings={"48":{"opt":48},"8240":{"opt":8240},"16432":{"opt":16432},"24624":{"opt":24624}}
+        profile={"decode":{"sharedQ8Nodes":2},"whisper":{"sharedQ8CastNodes":3}}
+        for variant in settings:
+            row=self.row(variant,repeat=0,phaseProfile=profile)
+            self.assertTrue(evaluate_shared_activation([row],settings)["passed"])
+            if variant!="48":
+                self.assertFalse(evaluate_shared_activation([{**row,"phaseProfile":None}],settings)["passed"])
 
 
 if __name__ == "__main__":
