@@ -81,7 +81,8 @@ bool compute_graph(ggml_cgraph* graph);
 // keeps a distinct buffer for them (rather than recycling their memory as a
 // reusable intermediate). Returns true on success.
 bool compute_graph_with_inputs(ggml_cgraph* graph,
-                               const std::function<void()>& set_inputs);
+                               const std::function<void()>& set_inputs,
+                               bool fresh_allocation_plan = false);
 
 // Allocate all tensors in `ctx` on a buffer compatible with the active
 // backend. Use after building a no_alloc ggml_context: allocate, then

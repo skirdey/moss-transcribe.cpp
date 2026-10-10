@@ -214,11 +214,15 @@ bool compute_graph(ggml_cgraph* graph) {
 }
 
 bool compute_graph_with_inputs(ggml_cgraph* graph,
-                               const std::function<void()>& set_inputs) {
+                               const std::function<void()>& set_inputs,
+                               bool fresh_allocation_plan) {
     ggml_backend_t b = backend();
     if (!b || !graph || !g_gallocr) return false;
     // Allocate first: input + intermediate tensors get their backend buffers.
     CpuTimer allocation_timer;
+    // Pinned GGML's cached allocation plan checks sizes, not changed output
+    // flags. Audit observers retaining intermediates need a fresh reservation.
+    if (fresh_allocation_plan && !ggml_gallocr_reserve(g_gallocr, graph)) return false;
     const bool allocated = ggml_gallocr_alloc_graph(g_gallocr, graph);
     cpu_profile_record(CpuStage::Allocate, allocation_timer.seconds());
     if (!allocated) {
