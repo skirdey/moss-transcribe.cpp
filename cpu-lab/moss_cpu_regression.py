@@ -158,6 +158,23 @@ def evaluate_shared_activation(runs, settings):
     return {"passed":not failures,"failures":failures}
 
 
+def evaluate_fused_projections(runs, settings):
+    failures=[];exercised=0;no_decode=0
+    for r in runs:
+        if not settings.get(r["variant"],{}).get("opt",0) & 32768: continue
+        decode=(r.get("phaseProfile") or {}).get("decode")
+        if decode is None:
+            failures.append(f'{r["case"]}/{r["variant"]}/{r["repeat"]}: missing fused-path profiling')
+        elif decode.get("graphs",0)>0:
+            if decode.get("fusedQ8Nodes",0)>0 and decode.get("fusedQ8Consumers",0)>0:exercised+=1
+            else:failures.append(f'{r["case"]}/{r["variant"]}/{r["repeat"]}: decode ran without requested fusion')
+        elif r.get("tokens")!=1:
+            failures.append(f'{r["case"]}/{r["variant"]}/{r["repeat"]}: missing decode graphs for multi-token generation')
+        else:no_decode+=1
+    return {"passed":not failures,"failures":failures,"exercisedRuns":exercised,
+            "singleEosRunsWithoutDecode":no_decode}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", type=Path, required=True)
@@ -325,6 +342,7 @@ def main():
     report["artifactGate"] = {"passed":not changed,"changed":changed}
     report["storageGate"] = evaluate_storage(report["runs"],report["variantSettings"])
     report["sharedActivationGate"] = evaluate_shared_activation(report["runs"],report["variantSettings"])
+    report["fusedProjectionGate"] = evaluate_fused_projections(report["runs"],report["variantSettings"])
     report["gate"] = evaluate(report["runs"])
     if "cache-reference" in args.variants:
         compared = [r for r in report["runs"] if r["variant"] != "baseline"]
@@ -339,7 +357,7 @@ def main():
     if args.candidate_reference:
         print(json.dumps({"candidateReferenceGate":report["candidateReferenceGate"]},indent=2))
     return 0 if all(report.get(g,{"passed":True})["passed"] for g in
-        ("artifactGate","storageGate","sharedActivationGate","gate","cacheReferenceGate","candidateReferenceGate","tokenTraceGate")) else 1
+        ("artifactGate","storageGate","sharedActivationGate","fusedProjectionGate","gate","cacheReferenceGate","candidateReferenceGate","tokenTraceGate")) else 1
 
 
 if __name__ == "__main__":
