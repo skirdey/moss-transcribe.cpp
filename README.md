@@ -522,3 +522,15 @@ medians improve only 0.2–2.7% against same-build opt48 under changing host loa
 this two-repeat pilot establishes neither quiet-host confidence nor a tenfold
 gain. Protected 16-thread graph probes observe 1.21x Q/K/V and 1.18x gate/up,
 including input conversion. Production remains its validated binary.
+
+### Sparse AMX exact arithmetic probe
+
+The [AMX probe report](cpu-lab/amx-lanes.md) preserves a standalone native INT8
+experiment that loads original Q8 weight rows and retains the pinned SIMD dot's
+eight accumulation groups. All 96 arithmetic and 144 protected timing cases
+match float bits, including signed-code and half-scale extremes. Fifteen native
+CTests and 34 Python checks pass. Representative 16-worker widths are 2.4–3.0x
+slower than pinned SIMD, so this version is rejected for model integration.
+Complete numeric evidence includes all controls and the lone tiny-shape 1.013x
+ratio. It adds no MOSS route; panel construction is timed, while quantization,
+loading and full generation are excluded. Production remains unchanged.

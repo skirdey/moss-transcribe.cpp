@@ -45,6 +45,19 @@ endif()
 add_test(NAME moss_exact_q8_bench COMMAND moss_exact_q8_bench)
 set_tests_properties(moss_exact_q8_bench PROPERTIES SKIP_RETURN_CODE 77)
 
+# Sparse AMX integer lanes preserve the pinned Q8 reduction tree. Deliberately
+# outside CTest until the arithmetic probe has run on supported hardware.
+add_executable(moss_amx_q8_lanes ../cpu-lab/moss_amx_q8_lanes.cpp)
+target_include_directories(moss_amx_q8_lanes PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
+target_link_libraries(moss_amx_q8_lanes PRIVATE moss-transcribe)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(moss_amx_q8_lanes PRIVATE -march=native -ffp-contract=off)
+  find_package(OpenMP)
+  if(OpenMP_CXX_FOUND)
+    target_link_libraries(moss_amx_q8_lanes PRIVATE OpenMP::OpenMP_CXX)
+  endif()
+endif()
+
 mt_add_test(test_mel_cpu)
 
 mt_add_test(test_mel)

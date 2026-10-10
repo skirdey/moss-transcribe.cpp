@@ -499,3 +499,27 @@ Next arithmetic probe: sparse AMX columns preserve eight separate four-code
 integer sums, original float FMA chains and the final horizontal-add tree.
 Require supported-hardware exact arithmetic and protected timing before any
 actual-model integration. Full-model gates remain mandatory for a new route.
+
+## Sparse AMX exact-order arithmetic, 2026-10-09
+
+The [AMX probe report](amx-lanes.md) tests separate four-code integer sums,
+original half-scale products and pinned FMA/horizontal-add order without a
+packed checkpoint copy. The native GCC body runs on hp-fury. All 96 arithmetic
+and 144 protected timing records preserve float bits and raw Q8 operands,
+including literal -128 PSIGNB correction and finite half-scale extremes. Fifteen
+native CTests and 34 Python checks pass; unsupported machines return 77 without
+portable fallback timing. It is an owned-vector probe, not a model route.
+
+Thirty-five of 36 normal shape/worker timing controls are slower. Representative
+16-worker widths are 2.4–3.0x slower than pinned SIMD; the sole higher ratio is
+K96/N17 at 16 workers, 5.008 to 4.945 microseconds (1.0129x). All measurements,
+including this tiny case, source/test/binary/library/log hashes and limits are
+retained. Panels/configuration are included; input quantization, loading and
+full generation are excluded. Shared OpenMP timings are unpinned. Reject this
+version for model integration; arithmetic exactness does not establish speed.
+
+Production/automatic processing were restored and API identity/health verified.
+The original quiet opt48 reference and tenfold objective remain unchanged,
+active and unachieved. Next isolate layout/scale/gather overhead before proposing
+a concrete new arithmetic version. Any actual-model integration requires all
+protected layer/cache, complete output/token/EOS and matched latency gates.
