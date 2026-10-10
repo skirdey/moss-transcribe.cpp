@@ -1,0 +1,69 @@
+diff --git a/tests/test_cpu_activation.cpp b/tests/test_cpu_activation.cpp
+index 3674938..4b305a4 100644
+--- a/tests/test_cpu_activation.cpp
++++ b/tests/test_cpu_activation.cpp
+@@ -36,6 +36,10 @@ bool trial(ggml_backend_t backend, int threads, Shape s, const char* distributio
+     const int blocks=s.k/32, stride=s.k+(s.strided ? 32 : 0);
+     auto source=ggml_new_tensor_2d(r.ctx,GGML_TYPE_F32,stride,s.m);
+     ggml_set_input(source);
++    // INPUT controls initial allocation, not retention after its last use.
++    // Keep reusable synthetic inputs alive across all variant graph executions,
++    // as externally allocated model weights/input buffers would be.
++    ggml_set_output(source);
+     auto x=s.strided ? ggml_view_2d(r.ctx,source,s.k,s.m,stride*sizeof(float),0) : source;
+     auto cast=ggml_cast(r.ctx,x,GGML_TYPE_Q8_0);
+     auto shared=mt::cpu_shared_q8_activation(r.ctx,x); require(shared,"shared conversion");
+@@ -57,6 +61,7 @@ bool trial(ggml_backend_t backend, int threads, Shape s, const char* distributio
+     for(int p=0;p<s.projections;++p) {
+         const int out_n=p && s.secondary_n ? s.secondary_n : s.n;
+         auto w=ggml_new_tensor_2d(r.ctx,GGML_TYPE_Q8_0,s.k,out_n);ggml_set_input(w);
++        ggml_set_output(w);
+         weights.push_back(w);raw.emplace_back(static_cast<size_t>(blocks)*out_n);
+         for(int i=0;i<out_n;++i) {
+             for(auto& f:row)f=normal(rng);
+@@ -80,6 +85,16 @@ bool trial(ggml_backend_t backend, int threads, Shape s, const char* distributio
+     r.alloc=ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
+     require(r.alloc && ggml_gallocr_alloc_graph(r.alloc,all),"graph allocation");
+     for(int p=0;p<s.projections;++p)ggml_backend_tensor_set(weights[p],raw[p].data(),0,raw[p].size()*sizeof(block_q8_0));
++    auto immutable_inputs=[&] {
++        std::vector<float> copied_input(input.size());
++        ggml_backend_tensor_get(source,copied_input.data(),0,copied_input.size()*sizeof(float));
++        require(!std::memcmp(input.data(),copied_input.data(),input.size()*sizeof(float)),"input overwritten");
++        for(int p=0;p<s.projections;++p) {
++            std::vector<block_q8_0> copied_weight(raw[p].size());
++            ggml_backend_tensor_get(weights[p],copied_weight.data(),0,copied_weight.size()*sizeof(block_q8_0));
++            require(!std::memcmp(raw[p].data(),copied_weight.data(),copied_weight.size()*sizeof(block_q8_0)),"weight overwritten");
++        }
++    };
+     size_t bit_diff_cast=0,bit_diff_shared=0,quant_diff=0;
+     float max_abs=0;
+     // Recompute after changing inputs to detect stale shared storage or a
+@@ -88,6 +103,7 @@ bool trial(ggml_backend_t backend, int threads, Shape s, const char* distributio
+         if(pass)for(int i=0;i<s.m;++i)for(int j=0;j<s.k;++j)input[i*stride+j]*=-.5f;
+         ggml_backend_tensor_set(source,input.data(),0,input.size()*sizeof(float));
+         require(ggml_backend_graph_compute(backend,all)==GGML_STATUS_SUCCESS,"compute");
++        immutable_inputs();
+         std::vector<block_q8_0> expected(static_cast<size_t>(blocks)*s.m),got(expected.size());
+         for(int i=0;i<s.m;++i) {
+             // The actual eager matmul splits each row's independent blocks
+@@ -110,7 +126,11 @@ bool trial(ggml_backend_t backend, int threads, Shape s, const char* distributio
+             ggml_backend_tensor_get(outputs[1][p],b.data(),0,b.size()*sizeof(float));
+             ggml_backend_tensor_get(outputs[2][p],c.data(),0,c.size()*sizeof(float));
+             for(size_t i=0;i<a.size();++i) {
+-                require(std::isfinite(a[i]) && std::isfinite(b[i]) && std::isfinite(c[i]),"finite output");
++                if(!std::isfinite(a[i]) || !std::isfinite(b[i]) || !std::isfinite(c[i])) {
++                    std::fprintf(stderr,"nonfinite: K=%d N=%d M=%d threads=%d pass=%d projection=%d index=%zu eager=%g cast=%g shared=%g\n",
++                        s.k,s.n,s.m,threads,pass,p,i,a[i],b[i],c[i]);
++                    throw std::runtime_error("finite output");
++                }
+                 bit_diff_cast+=std::memcmp(&a[i],&b[i],sizeof(float))!=0;
+                 bit_diff_shared+=std::memcmp(&a[i],&c[i],sizeof(float))!=0;
+                 max_abs=std::max(max_abs,std::max(std::fabs(a[i]-b[i]),std::fabs(a[i]-c[i])));
+@@ -129,6 +149,7 @@ bool trial(ggml_backend_t backend, int threads, Shape s, const char* distributio
+             if(round)samples[v].push_back(elapsed);
+         }
+         for(int v=0;v<3;++v)us[v]=median(samples[v]);
++        immutable_inputs();
+     }
+     std::printf("{\"threads\":%d,\"K\":%d,\"N\":%d,\"secondaryN\":%d,\"M\":%d,\"projections\":%d,\"stridedInput\":%s,\"distribution\":\"%s\",\"inputUpdates\":2,\"activationByteDifferences\":%zu,\"castFloatBitDifferences\":%zu,\"sharedFloatBitDifferences\":%zu,\"maxAbsError\":%.9g,\"referenceGraphUs\":%.3f,\"castGraphUs\":%.3f,\"sharedGraphUs\":%.3f,\"sharedSpeedup\":%.4f,\"extraWeightBytes\":0,\"fullInputLatency\":false}\n",
+         threads,s.k,s.n,s.secondary_n,s.m,s.projections,s.strided ? "true":"false",distribution,quant_diff,

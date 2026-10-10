@@ -1,0 +1,17 @@
+diff --git a/tests/test_cpu_activation.cpp b/tests/test_cpu_activation.cpp
+index 3674938..6462ad5 100644
+--- a/tests/test_cpu_activation.cpp
++++ b/tests/test_cpu_activation.cpp
+@@ -110,7 +110,11 @@ bool trial(ggml_backend_t backend, int threads, Shape s, const char* distributio
+             ggml_backend_tensor_get(outputs[1][p],b.data(),0,b.size()*sizeof(float));
+             ggml_backend_tensor_get(outputs[2][p],c.data(),0,c.size()*sizeof(float));
+             for(size_t i=0;i<a.size();++i) {
+-                require(std::isfinite(a[i]) && std::isfinite(b[i]) && std::isfinite(c[i]),"finite output");
++                if(!std::isfinite(a[i]) || !std::isfinite(b[i]) || !std::isfinite(c[i])) {
++                    std::fprintf(stderr,"nonfinite: K=%d N=%d M=%d threads=%d pass=%d projection=%d index=%zu eager=%g cast=%g shared=%g\n",
++                        s.k,s.n,s.m,threads,pass,p,i,a[i],b[i],c[i]);
++                    throw std::runtime_error("finite output");
++                }
+                 bit_diff_cast+=std::memcmp(&a[i],&b[i],sizeof(float))!=0;
+                 bit_diff_shared+=std::memcmp(&a[i],&c[i],sizeof(float))!=0;
+                 max_abs=std::max(max_abs,std::max(std::fabs(a[i]-b[i]),std::fabs(a[i]-c[i])));

@@ -188,10 +188,16 @@ including shared/separate conversion, signed-byte extremes, zeros, tails,
 K=32/1024/3072 and N up to 151936. The first run was unpinned with simultaneous
 production MOSS and other users' TTS work; its erratic timings are retained in
 `exact-graph-cast-v1.jsonl`. The pinned run waited for API idle with auto work
-paused; other TTS jobs remained active. Its normal 16-thread graph gains were
-1.18–1.43x, including input conversion and graph compute, excluding packing
-and graph construction. Packing cost is separately recorded. Neither graph
-run establishes full-model latency. Unsupported ISA builds skip with code 77.
+paused; other TTS jobs remained active. Its reported normal 16-thread graph
+ratios were 1.18–1.43x, excluding packing and graph construction. **Those warm
+graph ratios are withdrawn.** A full operand audit detected mutation of the
+original graph's synthetic weight tensor after its first computation, before
+any timing. Its activation input remained unchanged; the first, input-only
+audit had missed the weight mutation. The new retention/post-timing guard and
+negative audit are documented in [shared activation](shared-activation.md).
+Initial graph parity, separately owned-vector dot timings and the fresh-process
+full pilot below are distinct evidence. Real model weights are loader-owned.
+Unsupported ISA builds skip with code 77.
 
 The full pilot (`exact-decode-pilot-v1.json`) measured 18 fresh processes after
 three discarded warmups: three 60-second cases, three variants and two rounds
@@ -407,3 +413,37 @@ remains on its validated binary; automatic processing and API health were
 restored. The tenfold objective is active and unachieved. Next isolate shared
 activation conversion with reference matrix math, without duplicated packed
 weights, and prove single/multirow activation bytes and float results first.
+
+## Shared activation conversion and operand lifetime audit, 2026-10-09
+
+The [shared activation report](shared-activation.md) isolates conversion reuse
+with ordinary weights and reference matrix arithmetic. All 72 synthetic cases
+matched activation bytes and output float bits at 1/8/16 workers, including
+actual Qwen projection widths, strided rows and a 1500-row encoder input.
+Two input updates, immutable operands/artifacts and no concurrent MOSS passed.
+The 16-thread Qwen decode group observed 1.109x. Custom shared conversion was
+effectively neutral on the 1500-row encoder (1.0011x); shared cast observed
+about 1.20x there. All controls/results are retained, including slower cases.
+
+The new fixture initially failed because graph-allocated synthetic operands
+were reclaimed before repeated execution. It now retains them and byte-checks
+all weights/inputs after each update and timing. The older exact-Q8 graph
+microbenchmark lacked the same guard. Its input-only audit missed corruption;
+the complete audit detected **weight mutation in the original graph before
+timing**, with the activation unchanged and no added temporary. Its historical
+warm graph ratios are withdrawn. Initial graph output comparisons and the
+separate owned-vector dot/fresh-process full-model pilots remain their distinct
+evidence; actual model weights have external loader-owned storage.
+
+The final guarded build passed twelve native CTests in 24.77 seconds and 28
+Python checks on hp-fury. Frozen failed fixtures, exact repair patches, test-log
+and source hashes, raw numeric reports and public equivalent trees are retained.
+No actual model routing or production promotion was added. These warm graph
+results exclude loading, audio, attention and generation; they establish
+neither a full-input gain nor corpus accuracy or a tenfold result.
+
+Next test shape-aware shared cast/block conversion in the actual Q/K/V and
+gate/up paths, retaining ordinary weights and reference matrix operations.
+Use matched production, frozen fastest opt48 and same-build opt48 controls,
+including long speech/silence and full text/speaker/timestamp/token/EOS gates.
+The original quiet reference and tenfold objective remain unchanged and active.

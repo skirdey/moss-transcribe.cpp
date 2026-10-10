@@ -1,0 +1,23 @@
+diff --git a/tests/test_cpu_q8.cpp b/tests/test_cpu_q8.cpp
+index 473a8cb..e49bb61 100644
+--- a/tests/test_cpu_q8.cpp
++++ b/tests/test_cpu_q8.cpp
+@@ -70,12 +70,15 @@ int main(int argc,char** argv) {
+             if (ggml_backend_graph_compute(backend, graph) != GGML_STATUS_SUCCESS) return 2;
+             if(audit) {
+                 std::vector<float> after(input.size());
++                std::vector<block_q8_0> weight_after(raw.size());
+                 ggml_backend_tensor_get(x,after.data(),0,after.size()*sizeof(float));
++                ggml_backend_tensor_get(w,weight_after.data(),0,weight_after.size()*sizeof(block_q8_0));
+                 const bool mutated=std::memcmp(input.data(),after.data(),input.size()*sizeof(float));
+-                std::printf("{\"auditUnretainedInput\":true,\"threads\":%d,\"K\":%d,\"N\":%d,\"inputMutatedAfterFirstGraph\":%s,\"timingRan\":false}\n",
+-                    threads,k,n,mutated ? "true":"false");
++                const bool weight_mutated=std::memcmp(raw.data(),weight_after.data(),raw.size()*sizeof(block_q8_0));
++                std::printf("{\"auditUnretainedInput\":true,\"laterTemporaryAdded\":false,\"threads\":%d,\"K\":%d,\"N\":%d,\"inputMutatedAfterFirstGraph\":%s,\"weightMutatedAfterFirstGraph\":%s,\"timingRan\":false}\n",
++                    threads,k,n,mutated ? "true":"false",weight_mutated ? "true":"false");
+                 ggml_gallocr_free(alloc);ggml_free(ctx);
+-                if(mutated) {ggml_backend_free(backend);return 0;}
++                if(mutated || weight_mutated) {ggml_backend_free(backend);return 0;}
+                 continue;
+             }
+             std::vector<float> a(n), b(n), c(n);
