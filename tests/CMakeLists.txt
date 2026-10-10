@@ -13,6 +13,8 @@ mt_add_test(test_cpu_softmax)
 mt_add_test(test_cpu_threads)
 mt_add_test(test_cpu_q8)
 target_include_directories(test_cpu_q8 PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
+mt_add_test(test_cpu_activation)
+target_include_directories(test_cpu_activation PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 
 # Research executable, deliberately outside CTest: it reports arithmetic drift
 # from packed kernels and returns failure when raw float bits differ.
