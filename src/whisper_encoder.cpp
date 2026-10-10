@@ -124,6 +124,7 @@ void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_fra
     const char* cpu_opt=std::getenv("MTD_CPU_OPT");
     const bool shared_projection=cpu_opt && (std::atoi(cpu_opt) & 16384);
     const bool encoder_q8=cpu_opt && (std::atoi(cpu_opt) & 65536);
+    const bool encoder_qkv=cpu_opt && (std::atoi(cpu_opt) & 131072);
     CpuEncoderQ8 encoder_contexts;
     auto encoder_linear = [&](ggml_tensor* weight, ggml_tensor* bias, ggml_tensor* input) {
         auto* y=encoder_q8 ? encoder_contexts.mul_mat(ctx,weight,input) : nullptr;
@@ -141,9 +142,22 @@ void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_fra
             x=cpu_shared_projection_input(ctx,x,weights,3,CpuSharedActivationMode::Cast);
         }
 
-        ggml_tensor* q = encoder_linear(L.q_w, L.q_b, x);       // [d, T]
-        ggml_tensor* k = encoder_linear(L.k_w, nullptr, x);     // [d, T] (no bias)
-        ggml_tensor* v = encoder_linear(L.v_w, L.v_b, x);       // [d, T]
+        ggml_tensor* q;
+        ggml_tensor* k;
+        ggml_tensor* v;
+        ggml_tensor* weights[]={L.q_w,L.k_w,L.v_w};
+        auto* group=encoder_qkv ? encoder_contexts.qkv(ctx,x,weights,3) : nullptr;
+        if (group) {
+            // Each slice is contiguous [d,T], matching eager linear outputs.
+            q=ggml_view_2d(ctx,group,d,T,group->nb[1],0);
+            k=ggml_view_2d(ctx,group,d,T,group->nb[1],group->nb[2]);
+            v=ggml_view_2d(ctx,group,d,T,group->nb[1],2*group->nb[2]);
+            q=ggml_add(ctx,q,L.q_b);v=ggml_add(ctx,v,L.v_b);
+        } else {
+            q=encoder_linear(L.q_w,L.q_b,x);
+            k=encoder_linear(L.k_w,nullptr,x);
+            v=encoder_linear(L.v_w,L.v_b,x);
+        }
 
         // [d,T] -> [hd,H,T] -> [hd,T,H]
         ggml_tensor* Q = ggml_permute(ctx, ggml_reshape_3d(ctx, q, hd, H, T), 0, 2, 1, 3);

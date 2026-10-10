@@ -2,7 +2,7 @@
 import unittest
 import tempfile
 from pathlib import Path
-from moss_cpu_regression import evaluate_encoder_q8, evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference, token_fingerprint, evaluate_token_traces, evaluate_shared_activation, evaluate_fused_projections
+from moss_cpu_regression import evaluate_encoder_q8, evaluate_encoder_qkv, evaluate_pair_reference, evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference, token_fingerprint, evaluate_token_traces, evaluate_shared_activation, evaluate_fused_projections
 
 
 class RegressionGateTest(unittest.TestCase):
@@ -184,6 +184,48 @@ class RegressionGateTest(unittest.TestCase):
         self.assertTrue(evaluate_encoder_q8([self.row("48",phaseProfile=None)],settings)["passed"])
         row=self.row("65584",repeat=0,phaseProfile={"decode":{"encoderQ8Nodes":288}})
         self.assertFalse(evaluate_encoder_q8([row],settings)["passed"])
+
+    def test_declared_pair_ignores_older_controls_but_rejects_candidate_regressions(self):
+        rows=[self.row(),self.row("48",wallSeconds=12.),self.row("65584",wallSeconds=10.),self.row("196656",wallSeconds=9.8)]
+        gate=evaluate_pair_reference(rows,"65584","196656")
+        self.assertTrue(gate["passed"]);self.assertEqual(len(gate["comparisons"]),1)
+        for changes in ({"wallSeconds":11.},{"outputSha256":"changed"},{"complete":False},{"concurrentMoss":True}):
+            self.assertFalse(evaluate_pair_reference(rows[:-1]+[self.row("196656",**changes)],"65584","196656")["passed"])
+
+    def test_declared_pair_rejects_absent_cases_and_unstable_control(self):
+        rows=[self.row("65584"),self.row("196656")]
+        self.assertTrue(evaluate_pair_reference(rows,"65584","196656")["passed"])
+        for bad in ([],rows[:1],rows[1:],rows+[self.row(case="absent-pair")],
+                    rows+[self.row("65584",outputSha256="other")]):
+            self.assertFalse(evaluate_pair_reference(bad,"65584","196656")["passed"])
+        self.assertFalse(evaluate_pair_reference(rows,"65584","65584")["passed"])
+
+    def test_grouped_qkv_requires_all_logical_consumers_and_exact_callback_counts(self):
+        settings={"196656":{"opt":196656},"65584":{"opt":65584}}
+        valid={"graphs":2,"encoderQ8Nodes":192,"encoderQ8Executions":192,
+               "encoderQ8Consumers":288,"encoderQ8ConsumerExecutions":288,
+               "encoderQkvNodes":48,"encoderQkvExecutions":48,
+               "encoderQ8Failures":0,"encoderQ8MinWorkers":16,"encoderQ8MaxWorkers":16}
+        row=self.row("196656",repeat=0,phaseProfile={"whisper":valid})
+        self.assertTrue(evaluate_encoder_qkv([row],settings)["passed"])
+        for key,bad in (("graphs",0),("encoderQ8Nodes",288),("encoderQ8Executions",191),
+                        ("encoderQ8Consumers",287),("encoderQ8ConsumerExecutions",287),
+                        ("encoderQkvNodes",24),("encoderQkvExecutions",47),
+                        ("encoderQ8Failures",1),("encoderQ8MinWorkers",8),("encoderQ8MaxWorkers",32)):
+            self.assertFalse(evaluate_encoder_qkv([{**row,"phaseProfile":{"whisper":{**valid,key:bad}}}],settings)["passed"])
+        for profile in (None,{}, {"decode":valid}):
+            self.assertFalse(evaluate_encoder_qkv([{**row,"phaseProfile":profile}],settings)["passed"])
+        self.assertTrue(evaluate_encoder_qkv([self.row("65584")],settings)["passed"])
+
+    def test_qkv_only_flag_requires_three_consumers_per_callback(self):
+        settings={"131120":{"opt":131120}}
+        valid={"graphs":1,"encoderQ8Nodes":24,"encoderQ8Executions":24,
+               "encoderQ8Consumers":72,"encoderQ8ConsumerExecutions":72,
+               "encoderQkvNodes":24,"encoderQkvExecutions":24,
+               "encoderQ8Failures":0,"encoderQ8MinWorkers":16,"encoderQ8MaxWorkers":16}
+        row=self.row("131120",repeat=0,phaseProfile={"whisper":valid})
+        self.assertTrue(evaluate_encoder_qkv([row],settings)["passed"])
+        self.assertFalse(evaluate_encoder_qkv([{**row,"phaseProfile":{"whisper":{**valid,"encoderQ8Consumers":24}}}],settings)["passed"])
 
 
 if __name__ == "__main__":

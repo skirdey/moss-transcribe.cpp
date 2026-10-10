@@ -112,7 +112,7 @@ struct WorkerBarrier {
 #endif
 struct CpuEncoderQ8::Context {
     unsigned long long calls=0;
-    int workers=0;
+    int workers=0, groups=1;
     bool failed=false;
 #if MT_ENCODER_Q8_NATIVE
     WorkerBarrier barrier;
@@ -135,7 +135,7 @@ struct CpuEncoderQ8::Context {
         if (s.failed) {
             // Report an invalid graph result, never return uninitialized data.
             auto* out=static_cast<float*>(dst->data);
-            for (size_t i=ith;i<size_t(n)*m;i+=nth) out[i]=NAN;
+            for (size_t i=ith;i<size_t(n)*m*s.groups;i+=nth) out[i]=NAN;
             s.barrier.wait(nth);
             if (ith==0) { delete[] s.quant; delete[] s.panels;
                 s.quant=nullptr;s.panels=nullptr; }
@@ -148,12 +148,15 @@ struct CpuEncoderQ8::Context {
         for (size_t i=ith;i<count;i+=nth)
             pack_one(s.panels[i],s.quant,blocks,m,int(i/blocks),int(i%blocks));
         s.barrier.wait(nth);
-        const int q=weight_tiles/nth,remainder=weight_tiles%nth;
+        const int total_tiles=weight_tiles*s.groups;
+        const int q=total_tiles/nth,remainder=total_tiles%nth;
         const int first=ith*q+std::min(ith,remainder),last=first+q+(ith<remainder);
-        for (int mt=0;mt<input_tiles;++mt) for (int wt=first;wt<last;++wt) {
-            const auto* weight=static_cast<const block_q8_0*>(w->data)+size_t(wt*2)*blocks;
+        for (int mt=0;mt<input_tiles;++mt) for (int flat=first;flat<last;++flat) {
+            const int group=flat/weight_tiles,wt=flat%weight_tiles;
+            const auto* group_weight=dst->src[group ? group+1 : 0];
+            const auto* weight=static_cast<const block_q8_0*>(group_weight->data)+size_t(wt*2)*blocks;
             const auto* panels=s.panels+size_t(mt)*blocks;
-            auto* output=static_cast<float*>(dst->data)+size_t(mt*16)*n+wt*2;
+            auto* output=static_cast<float*>(dst->data)+size_t(group)*n*m+size_t(mt*16)*n+wt*2;
             const int columns=std::min(16,m-mt*16);
             if (wt*2+1<n) tile<2,true>(weight,panels,blocks,n,columns,output);
             else tile<1,true>(weight,panels,blocks,n,columns,output);
@@ -175,6 +178,26 @@ bool CpuEncoderQ8::supported() {
         && t->from_float && t->vec_dot && t->vec_dot_type==GGML_TYPE_Q8_0 && t->nrows==1;
 #else
     return false;
+#endif
+}
+ggml_tensor* CpuEncoderQ8::qkv(ggml_context* ctx,ggml_tensor* x,ggml_tensor* const* weights,size_t count) {
+#if MT_ENCODER_Q8_NATIVE
+    if (!ctx || !x || !weights || count!=3 || x->type!=GGML_TYPE_F32
+        || !ggml_is_contiguous(x) || x->ne[0]!=1024 || x->ne[1]!=1500
+        || x->ne[2]!=1 || x->ne[3]!=1 || !ggml_backend_is_cpu(backend())
+        || cpu_thread_count()!=16 || !supported())return nullptr;
+    for(size_t i=0;i<count;++i) {
+        const auto* w=weights[i];
+        if(!w || w->type!=GGML_TYPE_Q8_0 || w->ne[0]!=1024 || w->ne[1]!=1024
+            || w->ne[2]!=1 || w->ne[3]!=1 || !ggml_is_contiguous(w))return nullptr;
+    }
+    auto context=std::make_unique<Context>();context->groups=3;
+    auto* data=context.get();contexts_.push_back(std::move(context));
+    ggml_tensor* args[]={weights[0],x,weights[1],weights[2]};
+    return ggml_custom_4d(ctx,GGML_TYPE_F32,1024,1500,3,1,args,4,
+        Context::compute,GGML_N_TASKS_MAX,data);
+#else
+    (void)ctx;(void)x;(void)weights;(void)count;return nullptr;
 #endif
 }
 ggml_tensor* CpuEncoderQ8::mul_mat(ggml_context* ctx,ggml_tensor* w,ggml_tensor* x) {
@@ -207,6 +230,18 @@ bool CpuEncoderQ8::ok() const {
 unsigned long long CpuEncoderQ8::executions() const {
     unsigned long long count=0;for (const auto& s:contexts_)count+=s->calls;return count;
 }
+unsigned long long CpuEncoderQ8::consumers() const {
+    unsigned long long count=0;for(const auto& s:contexts_)count+=s->groups;return count;
+}
+unsigned long long CpuEncoderQ8::consumer_executions() const {
+    unsigned long long count=0;for(const auto& s:contexts_)count+=s->calls*s->groups;return count;
+}
+unsigned long long CpuEncoderQ8::qkv_nodes() const {
+    unsigned long long count=0;for(const auto& s:contexts_)count+=s->groups==3;return count;
+}
+unsigned long long CpuEncoderQ8::qkv_executions() const {
+    unsigned long long count=0;for(const auto& s:contexts_)if(s->groups==3)count+=s->calls;return count;
+}
 int CpuEncoderQ8::min_workers() const {
     int result=0;for (const auto& s:contexts_) if (s->workers)
         result=result ? std::min(result,s->workers) : s->workers;return result;
@@ -217,6 +252,7 @@ int CpuEncoderQ8::max_workers() const {
 void CpuEncoderQ8::record_profile() const {
     unsigned long long failures=0;
     for (const auto& s:contexts_)failures+=s->failed || !s->calls || s->workers!=16;
-    cpu_profile_record_encoder_q8(nodes(),executions(),failures,min_workers(),max_workers());
+    cpu_profile_record_encoder_q8(nodes(),executions(),failures,min_workers(),max_workers(),
+        consumers(),consumer_executions(),qkv_nodes(),qkv_executions());
 }
 }

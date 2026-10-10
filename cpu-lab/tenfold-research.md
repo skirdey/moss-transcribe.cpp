@@ -730,5 +730,48 @@ checks and identified executing kernels before whole-model comparisons. It
 retains original Q8 scales/order and never assumes whole-K integer accumulation
 or a different quantizer is lossless. Next investigate shared Q/K/V panels
 through one operation with contiguous output slices, retaining the same full-
-input gates. That extension is unimplemented; all parts of the pipeline still
-need improvement to meet the original target.
+input gates. That proposal is implemented by the grouped-QKV experiment below; all parts of
+the pipeline still need improvement to meet the original target.
+
+## Shared conversion and fusion boundaries, 2026-10-09
+
+[MonoMoE (2026)](https://arxiv.org/html/2609.04244) uses a persistent CUDA
+weight-major pipeline combining routing, quantization, projections, activation
+and reduction. Its H200 FP8 routed-MoE measurements compare the complete
+operator boundary against tuned vLLM grouped GEMM, with1.02–1.54× kernel gains
+across the reported shapes and up to18.7% TPOT reduction. Numerical validation
+uses an FP32 reference after BF16/FP8 conversions, cosine similarity at least
+0.998, and downstream task scores within reported sampling uncertainty.
+That is weaker than raw-bit/token identity and is not CPU dense-Q8 evidence.
+Inference: share input conversion and scratch only where the actual dependency
+and consumer boundaries permit it, preserving our own quantizer and reductions.
+Weight-major GPU streaming and HBM throughput cannot be assumed on this Xeon.
+
+[ClusterFusion++ (April2026)](https://arxiv.org/html/2604.23553) fuses complete
+Pythia/GPT-NeoX decoder blocks with CUDA cluster collectives and persistent
+TensorMaps/buffers on an RTX5090. It reports up to1.34× TPOT speedup, but
+occasional FP16 atomic mismatches and a99.4% overall token-match rate do not
+satisfy MOSS's exact-token acceptance rule. Its single-pass variance formula,
+changed reduction tree and approximate activation intrinsics need independent
+bit proofs before adoption here. The paper's fusion ablation motivates measuring
+the whole fused consumer region even when an isolated component is slower.
+Inference: our grouped CPU QKV shares only conversion/panels and leaves attention,
+bias and activation operators intact; it does not reproduce CUDA full-block fusion.
+
+The [grouped QKV protocol](encoder-qkv.md) preserves independent Q8 scales and
+FMA trees, owns one per-encode callback context per group, and exposes contiguous
+views. Its gate counts both physical callbacks and logical consumers, tests
+actual-worker failure and recovery, and adds a direct full-input pair comparison
+against the previous65584 path. Native17 CTests/40Python checks, all14encoder chunks and60full-input runs pass.
+All36 same-build token traces match and all11 full-input gates pass. The direct
+grouped/separate change is−0.22% to+0.37% by two-repeat point estimates, with
+no convincing incremental gain; the shared control includes the generalized
+single-projection callback. Keep the result opt-in and retain its complete
+dispersion/failed-to-improve evidence. The original tenfold goal is unachieved.
+
+Next test real stateful batched target append against sequential decoding before
+implementing drafts. Compare all hidden/logit bits and active K/V bytes at prefix
+length boundaries, prove rewind and changed-token recovery, then measure actual
+append+all-logits totals with matched workers and retained samples. The current
+T>1 masked path can alter reduction order versusT1; any bit drift prevents timing.
+Past-only ngram replay does not prove batched execution, latency or rollback.

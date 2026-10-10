@@ -242,7 +242,7 @@ benchmark harness, API server, remote client, and deployment tooling are open so
 under the same license; see `cpu-lab/NOTICE.txt`. This is a research branch of the C++
 port, not a claim of full-corpus equivalence to the original PyTorch model.
 
-The fastest validated option is `MTD_CPU_OPT=48` (cache + parallel decode softmax;
+The portable CPU baseline is `MTD_CPU_OPT=48` (cache + parallel decode softmax;
 measurements and quality gates below). Bit 16 stores the F32 value cache transposed
 and append new values directly. It removes repeated copies of the growing cache while
 retaining reference attention matmul and softmax arithmetic. It is opt-in; unset/zero
@@ -609,3 +609,15 @@ match21.5 million output floats, and48 fresh full-input runs preserve complete
 outputs/tokens/EOS with observed routes and passing latency gates. Speech
 medians are1.022–1.032× faster than same-build opt48. All numeric evidence is
 public, production remains unchanged, and the original10× goal is unachieved.
+
+
+### Exact shared encoder QKV experiment
+
+The [grouped QKV report](cpu-lab/encoder-qkv.md) adds research bit131072 to
+share input quantization and panels across three projections. Combined196656
+passes17 native CTests/40Python checks,21.5million real encoder float comparisons,
+and60 complete full-input runs including36 exact same-build token traces.
+A direct pair gate against same-build65584 passes; incremental point estimates
+range0.22% slower to0.37% faster, providing no convincing additional latency win.
+The full numeric artifact retains all timings, RSS and counters. This remains
+opt-in research; production is unchanged and the original10× goal is unachieved.
