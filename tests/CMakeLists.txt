@@ -34,8 +34,9 @@ add_executable(moss_target_batch_gate ${CMAKE_SOURCE_DIR}/cpu-lab/moss_target_ba
 target_include_directories(moss_target_batch_gate PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(moss_target_batch_gate PRIVATE moss-transcribe)
 add_executable(moss_target_batch_trace ${CMAKE_SOURCE_DIR}/cpu-lab/moss_target_batch_trace.cpp)
-target_include_directories(moss_target_batch_trace PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(moss_target_batch_trace PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 target_link_libraries(moss_target_batch_trace PRIVATE moss-transcribe)
+add_test(NAME moss_target_batch_trace_metadata COMMAND moss_target_batch_trace --audit-metadata)
 target_include_directories(test_cpu_projection PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 target_include_directories(test_cpu_activation PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 
