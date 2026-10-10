@@ -471,3 +471,22 @@ and frozen-reference gates. The final copied build passed ten native CTests and
 five output/EOS smokes; the updated harness passed 28 Python tests on hp-fury.
 Full numeric reports and exact source/test hashes accompany the report. Loader
 diagnostics and these busy-host trials do not establish a new end-to-end gain.
+
+### Shared activation conversion and benchmark input lifetimes
+
+The [shared activation report](cpu-lab/shared-activation.md) isolates reuse of
+the pinned Q8 converter with ordinary matrix arithmetic and weights. All 72
+synthetic cases matched conversion bytes and raw output float bits across
+single-row, strided and multirow inputs. The 16-thread Qwen decode group
+observed 1.11x; the 1500-row encoder group was effectively neutral with the
+custom converter, while shared cast observed about 1.20x. These warm graph
+measurements exclude model loading/audio/generation; model routing is pending.
+
+The first probe exposed allocator reuse of synthetic inputs across repeated
+subgraphs. Reusable operands are now retained and byte-checked after timing.
+The older exact-Q8 graph test had the same missing guard: the full operand
+audit detected weight mutation with the original graph, before any timing.
+Its earlier warm graph ratios are withdrawn. The guarded build passed twelve
+native CTests and 28 Python checks; the negative audit restores the original
+flags and checks both weights and activations. The separate owned-vector dot
+probe and fresh-process full-model latency rejection remain distinct evidence.
