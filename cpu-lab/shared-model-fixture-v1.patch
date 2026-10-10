@@ -1,0 +1,26 @@
+diff --git a/tests/test_cpu_activation.cpp b/tests/test_cpu_activation.cpp
+index 65e9a0e..c4e0c52 100644
+--- a/tests/test_cpu_activation.cpp
++++ b/tests/test_cpu_activation.cpp
+@@ -183,7 +183,7 @@ bool batch_conversion(ggml_backend_t backend) {
+     auto blocks=mt::cpu_shared_projection_input(r.ctx,x,consumers,2,mt::CpuSharedActivationMode::Blocks);
+     auto cast=mt::cpu_shared_projection_input(r.ctx,x,consumers,2,mt::CpuSharedActivationMode::Cast);
+     require(blocks && blocks!=x && blocks->op==GGML_OP_CUSTOM && blocks->src[0]==x,"block routing");
+-    require(cast && cast!=x && cast->op==GGML_OP_CPY && cast->src[0]==x && cast->type==GGML_TYPE_Q8_0,"cast routing");
++    require(cast && cast!=x && cast->op==GGML_OP_DUP && cast->src[0]==x && cast->type==GGML_TYPE_Q8_0,"cast routing");
+     require(mt::cpu_shared_projection_input(r.ctx,x,consumers,1,mt::CpuSharedActivationMode::Blocks)==x,"single consumer fallback");
+     require(mt::cpu_shared_projection_input(r.ctx,x,nullptr,2,mt::CpuSharedActivationMode::Blocks)==x,"null consumers fallback");
+     consumers[1]=ggml_new_tensor_2d(r.ctx,GGML_TYPE_F32,96,17);
+diff --git a/tests/test_cpu_shared_layer.cpp b/tests/test_cpu_shared_layer.cpp
+index b1367cd..7f247ad 100644
+--- a/tests/test_cpu_shared_layer.cpp
++++ b/tests/test_cpu_shared_layer.cpp
+@@ -102,7 +102,7 @@ void trial(ggml_backend_t backend,const Weights& w,int threads,int tokens) {
+         if(node->src[1]->type==GGML_TYPE_F32)++ordinary;
+         else {
+             require(node->src[1]->type==GGML_TYPE_Q8_0,"projection type");++shared;
+-            casts+=node->src[1]->op==GGML_OP_CPY;
++            casts+=node->src[1]->op==GGML_OP_DUP;
+         }
+     }
+     require(ordinary==5 && shared==5 && casts==(tokens>=256 ? 5 : 0),"actual layer routing");
