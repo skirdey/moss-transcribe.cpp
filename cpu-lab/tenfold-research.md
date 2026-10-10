@@ -673,3 +673,35 @@ the prior contraction regression is removed (1.6092× versuspriorinline).
 include losses and outliers. The next F32 graph gate must include quantization
 and callback overhead and compare against ordinary F32 GGML's selected route.
 No actual-model route, full-input measurement or tenfold achievement follows.
+
+## F32-input custom graph integration, 2026-10-09
+
+The [F32 graph probe](vnni-f32.md) uses existing callback workers and atomic
+barriers, preserving all tile arithmetic. Candidate totals include quantization,
+scratch allocation, packing, coordination and cleanup. All78 arithmetic and
+111 protected records,2097152 half conversions,15 CTests22.36s and34 Python
+checks pass. Ordinary F32 GGML and Q8/pinned controls match exact output bits;
+callback quantized bytes, initialized panels, actual workers and ownership match.
+AllM1500 matrices beatF32GGML1.2878–1.4103×, while15/30timed cases regress.
+Next port selective large encoder routing with per-encode context ownership,
+real-weight encoder bit parity and complete-token/output/EOS/full-input gates.
+No model routing or tenfold achievement is claimed.
+
+[The Integer Alibi, August18 2026 revision](https://arxiv.org/html/2608.13756)
+uses shared INT8 operands to isolate GPU kernel scale/rounding divergence.
+Its exact INT32 argument requires no overflow and the actual instruction path;
+it explicitly cautions about saturating intermediate CPU instructions. End-to-
+end historical runs lack runtime kernel manifests, unlike teacher-forced replay.
+Power-of-two scales are a diagnostic probe with no validated accuracy or
+performance mitigation. Transfer fixed-operand comparisons and runtime route
+evidence. Inference: our block-scaled Q8 floating accumulation still needs its
+original FMA order; a single integer sum or changed scales would change semantics.
+
+[FairyFuse, April22 2026](https://arxiv.org/html/2604.20913) fuses eight sub-GEMVs
+of a ternary widely-linear layer with masked add/subtract instructions. Its
+29.6× headline compares48-thread ternary against1-thread FP32; matched1-thread
+DRAM-cold gains are2.0–6.6×, and model throughput gains are1.24× versusQ4_K_M.
+The model uses ternary QAT and quality metrics differ from FP16, so this is not
+lossless compression of MOSS Q8 or exact output preservation. Transfer input
+reuse, register accumulation and worker-region amortization, retaining matched
+thread, format, cold/warm and full-input denominators.

@@ -77,8 +77,8 @@ credentials are absent.
 
 ## Next gate
 
-Add a separate F32-input GGML custom-op experiment and include quantization,
-callback/team overhead and allocation/cleanup in its paired totals. First
+The [F32-input GGML experiment](vnni-f32.md) now includes quantization,
+callback/team overhead and allocation/cleanup in its paired totals. Its gates
 compare output bits with ordinary F32-input GGML, whose selected route may
 differ from the prequantized control. Only a viable exact result proceeds to
 actual layers, cache updates, complete token/output/EOS checks and matched
