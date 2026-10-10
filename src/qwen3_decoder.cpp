@@ -150,7 +150,7 @@ bool Qwen3Decoder::run(const std::vector<float>& embeds, int T,
 
     cpu_profile_record(CpuStage::Build, build_timer.seconds());
     if (audit) (*audit)(gf, true);
-    if (!compute_graph_with_inputs(gf, set_inputs)) return false;
+    if (!compute_graph_with_inputs(gf, set_inputs, audit != nullptr)) return false;
 
     past_len_ = kv;
     out_hidden->resize((size_t)H * T);

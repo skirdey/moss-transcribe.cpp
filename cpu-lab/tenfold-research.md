@@ -817,3 +817,31 @@ batch shapes. Stage comparisons test the first changed arithmetic boundary.
 [LLM-42, January 30, 2026 revision](https://arxiv.org/abs/2601.17768), offers
 fixed-shape verification/rollback as an alternative. Verification, discarded work
 and cache correction must all be included in any speculative latency trial.
+
+## Quantized draft research (October 10, 2026 UTC)
+
+[SpecQuant](https://arxiv.org/html/2609.21704v1), submitted September 18, 2026,
+routes among quantized Qwen2.5 variants and reports 35–43% speed improvements
+with an accuracy-loss allowance of up to 2%. That allowance does not satisfy
+our bit/state-preserving requirement. Its CPU fallback description does not
+establish a measured MOSS speedup. A possible future adaptation is a quantized
+draft with the unchanged Q8 target as verifier; cache/state parity and the full
+cost of drafting, verification and rollback must pass before timing or promotion.
+No SpecQuant implementation is imported here.
+
+## Query-length attention arithmetic (October 10, 2026 UTC)
+
+The [expanded cache/context diagnosis](context-operations.md) first rejects an
+observer that loses same-shape intermediates, then repairs audit-only allocation
+reservation and adds an independent known-value negative control. Native
+20CTest/40Python checks pass; all 96 original state/logit/rollback records and
+13,832 old stage records remain exact. All 728 internal controls pass.
+
+At layer 0, valid cache values and probabilities match in every fixture.
+Full-length same-library dot replay matches native batch output, and each
+query's valid-length replay matches serial output, including all thirteen
+first-context drifts. Emitted GCC code mixes separate multiply/add vector tails
+with scalar FMA tails. The next default-off CPU candidate must preserve the
+per-query length and pass the full state/logit/rollback gate before timing.
+This evidence changes the next kernel action; it does not reduce measured
+full-input latency or achieve the original tenfold goal.

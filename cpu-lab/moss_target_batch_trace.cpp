@@ -3,6 +3,7 @@
 #include "generate.hpp"
 #include "qwen3_decoder.hpp"
 #include "ggml-impl.h" // Pinned custom-op field layout; exclude padding/pointers from hashing.
+#include "ggml-cpu/vec.h" // Replay the very same F32 dot from the pinned CPU library.
 
 #include <algorithm>
 #include <array>
@@ -29,6 +30,8 @@ void env(const char* key, const char* value) {
 #endif
 }
 using Bits = std::vector<uint32_t>;
+bool inspect_context_operations = false;
+size_t operation_control_failures = 0;
 enum Stage { Norm,Q,K,V,QNorm,KNorm,QRope,KRope,Scores,Probabilities,
              Context,AttentionProjection,Residual,FfnNorm,Gate,Up,Activation,Down,LayerOutput,StageCount };
 constexpr const char* names[] = {"attentionNorm","queryProjection","keyProjection","valueProjection",
@@ -37,12 +40,15 @@ constexpr const char* names[] = {"attentionNorm","queryProjection","keyProjectio
 struct Delta {
     size_t bits = 0, nonfinite = 0;
     double max_abs = 0;
+    void one(const float& a, const float& b) {
+        bits += std::memcmp(&a,&b,sizeof(float)) != 0;
+        if (!std::isfinite(a) || !std::isfinite(b)) ++nonfinite;
+        else max_abs = std::max(max_abs,std::abs(double(a)-double(b)));
+    }
     void add(const std::vector<float>& a, const std::vector<float>& b) {
         require(a.size() == b.size() && !a.empty(), "float comparison shape");
         for (size_t i = 0; i < a.size(); ++i) {
-            bits += std::memcmp(&a[i],&b[i],sizeof(float)) != 0;
-            if (!std::isfinite(a[i]) || !std::isfinite(b[i])) ++nonfinite;
-            else max_abs = std::max(max_abs,std::abs(double(a[i])-double(b[i])));
+            one(a[i],b[i]);
         }
     }
 };
@@ -56,6 +62,13 @@ struct Capture {
     std::vector<int> leaf_cache_roles;
     std::vector<ggml_custom2_op_t> callback_identities;
     std::vector<std::array<uint8_t,GGML_MAX_OP_PARAMS>> raw_custom_parameters;
+    struct Attention {
+        int head_dim = 0, kv_heads = 0;
+        std::vector<float> keys;    // [position, KV head, feature]
+        std::vector<float> values;  // [KV head, feature, position]
+        std::vector<float> raw_context; // Actual matmul: [head, query, feature]
+    };
+    std::vector<Attention> attention;
 };
 size_t differences(const Bits& a, const Bits& b) {
     require(a.size() == b.size(), "cache shape");
@@ -66,6 +79,103 @@ size_t differences(const Bits& a, const Bits& b) {
 std::vector<float> row(const std::vector<float>& x, int i, int width) {
     require(i >= 0 && (size_t)(i+1)*width <= x.size(), "row bounds");
     return {x.begin()+(size_t)i*width,x.begin()+(size_t)(i+1)*width};
+}
+std::vector<float> raw_context_row(const Capture& c, int layer, int query) {
+    require(layer >= 0 && (size_t)layer < c.attention.size() && query >= 0 && query < c.tokens,
+            "raw context row bounds");
+    const auto& a = c.attention[layer];
+    require(a.head_dim > 0 && c.heads > 0 && a.raw_context.size() == (size_t)c.heads*c.tokens*a.head_dim,
+            "raw context layout");
+    std::vector<float> result;
+    for (int head = 0; head < c.heads; ++head) {
+        const auto begin = a.raw_context.begin()+((size_t)head*c.tokens+query)*a.head_dim;
+        result.insert(result.end(),begin,begin+a.head_dim);
+    }
+    return result;
+}
+int kv_head(const Capture& c, const Capture::Attention& a, int head) {
+    require(a.kv_heads > 0 && c.heads % a.kv_heads == 0 && head >= 0 && head < c.heads,
+            "GQA head mapping");
+    return head/(c.heads/a.kv_heads);
+}
+std::vector<float> replay_context_row(const Capture& c, int layer, int query, int length) {
+    require(layer >= 0 && (size_t)layer < c.attention.size() && query >= 0 && query < c.tokens &&
+            length > 0 && length <= c.kv, "replay row bounds");
+    const auto& a = c.attention[layer];
+    require(a.head_dim > 0 && a.values.size() == (size_t)a.kv_heads*a.head_dim*c.kv &&
+            c.layers[layer][Probabilities].size() == (size_t)c.heads*c.tokens*c.kv,"replay operand layout");
+    std::vector<float> result((size_t)c.heads*a.head_dim);
+    for (int h = 0; h < c.heads; ++h) {
+        const auto* p = c.layers[layer][Probabilities].data()+((size_t)h*c.tokens+query)*c.kv;
+        const int k = kv_head(c,a,h);
+        for (int f = 0; f < a.head_dim; ++f) {
+            const auto* v = a.values.data()+((size_t)k*a.head_dim+f)*c.kv;
+            ggml_vec_dot_f32(length,&result[(size_t)h*a.head_dim+f],0,v,0,p,0,1);
+        }
+    }
+    return result;
+}
+int audit_context_layout() {
+    int cases = 0;
+    for (int count : {1,2,4,8}) {
+        Capture c; c.tokens = count; c.heads = 4; c.kv = 9;
+        c.attention.resize(1); auto& a = c.attention[0];
+        a.head_dim = 3; a.kv_heads = 2;
+        a.raw_context.resize((size_t)c.heads*count*a.head_dim);
+        for (int h = 0; h < c.heads; ++h)
+            for (int q = 0; q < count; ++q)
+                for (int f = 0; f < a.head_dim; ++f)
+                    a.raw_context[((size_t)h*count+q)*a.head_dim+f] = float(100*h+10*q+f);
+        for (int q = 0; q < count; ++q) {
+            auto x = raw_context_row(c,0,q);
+            for (int h = 0; h < c.heads; ++h)
+                for (int f = 0; f < a.head_dim; ++f)
+                    require(x[h*a.head_dim+f] == float(100*h+10*q+f),"context transpose preserves distinct markers");
+        }
+        require(kv_head(c,a,0)==0 && kv_head(c,a,1)==0 && kv_head(c,a,2)==1 && kv_head(c,a,3)==1,"GQA grouping");
+        bool bad_query = false, bad_heads = false, bad_size = false;
+        try { (void)raw_context_row(c,0,count); } catch (const std::runtime_error&) { bad_query = true; }
+        a.kv_heads = 3;
+        try { (void)kv_head(c,a,0); } catch (const std::runtime_error&) { bad_heads = true; }
+        a.raw_context.pop_back();
+        try { (void)raw_context_row(c,0,0); } catch (const std::runtime_error&) { bad_size = true; }
+        require(bad_query && bad_heads && bad_size,"context bounds and unsupported layout rejected");
+        ++cases;
+    }
+    std::printf("{\"record\":\"contextLayoutControl\",\"cases\":%d,\"distinctMarkersExact\":true,"
+                "\"gqaGroupingExact\":true,\"invalidQueryRejected\":true,\"invalidHeadGroupingRejected\":true,"
+                "\"invalidStorageSizeRejected\":true}\n",cases);
+    return 0;
+}
+int audit_allocation() {
+    env("MTD_DEVICE","cpu"); env("MTD_THREADS","1");
+    require(std::string(mt::backend_name()) == "CPU", "allocation control CPU backend");
+    auto run = [&](bool capture, bool fresh) {
+        auto* ctx = ggml_init({1024*1024,nullptr,true}); require(ctx,"allocation control context");
+        auto* a = ggml_new_tensor_1d(ctx,GGML_TYPE_F32,64);
+        auto* b = ggml_new_tensor_1d(ctx,GGML_TYPE_F32,64);
+        ggml_set_input(a); ggml_set_input(b);
+        auto* middle = ggml_add(ctx,a,b); auto* output = ggml_mul(ctx,middle,b);
+        if (capture) ggml_set_output(middle);
+        ggml_set_output(output);
+        auto* graph = ggml_new_graph(ctx); ggml_build_forward_expand(graph,output);
+        std::vector<float> av(64,1.0f),bv(64,2.0f),actual(64),final(64);
+        require(mt::compute_graph_with_inputs(graph,[&]() {
+            ggml_backend_tensor_set(a,av.data(),0,av.size()*sizeof(float));
+            ggml_backend_tensor_set(b,bv.data(),0,bv.size()*sizeof(float));
+        },fresh),"allocation control compute");
+        ggml_backend_tensor_get(middle,actual.data(),0,actual.size()*sizeof(float));
+        ggml_backend_tensor_get(output,final.data(),0,final.size()*sizeof(float));
+        require(std::all_of(final.begin(),final.end(),[](float x){return x==6.0f;}),"quiet final result preserved");
+        size_t wrong = std::count_if(actual.begin(),actual.end(),[](float x){return x!=3.0f;});
+        ggml_free(ctx); return wrong;
+    };
+    (void)run(false,false);
+    const auto stale = run(true,false), repaired = run(true,true);
+    require(stale==64 && repaired==0,"changed output flags require fresh allocation plan");
+    std::printf("{\"record\":\"allocationControl\",\"elements\":64,\"stalePlanWrongIntermediateElements\":%zu,"
+                "\"freshPlanWrongIntermediateElements\":%zu,\"finalResultsExact\":true,\"freshPlanControlPassed\":true}\n",stale,repaired);
+    return 0;
 }
 void identify_graph(ggml_cgraph* graph, Capture* identity,
                     const std::unordered_map<const ggml_tensor*,int>* cache_roles = nullptr) {
@@ -249,6 +359,7 @@ public:
                 tokens <= d.max_seq_-d.past_len_, "append dimensions");
         result->tokens = tokens; result->kv = d.past_len_+tokens; result->heads = d.hp_.n_heads;
         std::vector<std::array<ggml_tensor*,StageCount>> tensors;
+        std::vector<ggml_tensor*> raw_context;
         std::unordered_map<const ggml_tensor*,int> cache_roles;
         for (int l = 0; l < d.hp_.n_layers; ++l) {
             cache_roles[d.k_cache_[l]] = 2*l; cache_roles[d.v_cache_[l]] = 2*l+1;
@@ -264,6 +375,20 @@ public:
                         require(t && t->type == GGML_TYPE_F32 && ggml_is_contiguous(t), "capture tensor layout");
                         ggml_set_output(t);
                     }
+                if (inspect_context_operations) {
+                    for (size_t l = 0; l < tensors.size(); ++l) {
+                        auto* ctx = tensors[l][Context];
+                        require(ctx->op == GGML_OP_CONT && ctx->src[0]->op == GGML_OP_PERMUTE,
+                                "context contiguous copy and permutation");
+                        auto* mat = ctx->src[0]->src[0];
+                        require(mat && mat->op == GGML_OP_MUL_MAT && mat->type == GGML_TYPE_F32 &&
+                                ggml_is_contiguous(mat) && storage(mat->src[0]) == d.v_cache_[l] &&
+                                mat->src[1] == tensors[l][Probabilities] && mat->ne[0] == d.hp_.head_dim &&
+                                mat->ne[1] == tokens && mat->ne[2] == d.hp_.n_heads && mat->ne[3] == 1,
+                                "actual value matmul layout and operands");
+                        raw_context.push_back(mat); ggml_set_output(mat);
+                    }
+                }
             } else if (capture) {
                 result->layers.resize(tensors.size());
                 for (size_t l = 0; l < tensors.size(); ++l)
@@ -273,6 +398,30 @@ public:
                         require(values.size()*sizeof(float) == ggml_nbytes(t), "contiguous capture bytes");
                         ggml_backend_tensor_get(t,values.data(),0,ggml_nbytes(t));
                     }
+                if (inspect_context_operations) {
+                    result->attention.resize(tensors.size());
+                    for (size_t l = 0; l < tensors.size(); ++l) {
+                        auto& a = result->attention[l]; a.head_dim = d.hp_.head_dim; a.kv_heads = d.hp_.n_kv_heads;
+                        auto* mat = raw_context[l]; a.raw_context.resize(ggml_nelements(mat));
+                        ggml_backend_tensor_get(mat,a.raw_context.data(),0,ggml_nbytes(mat));
+                        const int kv = result->kv, hd = a.head_dim, heads = a.kv_heads;
+                        auto* k = d.k_cache_[l]; auto* v = d.v_cache_[l];
+                        require(ggml_is_contiguous(k) && ggml_is_contiguous(v) && k->type == GGML_TYPE_F32 &&
+                                v->type == GGML_TYPE_F32 && k->ne[0] == hd && k->ne[1] == heads &&
+                                k->ne[2] == d.max_seq_ && v->ne[0] == d.max_seq_ && v->ne[1] == hd &&
+                                v->ne[2] == heads,"actual cache operand layout");
+                        a.keys.resize((size_t)kv*hd*heads);
+                        ggml_backend_tensor_get(k,a.keys.data(),0,a.keys.size()*sizeof(float));
+                        std::vector<float> cache_values(ggml_nelements(v));
+                        ggml_backend_tensor_get(v,cache_values.data(),0,ggml_nbytes(v));
+                        a.values.reserve((size_t)kv*hd*heads);
+                        for (int h = 0; h < heads; ++h)
+                            for (int f = 0; f < hd; ++f) {
+                                auto begin = cache_values.begin()+((size_t)h*hd+f)*d.max_seq_;
+                                a.values.insert(a.values.end(),begin,begin+kv);
+                            }
+                    }
+                }
             }
         };
         return d.run(x,tokens,hidden,&hook);
@@ -349,12 +498,85 @@ std::vector<float> stage_row(const Capture& c, int layer, Stage stage, int query
     }
     return out;
 }
+size_t inspect_operations(int mode, int prefix, const std::vector<Capture>& serial,
+                         const Capture& batch, int layer) {
+    const auto& b = batch.attention[layer];
+    require(serial.size() == (size_t)batch.tokens && batch.kv == prefix+batch.tokens,"inspection token bounds");
+    const auto saved_bv = b.values, saved_bp = batch.layers[layer][Probabilities];
+    Delta raw_delta, serial_copy, batch_copy, serial_full, batch_full, batch_valid_serial, full_valid;
+    Delta key_inputs, value_inputs, serial_k_store, serial_v_store, batch_k_store, batch_v_store;
+    for (int q = 0; q < batch.tokens; ++q) {
+        const auto& c = serial[q]; const auto& a = c.attention[layer];
+        const int valid = prefix+q+1, hd = b.head_dim, heads = b.kv_heads;
+        require(c.tokens == 1 && c.kv == valid && a.head_dim == hd && a.kv_heads == heads &&
+                c.heads == batch.heads && a.keys.size() == (size_t)valid*heads*hd &&
+                b.keys.size() == (size_t)batch.kv*heads*hd,"inspection cache layout");
+        for (int p = 0; p < valid; ++p)
+            for (int h = 0; h < heads; ++h)
+                for (int f = 0; f < hd; ++f) {
+                    key_inputs.one(a.keys[((size_t)p*heads+h)*hd+f],b.keys[((size_t)p*heads+h)*hd+f]);
+                    value_inputs.one(a.values[((size_t)h*hd+f)*valid+p],b.values[((size_t)h*hd+f)*batch.kv+p]);
+                }
+        const auto saved_sv = a.values, saved_sp = c.layers[layer][Probabilities];
+        const auto sraw = raw_context_row(c,layer,0), braw = raw_context_row(batch,layer,q);
+        const auto sd = replay_context_row(c,layer,0,valid);
+        const auto bd = replay_context_row(batch,layer,q,batch.kv);
+        const auto bv = replay_context_row(batch,layer,q,valid);
+        raw_delta.add(sraw,braw);
+        serial_copy.add(sraw,stage_row(c,layer,Context,0,valid));
+        batch_copy.add(braw,stage_row(batch,layer,Context,q,valid));
+        serial_full.add(sraw,sd); batch_full.add(braw,bd);
+        batch_valid_serial.add(sraw,bv); full_valid.add(bd,bv);
+        require(!std::memcmp(saved_sv.data(),a.values.data(),saved_sv.size()*sizeof(float)) &&
+                !std::memcmp(saved_sp.data(),c.layers[layer][Probabilities].data(),saved_sp.size()*sizeof(float)),
+                "serial replay operands unchanged");
+        const auto sk = stage_row(c,layer,KRope,0,valid), sv = stage_row(c,layer,V,0,valid);
+        const auto bk = stage_row(batch,layer,KRope,q,valid), bvalue = stage_row(batch,layer,V,q,valid);
+        require(sk.size() == (size_t)heads*hd && sv.size() == sk.size() && bk.size() == sk.size() && bvalue.size() == sk.size(),
+                "store producer layouts");
+        for (int h = 0; h < heads; ++h)
+            for (int f = 0; f < hd; ++f) {
+                const size_t index = (size_t)h*hd+f, position = prefix+q;
+                serial_k_store.one(sk[index],a.keys[position*heads*hd+index]);
+                serial_v_store.one(sv[index],a.values[index*valid+position]);
+                batch_k_store.one(bk[index],b.keys[position*heads*hd+index]);
+                batch_v_store.one(bvalue[index],b.values[index*batch.kv+position]);
+            }
+    }
+    require(!std::memcmp(saved_bv.data(),b.values.data(),saved_bv.size()*sizeof(float)) &&
+            !std::memcmp(saved_bp.data(),batch.layers[layer][Probabilities].data(),saved_bp.size()*sizeof(float)),
+            "batch replay operands unchanged");
+    size_t nonfinite = 0;
+    for (const auto* d : {&raw_delta,&serial_copy,&batch_copy,&serial_full,&batch_full,&batch_valid_serial,&full_valid,
+                         &key_inputs,&value_inputs,&serial_k_store,&serial_v_store,&batch_k_store,&batch_v_store}) nonfinite += d->nonfinite;
+    operation_control_failures += bool(serial_copy.bits || batch_copy.bits || serial_full.bits || batch_full.bits ||
+        serial_k_store.bits || serial_v_store.bits || batch_k_store.bits || batch_v_store.bits || nonfinite);
+    std::printf("{\"record\":\"contextOperations\",\"mode\":%d,\"prefix\":%d,\"appendTokens\":%d,\"layer\":%d,"
+        "\"rawMatmulBitDifferences\":%zu,\"rawMatmulMaxAbs\":%.17g,\"serialPermutationCopyBitDifferences\":%zu,"
+        "\"batchPermutationCopyBitDifferences\":%zu,\"serialFullLengthReplayBitDifferences\":%zu,\"serialFullLengthReplayMaxAbs\":%.17g,"
+        "\"batchFullLengthReplayBitDifferences\":%zu,\"batchFullLengthReplayMaxAbs\":%.17g,"
+        "\"batchValidLengthReplayVsSerialBitDifferences\":%zu,\"batchValidLengthReplayVsSerialMaxAbs\":%.17g,"
+        "\"batchFullVsValidReplayBitDifferences\":%zu,\"batchFullVsValidReplayMaxAbs\":%.17g,"
+        "\"validKeyInputBitDifferences\":%zu,\"validValueInputBitDifferences\":%zu,"
+        "\"serialNewKeyStoreBitDifferences\":%zu,\"serialNewValueStoreBitDifferences\":%zu,"
+        "\"batchNewKeyStoreBitDifferences\":%zu,\"batchNewValueStoreBitDifferences\":%zu,"
+        "\"nonfiniteElements\":%zu,\"replayOperandsUnchanged\":true,\"timingPerformed\":false}\n",
+        mode,prefix,batch.tokens,layer,raw_delta.bits,raw_delta.max_abs,serial_copy.bits,batch_copy.bits,
+        serial_full.bits,serial_full.max_abs,batch_full.bits,batch_full.max_abs,batch_valid_serial.bits,batch_valid_serial.max_abs,
+        full_valid.bits,full_valid.max_abs,key_inputs.bits,value_inputs.bits,serial_k_store.bits,serial_v_store.bits,
+        batch_k_store.bits,batch_v_store.bits,nonfinite);
+    return nonfinite;
+}
 }
 
 int main(int argc, char** argv) {
     try {
         if (argc == 2 && !std::strcmp(argv[1],"--audit-metadata")) return audit_metadata();
-        require(argc == 2, "usage: moss_target_batch_trace MODEL");
+        if (argc == 2 && !std::strcmp(argv[1],"--audit-context-layout")) return audit_context_layout();
+        if (argc == 2 && !std::strcmp(argv[1],"--audit-allocation")) return audit_allocation();
+        require(argc == 2 || (argc == 3 && !std::strcmp(argv[2],"--context-operations")),
+                "usage: moss_target_batch_trace MODEL [--context-operations]");
+        inspect_context_operations = argc == 3;
         env("MTD_DEVICE","cpu"); env("MTD_CPU_OPT","48"); env("MTD_THREADS","16");
         env("OMP_NUM_THREADS","16"); env("OMP_DYNAMIC","FALSE");
         for (const char* key : {"MTD_THREADS_WHISPER","MTD_THREADS_ADAPTOR","MTD_THREADS_PREFILL","MTD_THREADS_DECODE","MTD_THREADS_LOGITS"}) env(key,"16");
@@ -444,6 +666,7 @@ int main(int argc, char** argv) {
                         "\"stageName\":\"%s\",\"elements\":%zu,\"floatBitDifferences\":%zu,\"maxAbs\":%.17g,\"nonfiniteElements\":%zu}\n",
                         c.mode,c.prefix,c.count,l,s,names[s],elements,delta.bits,delta.max_abs,delta.nonfinite);
                 }
+                if (inspect_context_operations) nonfinite += inspect_operations(c.mode,c.prefix,captured_steps,captured_group,l);
                 const auto& p = captured_group.layers[l][Probabilities];
                 for (int i = 0; i < c.count; ++i)
                     for (int h = 0; h < captured_group.heads; ++h)
@@ -475,7 +698,10 @@ int main(int argc, char** argv) {
             std::vector<uint8_t> actual(w.bytes.size()); ggml_backend_tensor_get(w.t,actual.data(),0,actual.size());
             for (size_t i = 0; i < actual.size(); ++i) changed_weights += actual[i] != w.bytes[i];
         }
-        const bool valid = complete == 26 && !capture_changes && !future_nonzero && !nonfinite && !changed_weights;
+        const bool valid = complete == 26 && !capture_changes && !future_nonzero && !nonfinite && !changed_weights && !operation_control_failures;
+        if (inspect_context_operations)
+            std::printf("{\"record\":\"contextOperationsSummary\",\"operationRecords\":%zu,\"operationControlFailures\":%zu,"
+                        "\"expandedAttributionEligible\":%s}\n",complete*cfg.text_layers,operation_control_failures,valid?"true":"false");
         std::printf("{\"record\":\"summary\",\"cases\":%zu,\"stageRecords\":%zu,\"quietDriftCases\":%zu,\"captureChangedCases\":%zu,"
             "\"futureProbabilityNonzeroElements\":%zu,\"nonfiniteElements\":%zu,\"modelWeightBytesChecked\":%zu,\"modelWeightByteChanges\":%zu,"
             "\"traceAttributionEligible\":%s,\"timingPerformed\":false,\"productionPromoted\":false}\n",

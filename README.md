@@ -635,6 +635,11 @@ API is exposed, and the original full-input10× goal remains unachieved.
 
 ### Protected target-batch stage attribution
 
+The [cache/matmul observation extension](cpu-lab/context-operations.md) checks
+cache producers, raw context copies and same-library dot replays. It adds an
+allocation-plan negative control: final parity alone can miss overwritten
+intermediates. Fresh reservations apply only to the private lab audit hook.
+
 The [decoder trace report](cpu-lab/target-batch-trace.md) preserves all 13,832
 native stage records across 26 diagnostic/control fixtures, with unchanged quiet
 hidden/KV results under capture and 18 CTests/40 Python checks passing. All eight

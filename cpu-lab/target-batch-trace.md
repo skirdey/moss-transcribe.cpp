@@ -6,6 +6,13 @@ graph to locate the first differing layer and operation. It does not implement
 speculative generation, change layer arithmetic, expose a production batch API,
 or measure a speedup. The original tenfold full-input goal remains unachieved.
 
+The [expanded cache/matmul diagnosis](context-operations.md) found a limitation
+of the original observation controls: equal final hidden/KV results can coexist
+with overwritten intermediates when a same-shape allocation plan ignores new
+output-retention flags. Its repair forces reservation only for the lab hook and
+requires independent store/copy/replay checks. Original numeric difference
+records are retained; they alone do not prove every captured tensor's lifetime.
+
 ## Observation protocol
 
 One immutable Q8 checkpoint serves four separately owned decoder/KV states.

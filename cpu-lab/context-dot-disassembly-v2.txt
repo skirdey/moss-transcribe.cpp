@@ -1,0 +1,152 @@
+
+/home/stan/hw-moss-context-ops-v2/build/third_party/ggml/src/libggml-cpu.so.0:     file format elf64-x86-64
+
+
+Disassembly of section .init:
+
+Disassembly of section .plt:
+
+Disassembly of section .plt.got:
+
+Disassembly of section .plt.sec:
+
+Disassembly of section .text:
+
+00000000000a3e60 <ggml_vec_dot_f32>:
+   a3e60:	f3 0f 1e fa          	endbr64
+   a3e64:	89 fa                	mov    %edi,%edx
+   a3e66:	41 89 fa             	mov    %edi,%r10d
+   a3e69:	49 89 f3             	mov    %rsi,%r11
+   a3e6c:	49 89 c8             	mov    %rcx,%r8
+   a3e6f:	83 e2 c0             	and    $0xffffffc0,%edx
+   a3e72:	0f 8e 04 02 00 00    	jle    a407c <ggml_vec_dot_f32+0x21c>
+   a3e78:	8d 72 ff             	lea    -0x1(%rdx),%esi
+   a3e7b:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   a3e7f:	48 89 c8             	mov    %rcx,%rax
+   a3e82:	4c 89 c9             	mov    %r9,%rcx
+   a3e85:	62 f1 7c 48 28 da    	vmovaps %zmm2,%zmm3
+   a3e8b:	c1 ee 06             	shr    $0x6,%esi
+   a3e8e:	62 f1 7c 48 28 ca    	vmovaps %zmm2,%zmm1
+   a3e94:	62 f1 7c 48 28 c2    	vmovaps %zmm2,%zmm0
+   a3e9a:	48 c1 e6 08          	shl    $0x8,%rsi
+   a3e9e:	49 8d b4 30 00 01 00 	lea    0x100(%r8,%rsi,1),%rsi
+   a3ea5:	00 
+   a3ea6:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+   a3ead:	00 00 00 
+   a3eb0:	62 f1 7c 48 10 20    	vmovups (%rax),%zmm4
+   a3eb6:	62 f1 7c 48 10 68 01 	vmovups 0x40(%rax),%zmm5
+   a3ebd:	48 05 00 01 00 00    	add    $0x100,%rax
+   a3ec3:	48 81 c1 00 01 00 00 	add    $0x100,%rcx
+   a3eca:	62 f1 7c 48 10 70 fe 	vmovups -0x80(%rax),%zmm6
+   a3ed1:	62 f1 7c 48 10 78 ff 	vmovups -0x40(%rax),%zmm7
+   a3ed8:	62 f2 5d 48 b8 41 fc 	vfmadd231ps -0x100(%rcx),%zmm4,%zmm0
+   a3edf:	62 f2 55 48 b8 49 fd 	vfmadd231ps -0xc0(%rcx),%zmm5,%zmm1
+   a3ee6:	62 f2 4d 48 b8 59 fe 	vfmadd231ps -0x80(%rcx),%zmm6,%zmm3
+   a3eed:	62 f2 45 48 b8 51 ff 	vfmadd231ps -0x40(%rcx),%zmm7,%zmm2
+   a3ef4:	48 39 c6             	cmp    %rax,%rsi
+   a3ef7:	75 b7                	jne    a3eb0 <ggml_vec_dot_f32+0x50>
+   a3ef9:	62 f1 7c 48 58 c3    	vaddps %zmm3,%zmm0,%zmm0
+   a3eff:	62 f1 74 48 58 ca    	vaddps %zmm2,%zmm1,%zmm1
+   a3f05:	62 f1 7c 48 58 c1    	vaddps %zmm1,%zmm0,%zmm0
+   a3f0b:	62 f3 fd 48 1b c1 01 	vextractf64x4 $0x1,%zmm0,%ymm1
+   a3f12:	c5 f4 58 c0          	vaddps %ymm0,%ymm1,%ymm0
+   a3f16:	c4 e3 7d 19 c1 01    	vextractf128 $0x1,%ymm0,%xmm1
+   a3f1c:	c5 f0 58 c0          	vaddps %xmm0,%xmm1,%xmm0
+   a3f20:	c4 e3 79 04 c8 4e    	vpermilps $0x4e,%xmm0,%xmm1
+   a3f26:	c5 f0 58 c8          	vaddps %xmm0,%xmm1,%xmm1
+   a3f2a:	c5 f8 28 c1          	vmovaps %xmm1,%xmm0
+   a3f2e:	c5 f0 c6 c9 55       	vshufps $0x55,%xmm1,%xmm1,%xmm1
+   a3f33:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   a3f37:	41 39 d2             	cmp    %edx,%r10d
+   a3f3a:	0f 8e 33 01 00 00    	jle    a4073 <ggml_vec_dot_f32+0x213>
+   a3f40:	55                   	push   %rbp
+   a3f41:	44 89 d1             	mov    %r10d,%ecx
+   a3f44:	29 d1                	sub    %edx,%ecx
+   a3f46:	8d 41 ff             	lea    -0x1(%rcx),%eax
+   a3f49:	48 89 e5             	mov    %rsp,%rbp
+   a3f4c:	53                   	push   %rbx
+   a3f4d:	83 f8 06             	cmp    $0x6,%eax
+   a3f50:	0f 86 2f 01 00 00    	jbe    a4085 <ggml_vec_dot_f32+0x225>
+   a3f56:	48 63 f2             	movslq %edx,%rsi
+   a3f59:	89 cf                	mov    %ecx,%edi
+   a3f5b:	31 c0                	xor    %eax,%eax
+   a3f5d:	48 c1 e6 02          	shl    $0x2,%rsi
+   a3f61:	c1 ef 03             	shr    $0x3,%edi
+   a3f64:	49 8d 1c 30          	lea    (%r8,%rsi,1),%rbx
+   a3f68:	48 c1 e7 05          	shl    $0x5,%rdi
+   a3f6c:	4c 01 ce             	add    %r9,%rsi
+   a3f6f:	90                   	nop
+   a3f70:	c5 fc 10 24 03       	vmovups (%rbx,%rax,1),%ymm4
+   a3f75:	c5 dc 59 0c 06       	vmulps (%rsi,%rax,1),%ymm4,%ymm1
+   a3f7a:	48 83 c0 20          	add    $0x20,%rax
+   a3f7e:	c5 f2 58 d8          	vaddss %xmm0,%xmm1,%xmm3
+   a3f82:	c5 f0 c6 c1 55       	vshufps $0x55,%xmm1,%xmm1,%xmm0
+   a3f87:	c5 f0 c6 d1 ff       	vshufps $0xff,%xmm1,%xmm1,%xmm2
+   a3f8c:	c5 fa 58 c3          	vaddss %xmm3,%xmm0,%xmm0
+   a3f90:	c5 f0 15 d9          	vunpckhps %xmm1,%xmm1,%xmm3
+   a3f94:	c5 fa 58 c3          	vaddss %xmm3,%xmm0,%xmm0
+   a3f98:	c5 fa 58 c2          	vaddss %xmm2,%xmm0,%xmm0
+   a3f9c:	62 f3 7d 28 19 ca 01 	vextractf32x4 $0x1,%ymm1,%xmm2
+   a3fa3:	c5 fa 58 c2          	vaddss %xmm2,%xmm0,%xmm0
+   a3fa7:	62 f3 75 28 03 d1 05 	valignd $0x5,%ymm1,%ymm1,%ymm2
+   a3fae:	c5 fa 58 c2          	vaddss %xmm2,%xmm0,%xmm0
+   a3fb2:	62 f3 75 28 03 d1 06 	valignd $0x6,%ymm1,%ymm1,%ymm2
+   a3fb9:	62 f3 75 28 03 c9 07 	valignd $0x7,%ymm1,%ymm1,%ymm1
+   a3fc0:	c5 fa 58 c2          	vaddss %xmm2,%xmm0,%xmm0
+   a3fc4:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   a3fc8:	48 39 f8             	cmp    %rdi,%rax
+   a3fcb:	75 a3                	jne    a3f70 <ggml_vec_dot_f32+0x110>
+   a3fcd:	89 ce                	mov    %ecx,%esi
+   a3fcf:	83 e6 f8             	and    $0xfffffff8,%esi
+   a3fd2:	8d 04 16             	lea    (%rsi,%rdx,1),%eax
+   a3fd5:	f6 c1 07             	test   $0x7,%cl
+   a3fd8:	0f 84 87 00 00 00    	je     a4065 <ggml_vec_dot_f32+0x205>
+   a3fde:	29 f1                	sub    %esi,%ecx
+   a3fe0:	8d 79 ff             	lea    -0x1(%rcx),%edi
+   a3fe3:	83 ff 02             	cmp    $0x2,%edi
+   a3fe6:	76 3a                	jbe    a4022 <ggml_vec_dot_f32+0x1c2>
+   a3fe8:	48 63 d2             	movslq %edx,%rdx
+   a3feb:	48 01 f2             	add    %rsi,%rdx
+   a3fee:	c4 c1 78 10 2c 90    	vmovups (%r8,%rdx,4),%xmm5
+   a3ff4:	c4 c1 50 59 0c 91    	vmulps (%r9,%rdx,4),%xmm5,%xmm1
+   a3ffa:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   a3ffe:	c5 f0 c6 d1 55       	vshufps $0x55,%xmm1,%xmm1,%xmm2
+   a4003:	c5 fa 58 c2          	vaddss %xmm2,%xmm0,%xmm0
+   a4007:	c5 f0 15 d1          	vunpckhps %xmm1,%xmm1,%xmm2
+   a400b:	c5 f0 c6 c9 ff       	vshufps $0xff,%xmm1,%xmm1,%xmm1
+   a4010:	c5 fa 58 c2          	vaddss %xmm2,%xmm0,%xmm0
+   a4014:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   a4018:	f6 c1 03             	test   $0x3,%cl
+   a401b:	74 48                	je     a4065 <ggml_vec_dot_f32+0x205>
+   a401d:	83 e1 fc             	and    $0xfffffffc,%ecx
+   a4020:	01 c8                	add    %ecx,%eax
+   a4022:	48 63 c8             	movslq %eax,%rcx
+   a4025:	c4 c1 7a 10 34 88    	vmovss (%r8,%rcx,4),%xmm6
+   a402b:	48 8d 14 8d 00 00 00 	lea    0x0(,%rcx,4),%rdx
+   a4032:	00 
+   a4033:	c4 c2 49 b9 04 89    	vfmadd231ss (%r9,%rcx,4),%xmm6,%xmm0
+   a4039:	8d 48 01             	lea    0x1(%rax),%ecx
+   a403c:	41 39 ca             	cmp    %ecx,%r10d
+   a403f:	7e 24                	jle    a4065 <ggml_vec_dot_f32+0x205>
+   a4041:	c4 c1 7a 10 7c 10 04 	vmovss 0x4(%r8,%rdx,1),%xmm7
+   a4048:	83 c0 02             	add    $0x2,%eax
+   a404b:	c4 c2 41 b9 44 11 04 	vfmadd231ss 0x4(%r9,%rdx,1),%xmm7,%xmm0
+   a4052:	41 39 c2             	cmp    %eax,%r10d
+   a4055:	7e 0e                	jle    a4065 <ggml_vec_dot_f32+0x205>
+   a4057:	c4 c1 7a 10 7c 10 08 	vmovss 0x8(%r8,%rdx,1),%xmm7
+   a405e:	c4 c2 41 b9 44 11 08 	vfmadd231ss 0x8(%r9,%rdx,1),%xmm7,%xmm0
+   a4065:	c4 c1 7a 11 03       	vmovss %xmm0,(%r11)
+   a406a:	c5 f8 77             	vzeroupper
+   a406d:	48 8b 5d f8          	mov    -0x8(%rbp),%rbx
+   a4071:	c9                   	leave
+   a4072:	c3                   	ret
+   a4073:	c4 c1 7a 11 03       	vmovss %xmm0,(%r11)
+   a4078:	c5 f8 77             	vzeroupper
+   a407b:	c3                   	ret
+   a407c:	c5 f9 57 c0          	vxorpd %xmm0,%xmm0,%xmm0
+   a4080:	e9 86 fe ff ff       	jmp    a3f0b <ggml_vec_dot_f32+0xab>
+   a4085:	89 d0                	mov    %edx,%eax
+   a4087:	31 f6                	xor    %esi,%esi
+   a4089:	e9 50 ff ff ff       	jmp    a3fde <ggml_vec_dot_f32+0x17e>
+
+Disassembly of section .fini:
