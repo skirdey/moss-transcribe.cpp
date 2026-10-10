@@ -490,3 +490,20 @@ Its earlier warm graph ratios are withdrawn. The guarded build passed twelve
 native CTests and 28 Python checks; the negative audit restores the original
 flags and checks both weights and activations. The separate owned-vector dot
 probe and fresh-process full-model latency rejection remain distinct evidence.
+
+### Shared conversion in actual model graphs
+
+The [actual-model report](cpu-lab/shared-model.md) adds guarded, explicit
+research switches for Qwen Q/K/V and gate/up conversion reuse (8192) and
+Whisper Q/K/V (16384). They retain ordinary weights and matrix operations and
+are off by default. Thirteen native CTests, including real Qwen layer/cache
+float-bit comparisons, and 33 Python gate/parser tests pass on hp-fury.
+
+All [72 paired full-input runs](cpu-lab/shared-model-pilot-v2.json) completed
+with identical output/count/EOS; the 48 numeric runs also match complete
+same-build token hashes. Artifact and observed-route checks pass. The trial
+still rejects promotion: combined reuse was 5.31% slower than same-build opt48
+on German speech, and real-empty speech failed production for every opt48
+control/candidate. Both frozen attempts and the fixture repair are retained.
+The host was busy; no quiet-host or tenfold gain is established. Production
+keeps its validated binary and original configuration.

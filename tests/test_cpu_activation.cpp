@@ -10,6 +10,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <random>
 #include <stdexcept>
@@ -177,12 +178,27 @@ bool batch_conversion(ggml_backend_t backend) {
     require(mt::cpu_shared_q8_activation(r.ctx,ggml_new_tensor_1d(r.ctx,GGML_TYPE_F16,32))==nullptr,"type rejection");
     auto transposed=ggml_transpose(r.ctx,x);
     require(mt::cpu_shared_q8_activation(r.ctx,transposed)==nullptr,"scalar stride rejection");
+    auto w=ggml_new_tensor_2d(r.ctx,GGML_TYPE_Q8_0,96,17);
+    ggml_tensor* consumers[]={w,w};
+    auto blocks=mt::cpu_shared_projection_input(r.ctx,x,consumers,2,mt::CpuSharedActivationMode::Blocks);
+    auto cast=mt::cpu_shared_projection_input(r.ctx,x,consumers,2,mt::CpuSharedActivationMode::Cast);
+    require(blocks && blocks!=x && blocks->op==GGML_OP_CUSTOM && blocks->src[0]==x,"block routing");
+    require(cast && cast!=x && cast->op==GGML_OP_CPY && cast->src[0]==x && cast->type==GGML_TYPE_Q8_0,"cast routing");
+    require(mt::cpu_shared_projection_input(r.ctx,x,consumers,1,mt::CpuSharedActivationMode::Blocks)==x,"single consumer fallback");
+    require(mt::cpu_shared_projection_input(r.ctx,x,nullptr,2,mt::CpuSharedActivationMode::Blocks)==x,"null consumers fallback");
+    consumers[1]=ggml_new_tensor_2d(r.ctx,GGML_TYPE_F32,96,17);
+    require(mt::cpu_shared_projection_input(r.ctx,x,consumers,2,mt::CpuSharedActivationMode::Blocks)==x,"mixed F32 weights fallback");
+    consumers[1]=ggml_new_tensor_2d(r.ctx,GGML_TYPE_F16,96,17);
+    require(mt::cpu_shared_projection_input(r.ctx,x,consumers,2,mt::CpuSharedActivationMode::Cast)==x,"mixed F16 weights fallback");
+    consumers[1]=ggml_new_tensor_2d(r.ctx,GGML_TYPE_Q8_0,32,17);
+    require(mt::cpu_shared_projection_input(r.ctx,x,consumers,2,mt::CpuSharedActivationMode::Cast)==x,"weight width fallback");
     return !std::memcmp(expected.data(),actual.data(),actual.size()*sizeof(block_q8_0));
 }
 }
 
 int main(int argc,char** argv) {
     try {
+        setenv("MTD_DEVICE","cpu",1);
         const bool benchmark=argc==2 && !std::strcmp(argv[1],"--benchmark");
         if(argc>1 && !benchmark)throw std::runtime_error("usage: test_cpu_activation [--benchmark]");
         auto backend=ggml_backend_cpu_init();require(backend,"CPU backend");

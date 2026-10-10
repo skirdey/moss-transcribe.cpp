@@ -2,6 +2,7 @@
 
 #include "backend.hpp"
 #include "cpu_profile.hpp"
+#include "cpu_activation.hpp"
 #include "common.hpp"
 #include "ggml_extend.hpp"
 
@@ -9,6 +10,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <cstdlib>
 #include <string>
 #include <vector>
 
@@ -118,12 +120,18 @@ void WhisperEncoder::encode(const std::vector<float>& mel, int n_mels, int n_fra
     cur = ggml_add(ctx, cur, pos_embd_);              // enc.pos_embd ne=[d, T]
 
     const float kq_scale = 1.0f / std::sqrt((float)hd);
+    const char* cpu_opt=std::getenv("MTD_CPU_OPT");
+    const bool shared_projection=cpu_opt && (std::atoi(cpu_opt) & 16384);
 
     for (int il = 0; il < n_layers_; ++il) {
         const WhisperLayer& L = layers_[il];
 
         ggml_tensor* res = cur;
         ggml_tensor* x   = layer_norm(ctx, cur, L.attn_ln_w, L.attn_ln_b, 1e-5f);
+        if (shared_projection) {
+            ggml_tensor* weights[] = {L.q_w,L.k_w,L.v_w};
+            x=cpu_shared_projection_input(ctx,x,weights,3,CpuSharedActivationMode::Cast);
+        }
 
         ggml_tensor* q = linear(ctx, L.q_w, L.q_b, x);       // [d, T]
         ggml_tensor* k = linear(ctx, L.k_w, nullptr, x);     // [d, T] (no bias)

@@ -1,4 +1,6 @@
 #include "cpu_activation.hpp"
+#include "backend.hpp"
+#include "cpu_profile.hpp"
 #include "ggml-cpu.h"
 
 #include <algorithm>
@@ -38,5 +40,23 @@ ggml_tensor* cpu_shared_q8_activation(ggml_context* ctx, ggml_tensor* x) {
     ggml_tensor* args[] = {x};
     return ggml_custom_4d(ctx, GGML_TYPE_Q8_0, x->ne[0], x->ne[1], x->ne[2], x->ne[3],
                           args, 1, convert, GGML_N_TASKS_MAX, nullptr);
+}
+
+ggml_tensor* cpu_shared_projection_input(ggml_context* ctx, ggml_tensor* x,
+    ggml_tensor* const* weights, size_t count, CpuSharedActivationMode mode) {
+    if (!x || !weights || count < 2 || x->type != GGML_TYPE_F32
+        || x->nb[0] != sizeof(float) || x->ne[0] <= 0
+        || x->ne[0] % ggml_blck_size(GGML_TYPE_Q8_0)
+        || !ggml_backend_is_cpu(backend())) return x;
+    for (size_t i=0; i<count; ++i) {
+        const auto* w=weights[i];
+        if (!w || w->type != GGML_TYPE_Q8_0 || w->ne[0] != x->ne[0]
+            || !ggml_is_contiguous(w) || w->ne[2] != 1 || w->ne[3] != 1) return x;
+    }
+    auto q=mode==CpuSharedActivationMode::Cast ? ggml_cast(ctx,x,GGML_TYPE_Q8_0)
+        : cpu_shared_q8_activation(ctx,x);
+    if (!q) return x;
+    cpu_profile_record_shared_q8(mode==CpuSharedActivationMode::Cast, count);
+    return q;
 }
 }

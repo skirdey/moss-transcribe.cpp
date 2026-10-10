@@ -17,6 +17,7 @@ import subprocess
 import threading
 import time
 import wave
+from moss_ngram_audit import read_trace
 
 
 def digest(path):
@@ -38,14 +39,14 @@ def variant_settings(variant, default_threads):
     return match[1], threads, bool(match[3])
 
 
-def run_environment(base, affinity, opt, threads, lib, profile=False, passive=False, phase_threads=None):
+def run_environment(base, affinity, opt, threads, lib, profile=False, passive=False, phase_threads=None, trace_tokens=False):
     env = {**base, **affinity}
     # A named default is reproducible even if the invoking shell tuned libgomp.
     for key in ("OMP_WAIT_POLICY", "GOMP_SPINCOUNT", "OMP_DYNAMIC", "OMP_THREAD_LIMIT"):
         env.pop(key, None)
     for phase in ("WHISPER", "ADAPTOR", "PREFILL", "DECODE", "LOGITS"):
         env.pop("MTD_THREADS_"+phase, None)
-    env.update({"MTD_PROFILE": "1" if profile else "0", "MTD_TRACE_TOKENS": "0", "MTD_DEVICE": "cpu",
+    env.update({"MTD_PROFILE": "1" if profile else "0", "MTD_TRACE_TOKENS": "1" if trace_tokens else "0", "MTD_DEVICE": "cpu",
                 "MTD_THREADS": str(threads), "OMP_NUM_THREADS": str(threads),
                 "OMP_DYNAMIC": "FALSE", "MTD_CPU_OPT": opt,
                 "MTD_LOOP_GUARD": "1", "MTD_REPETITION_PENALTY": "1.0",
@@ -117,6 +118,46 @@ def evaluate_candidate_reference(runs, reference):
     return evaluate([r for r in runs if r["variant"] not in ("baseline","cache-reference")],baseline=reference)
 
 
+def token_fingerprint(path):
+    tokens,eos,_ = read_trace(path)
+    if not tokens or tokens[-1] != eos or eos in tokens[:-1]:
+        raise ValueError("Token trace lacks unique terminal EOS")
+    # Hash canonical IDs and EOS; never include reconstructable IDs in reports.
+    encoded=json.dumps({"eos":eos,"tokens":tokens},separators=(",",":")).encode()
+    return {"sha256":hashlib.sha256(encoded).hexdigest(),"count":len(tokens)}
+
+
+def evaluate_token_traces(runs, reference):
+    selected=[r for r in runs if r["variant"] not in ("baseline","cache-reference")]
+    failures=[]
+    if not selected: failures.append("No same-build token traces")
+    for case in sorted({r["case"] for r in selected}):
+        controls=[r for r in selected if r["case"]==case and r["variant"]==reference]
+        hashes={r.get("tokenTrace",{}).get("sha256") for r in controls}
+        if not controls or None in hashes or len(hashes)!=1:
+            failures.append(case+": missing or unstable same-build token control")
+        for row in [r for r in selected if r["case"]==case]:
+            trace=row.get("tokenTrace") or {}
+            if (not row["complete"] or row.get("concurrentMoss") or not trace.get("sha256")
+                or trace.get("count") != row["tokens"] or trace.get("sha256") not in hashes):
+                failures.append(case+"/"+row["variant"]+": missing, incomplete or changed full token trace")
+    return {"passed":not failures,"failures":failures,
+            "scope":"Complete same-build greedy token IDs including unique EOS; old production/frozen binaries retain full-output/count/EOS checks."}
+
+
+def evaluate_shared_activation(runs, settings):
+    failures=[]
+    for r in runs:
+        opt=settings.get(r["variant"],{}).get("opt",0)
+        if not opt & (8192|16384): continue
+        phases=r.get("phaseProfile") or {}
+        decoder=sum(phases.get(p,{}).get("sharedQ8Nodes",0) for p in ("prefill","decode"))
+        encoder=phases.get("whisper",{}).get("sharedQ8CastNodes",0)
+        if (opt & 8192 and decoder<=0) or (opt & 16384 and encoder<=0):
+            failures.append(f'{r["case"]}/{r["variant"]}/{r["repeat"]}: requested shared conversion was not observed')
+    return {"passed":not failures,"failures":failures}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", type=Path, required=True)
@@ -139,12 +180,15 @@ def main():
     p.add_argument("--decode-threads",type=int,default=0,help="Candidate-only decode budget; zero keeps startup threads")
     p.add_argument("--logits-threads",type=int,default=0,help="Candidate-only logits budget; zero keeps startup threads")
     p.add_argument("--profile",action="store_true",help="Collect numeric CPU phase/graph timings from instrumented candidates")
+    p.add_argument("--trace-tokens",action="store_true",help="Require identical complete token IDs against --candidate-reference; private logs only, numeric hashes in report")
     args = p.parse_args()
     if args.repeats < 1 or args.threads < 1 or args.decode_threads < 0 or args.logits_threads < 0 or "baseline" not in args.variants or len(args.variants) < 2:
         p.error("Need at least one repeat, baseline, and a candidate")
     candidates = [v for v in args.variants if v not in ("baseline","cache-reference")]
     if args.candidate_reference and (args.candidate_reference not in candidates or len(set(candidates)) < 2):
         p.error("Candidate reference must be a numeric variant with another same-build candidate")
+    if args.trace_tokens and not args.candidate_reference:
+        p.error("Token parity needs an explicit same-build candidate reference")
     root = args.root.resolve()
     results = root / args.name
     results.mkdir(parents=True, exist_ok=True)
@@ -168,6 +212,11 @@ def main():
               "sourceCommit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root / "source", text=True).strip(),
               "cpu": subprocess.check_output(["lscpu"], text=True), "runs": []}
     report["harnessSha256"] = digest(Path(__file__))
+    report["traceReaderSha256"] = digest(Path(__file__).with_name("moss_ngram_audit.py"))
+    report["sourceTree"] = subprocess.check_output(["git","rev-parse","HEAD^{tree}"],cwd=root / "source",text=True).strip()
+    report["sourceClean"] = not subprocess.check_output(["git","status","--porcelain"],cwd=root / "source",text=True).strip()
+    if not report["sourceClean"]:
+        raise ValueError("Freeze and commit source before benchmarking")
     report["threads"] = args.threads
     report["variantSettings"] = {v: {"opt": int(configuration(v)[1]), "threads": configuration(v)[3],
                                        "waitPolicy": "passive" if configuration(v)[4] else "default",
@@ -175,6 +224,7 @@ def main():
                                  for v in args.variants}
     report["protocol"] += " Candidate OPT@THREADS labels override per-run threads; -passive sets OMP_WAIT_POLICY=PASSIVE/GOMP_SPINCOUNT=0. Default variants clear inherited wait/dynamic/thread-limit settings."
     report["phaseProfiling"] = args.profile
+    report["tokenTracingSameBuild"] = args.trace_tokens
     report["sourceSha256"] = {str(path.relative_to(root / "source")):digest(path)
                               for path in sorted((root / "source/src").glob("*")) if path.is_file()}
     report["sourceSha256"]["CMakeLists.txt"] = digest(root / "source/CMakeLists.txt")
@@ -222,7 +272,8 @@ def main():
             for variant in variants:
                 key = f"{case}-{variant}-{repeat}"
                 binary, opt, lib, threads, passive, budgets = configuration(variant)
-                env = run_environment(os.environ, affinity, opt, threads, lib, args.profile, passive, budgets)
+                env = run_environment(os.environ, affinity, opt, threads, lib, args.profile, passive, budgets,
+                                      args.trace_tokens and variant not in ("baseline","cache-reference"))
                 raw, log, timer = [results / (key + ext) for ext in (".txt", ".log", ".time")]
                 cmd = ["/usr/bin/time", "-f", "%M", "-o", str(timer), str(binary), "transcribe", str(model), str(audio), "--max-new", "4096"]
                 start = time.perf_counter()
@@ -258,6 +309,9 @@ def main():
                        "profile": {k:float(v) for k,v in re.findall(r"(prefill|embedding|decoder|logits)=([\d.]+)",stderr)},
                        "phaseProfile": json.loads(phase_match[1]) if (phase_match := re.search(r"^CPU_PHASE_PROFILE (\{.*\})$", stderr, re.M)) else None,
                        "modelStorage":parse_storage(stderr)}
+                if args.trace_tokens and variant not in ("baseline","cache-reference"):
+                    try: row["tokenTrace"]=token_fingerprint(log)
+                    except ValueError as error: row["tokenTrace"]={"error":str(error)}
                 report["runs"].append(row)
                 report_path.write_text(json.dumps(report,indent=2))
                 print(json.dumps(row),flush=True)
@@ -266,9 +320,11 @@ def main():
     if "cache-reference" in args.variants:
         artifact_hashes.update({str(reference):report["binarySha256"]["cache-reference"], **report["referenceLibraries"]})
     artifact_hashes.update({str(root / "source" / name):value for name,value in report["sourceSha256"].items()})
+    artifact_hashes.update({str(Path(__file__)):report["harnessSha256"],str(Path(__file__).with_name("moss_ngram_audit.py")):report["traceReaderSha256"]})
     changed = [path for path,value in artifact_hashes.items() if digest(path) != value]
     report["artifactGate"] = {"passed":not changed,"changed":changed}
     report["storageGate"] = evaluate_storage(report["runs"],report["variantSettings"])
+    report["sharedActivationGate"] = evaluate_shared_activation(report["runs"],report["variantSettings"])
     report["gate"] = evaluate(report["runs"])
     if "cache-reference" in args.variants:
         compared = [r for r in report["runs"] if r["variant"] != "baseline"]
@@ -276,11 +332,14 @@ def main():
     if args.candidate_reference:
         report["candidateReference"] = args.candidate_reference
         report["candidateReferenceGate"] = evaluate_candidate_reference(report["runs"],args.candidate_reference)
+    if args.trace_tokens:
+        report["tokenTraceGate"] = evaluate_token_traces(report["runs"],args.candidate_reference)
     report_path.write_text(json.dumps(report,indent=2))
     print(json.dumps(report["gate"],indent=2))
     if args.candidate_reference:
         print(json.dumps({"candidateReferenceGate":report["candidateReferenceGate"]},indent=2))
-    return 0 if report["artifactGate"]["passed"] and report["storageGate"]["passed"] and report["gate"]["passed"] and report.get("cacheReferenceGate",{"passed":True})["passed"] and report.get("candidateReferenceGate",{"passed":True})["passed"] else 1
+    return 0 if all(report.get(g,{"passed":True})["passed"] for g in
+        ("artifactGate","storageGate","sharedActivationGate","gate","cacheReferenceGate","candidateReferenceGate","tokenTraceGate")) else 1
 
 
 if __name__ == "__main__":
