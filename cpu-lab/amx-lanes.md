@@ -22,13 +22,16 @@ compiler, native binary/library/test/controller/log hashes and all measurements.
 GCC compiled and executed the native AMX body on hp-fury's Xeon Gold 5416S.
 Fifteen native CTests passed in 22.43 seconds; 34 Python gate/parser checks passed.
 
-All 96 native arithmetic cases and 144 protected timing cases have zero output
-float-bit differences. The grids cover 1/16 workers (timing adds 8), K32/96/1024/
+The separate native arithmetic run has 96 cases. The benchmark run has 144
+protected records: 36 normal records with timings and 108 arithmetic-only edge
+records with zero durations. Every record has zero output float-bit differences.
+The grids cover 1/16 workers (the benchmark adds 8), K32/96/1024/
 3072, N17/1024/3072 and normal/zero/extreme/half-scale-edge distributions. Literal
 codes -128/-127/0/127 and finite half-scale extremes include signed zeros,
 subnormals, smallest normals and maximum positive/negative finite scales.
-Every case uses two input updates. Raw Q8 activation and weight bytes are
-checked for immutability before and after timing; outputs must remain finite.
+Every record uses two input updates. Raw Q8 activation and weight bytes are
+checked after both comparisons and again after timing for the 36 timed normal
+records; outputs must remain finite.
 F32 converter source uses a separate value-equality guard. Operand snapshots
 are validation overhead, distinct from a packed inference checkpoint copy.
 
