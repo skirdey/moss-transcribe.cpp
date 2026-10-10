@@ -1,6 +1,7 @@
 #include "qwen3.hpp"
 #include "backend.hpp"
 #include "cpu_softmax.hpp"
+#include "cpu_activation.hpp"
 #include "ggml-cpu.h"
 
 #include <cmath>
@@ -75,6 +76,12 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
 
     // ---- attention pre-norm ----
     struct ggml_tensor* xn = rms_norm(ctx, x, w.attn_norm, eps);
+    const bool shared_projection = layout_opt && (std::atoi(layout_opt) & 8192);
+    if (shared_projection) {
+        ggml_tensor* weights[] = {w.attn_q,w.attn_k,w.attn_v};
+        xn=cpu_shared_projection_input(ctx,xn,weights,3,
+            n_tokens*n_batch>=256 ? CpuSharedActivationMode::Cast : CpuSharedActivationMode::Blocks);
+    }
 
     // ---- q, k, v (no bias in Qwen3) ----
     struct ggml_tensor* q = ggml_mul_mat(ctx, w.attn_q, xn);
@@ -176,6 +183,11 @@ Qwen3LayerOut qwen3_layer_forward(struct ggml_context* ctx, struct ggml_tensor* 
 
     // ---- FFN: SwiGLU = down( silu(gate(x)) * up(x) ) ----
     struct ggml_tensor* hn = rms_norm(ctx, h, w.ffn_norm, eps);
+    if (shared_projection) {
+        ggml_tensor* weights[] = {w.ffn_gate,w.ffn_up};
+        hn=cpu_shared_projection_input(ctx,hn,weights,2,
+            n_tokens*n_batch>=256 ? CpuSharedActivationMode::Cast : CpuSharedActivationMode::Blocks);
+    }
     struct ggml_tensor* g  = ggml_mul_mat(ctx, w.ffn_gate, hn);
     struct ggml_tensor* u  = ggml_mul_mat(ctx, w.ffn_up,   hn);
     const char* opt = std::getenv("MTD_CPU_OPT");

@@ -8,6 +8,7 @@ namespace mt {
 namespace {
 struct Counters {
     unsigned long long calls = 0, graphs = 0;
+    unsigned long long shared_q8 = 0, shared_q8_cast = 0, shared_q8_consumers = 0;
     double total = 0, build = 0, allocate = 0, input = 0, compute = 0;
 };
 thread_local std::array<Counters, static_cast<size_t>(CpuPhase::Count)> counters;
@@ -43,13 +44,19 @@ void cpu_profile_record(CpuStage stage, double seconds) {
         case CpuStage::Compute: c.compute += seconds; break;
     }
 }
+void cpu_profile_record_shared_q8(bool cast, unsigned long long consumers) {
+    if (!cpu_profile_enabled()) return;
+    auto& c=counters[static_cast<size_t>(current)];
+    ++c.shared_q8; c.shared_q8_cast+=cast; c.shared_q8_consumers+=consumers;
+}
 void cpu_profile_print() {
     if (!cpu_profile_enabled()) return;
     std::fputs("CPU_PHASE_PROFILE {", stderr);
     for (size_t i = 0; i < counters.size(); ++i) {
         const auto& c = counters[i];
-        std::fprintf(stderr, "%s\"%s\":{\"calls\":%llu,\"graphs\":%llu,\"totalSeconds\":%.9f,\"buildSeconds\":%.9f,\"allocateSeconds\":%.9f,\"inputSeconds\":%.9f,\"computeSeconds\":%.9f}",
-            i ? "," : "", names[i], c.calls, c.graphs, c.total, c.build, c.allocate, c.input, c.compute);
+        std::fprintf(stderr, "%s\"%s\":{\"calls\":%llu,\"graphs\":%llu,\"totalSeconds\":%.9f,\"buildSeconds\":%.9f,\"allocateSeconds\":%.9f,\"inputSeconds\":%.9f,\"computeSeconds\":%.9f,\"sharedQ8Nodes\":%llu,\"sharedQ8CastNodes\":%llu,\"sharedQ8Consumers\":%llu}",
+            i ? "," : "", names[i], c.calls, c.graphs, c.total, c.build, c.allocate, c.input, c.compute,
+            c.shared_q8,c.shared_q8_cast,c.shared_q8_consumers);
     }
     std::fputs("}\n", stderr);
 }

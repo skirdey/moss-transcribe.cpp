@@ -10,6 +10,7 @@ bool cpu_profile_enabled();
 void cpu_profile_reset();
 void cpu_profile_print();
 void cpu_profile_record(CpuStage stage, double seconds);
+void cpu_profile_record_shared_q8(bool cast, unsigned long long consumers);
 class CpuTimer {
 public:
     CpuTimer();
