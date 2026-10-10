@@ -66,7 +66,7 @@ struct Weights {
     }
 };
 
-void trial(ggml_backend_t backend,const Weights& w,int threads,int tokens) {
+void trial(ggml_backend_t backend,const Weights& w,int threads,int tokens,bool fused) {
     Resources graph_resources,cache_resources;
     graph_resources.ctx=ggml_init({16*1024*1024,nullptr,true});require(graph_resources.ctx,"graph context");
     cache_resources.ctx=ggml_init({1024*1024,nullptr,true});require(cache_resources.ctx,"cache context");
@@ -88,13 +88,16 @@ void trial(ggml_backend_t backend,const Weights& w,int threads,int tokens) {
     mt::Qwen3Hparams hp;
     hp.hidden=1024;hp.n_heads=16;hp.n_kv_heads=8;hp.head_dim=128;hp.intermediate=3072;
     for(int v=0;v<2;++v) {
-        setenv("MTD_CPU_OPT",v ? "8240" : "48",1);
+        setenv("MTD_CPU_OPT",v ? (fused ? "32816" : "8240") : "48",1);
         auto out=mt::qwen3_layer_forward(ctx,x,pos,mask,nullptr,nullptr,w.layer,hp,graph,kc[v],vc[v],past);
         y[v]=out.y;ggml_set_output(y[v]);ggml_build_forward_expand(graph,y[v]);
     }
-    int ordinary=0,shared=0,casts=0;
+    int ordinary=0,shared=0,casts=0,fused_nodes=0,fused_consumers=0;
     for(int i=0;i<ggml_graph_n_nodes(graph);++i) {
         auto node=ggml_graph_node(graph,i);
+        if(node->op==GGML_OP_CUSTOM && (node->src[1]==w.layer.attn_q || node->src[1]==w.layer.ffn_gate)) {
+            ++fused_nodes;fused_consumers+=node->src[1]==w.layer.attn_q ? 3 : 2;
+        }
         if(node->op!=GGML_OP_MUL_MAT)continue;
         const auto weight=node->src[0];
         if(weight!=w.layer.attn_q && weight!=w.layer.attn_k && weight!=w.layer.attn_v
@@ -105,7 +108,10 @@ void trial(ggml_backend_t backend,const Weights& w,int threads,int tokens) {
             casts+=node->src[1]->op==GGML_OP_CPY;
         }
     }
-    require(ordinary==5 && shared==5 && casts==(tokens>=256 ? 5 : 0),"actual layer routing");
+    if(fused)require(ordinary==(tokens==1 ? 5 : 10) && shared==0 && casts==0
+        && fused_nodes==(tokens==1 ? 2 : 0) && fused_consumers==(tokens==1 ? 5 : 0),"actual fused layer routing/fallback");
+    else require(ordinary==5 && shared==5 && casts==(tokens>=256 ? 5 : 0)
+        && fused_nodes==0,"actual shared layer routing");
     graph_resources.alloc=ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
     require(ggml_gallocr_alloc_graph(graph_resources.alloc,graph),"layer allocation");
     std::vector<float> input(1024*tokens),causal(tokens*tokens),cache(128*8*capacity);
@@ -134,20 +140,24 @@ void trial(ggml_backend_t backend,const Weights& w,int threads,int tokens) {
         }
         std::vector<float> unchanged(input.size());ggml_backend_tensor_get(x,unchanged.data(),0,unchanged.size()*sizeof(float));
         require(!std::memcmp(unchanged.data(),input.data(),input.size()*sizeof(float)),"layer input overwritten");w.unchanged();
-        std::printf("{\"threads\":%d,\"tokens\":%d,\"pastTokens\":%d,\"update\":%d,\"sharedConsumers\":%d,\"castConsumers\":%d,\"layerAndCacheBitDifferences\":%zu}\n",threads,tokens,past,update,shared,casts,different);
+        std::printf("{\"threads\":%d,\"tokens\":%d,\"pastTokens\":%d,\"update\":%d,\"sharedConsumers\":%d,\"castConsumers\":%d,\"fusedNodes\":%d,\"fusedConsumers\":%d,\"layerAndCacheBitDifferences\":%zu}\n",threads,tokens,past,update,shared,casts,fused_nodes,fused_consumers,different);
         std::fflush(stdout);require(different==0,"layer/cache bit identity");
     }
 }
 }
 
-int main() {
+int main(int argc,char** argv) {
     try {
+        const bool fused=argc==2 && !std::strcmp(argv[1],"--fused");
+        require(argc==1 || fused,"usage: test_cpu_shared_layer [--fused]");
         setenv("MTD_DEVICE","cpu",1);setenv("MTD_THREADS","16",1);
         auto backend=mt::backend();require(ggml_backend_is_cpu(backend),"CPU backend");
+        const auto* traits=ggml_get_type_traits_cpu(GGML_TYPE_Q8_0);
+        if(fused && (traits->nrows!=1 || traits->vec_dot_type!=GGML_TYPE_Q8_0))return 77;
         Weights weights(backend);
         for(int threads:{1,16}) {
             ggml_backend_cpu_set_n_threads(backend,threads);
-            for(int tokens:{1,3,64,257})trial(backend,weights,threads,tokens);
+            for(int tokens:{1,3,64,257})trial(backend,weights,threads,tokens,fused);
         }
         return 0;
     } catch(const std::exception& e) {std::fprintf(stderr,"test_cpu_shared_layer: %s\n",e.what());return 1;}
