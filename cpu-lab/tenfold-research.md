@@ -705,3 +705,30 @@ The model uses ternary QAT and quality metrics differ from FP16, so this is not
 lossless compression of MOSS Q8 or exact output preservation. Transfer input
 reuse, register accumulation and worker-region amortization, retaining matched
 thread, format, cold/warm and full-input denominators.
+
+## Selective real-weight encoder integration, 2026-10-09
+
+The [encoder report](encoder-vnni.md) routes only the three measured M1500 Q8
+shapes at16 workers behind research bit65536. Per-encode contexts survive
+compute/read and own the quantizer/panels/barriers; actual callback counters
+are collected after the join. All16 native CTests and36 Python checks pass.
+All12 synthetic records and14 real-weight chunks are bit exact, including
+21,504,000 encoder output floats and2,016 actual node executions.
+
+The complete48-run fresh-process pilot passes full outputs/count/EOS, all24
+same-build token traces, immutable artifacts, all12 actual candidate routes
+and all three fixed five-percent latency gates. Same-build speech speedups
+are1.0220–1.0318×; silence/real-empty1.0524–1.0577×. Full-input includes load.
+All records remain, and shared load12.96–16.19/two repeats do not establish
+confidence or replace the immutable quiet baseline. Encoder-only reference-
+first observations (median1.0668×) are correctness-first, not counterbalanced.
+Controller0/restoredauto1/authAPIunchanged; watcher stopped. No production
+promotion, private payload publication, corpus accuracy claim or10× completion.
+
+This applies the Integer Alibi method of fixed operands, intermediate bit
+checks and identified executing kernels before whole-model comparisons. It
+retains original Q8 scales/order and never assumes whole-K integer accumulation
+or a different quantizer is lossless. Next investigate shared Q/K/V panels
+through one operation with contiguous output slices, retaining the same full-
+input gates. That extension is unimplemented; all parts of the pipeline still
+need improvement to meet the original target.

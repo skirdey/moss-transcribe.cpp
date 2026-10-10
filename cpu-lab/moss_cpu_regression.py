@@ -175,6 +175,20 @@ def evaluate_fused_projections(runs, settings):
             "singleEosRunsWithoutDecode":no_decode}
 
 
+def evaluate_encoder_q8(runs, settings):
+    failures=[];exercised=0
+    for r in runs:
+        if not settings.get(r["variant"],{}).get("opt",0) & 65536: continue
+        p=(r.get("phaseProfile") or {}).get("whisper") or {}
+        nodes=p.get("encoderQ8Nodes",0);executions=p.get("encoderQ8Executions",0)
+        if (p.get("graphs",0)<=0 or nodes<6*p.get("graphs",0) or executions!=nodes
+            or p.get("encoderQ8Failures")!=0 or p.get("encoderQ8MinWorkers")!=16
+            or p.get("encoderQ8MaxWorkers")!=16):
+            failures.append(f'{r["case"]}/{r["variant"]}/{r["repeat"]}: requested encoder route/actual 16-worker executions not verified')
+        else: exercised+=1
+    return {"passed":not failures,"failures":failures,"exercisedRuns":exercised}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", type=Path, required=True)
@@ -343,6 +357,7 @@ def main():
     report["storageGate"] = evaluate_storage(report["runs"],report["variantSettings"])
     report["sharedActivationGate"] = evaluate_shared_activation(report["runs"],report["variantSettings"])
     report["fusedProjectionGate"] = evaluate_fused_projections(report["runs"],report["variantSettings"])
+    report["encoderQ8Gate"] = evaluate_encoder_q8(report["runs"],report["variantSettings"])
     report["gate"] = evaluate(report["runs"])
     if "cache-reference" in args.variants:
         compared = [r for r in report["runs"] if r["variant"] != "baseline"]
@@ -357,7 +372,7 @@ def main():
     if args.candidate_reference:
         print(json.dumps({"candidateReferenceGate":report["candidateReferenceGate"]},indent=2))
     return 0 if all(report.get(g,{"passed":True})["passed"] for g in
-        ("artifactGate","storageGate","sharedActivationGate","fusedProjectionGate","gate","cacheReferenceGate","candidateReferenceGate","tokenTraceGate")) else 1
+        ("artifactGate","storageGate","sharedActivationGate","fusedProjectionGate","encoderQ8Gate","gate","cacheReferenceGate","candidateReferenceGate","tokenTraceGate")) else 1
 
 
 if __name__ == "__main__":

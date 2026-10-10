@@ -2,7 +2,7 @@
 import unittest
 import tempfile
 from pathlib import Path
-from moss_cpu_regression import evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference, token_fingerprint, evaluate_token_traces, evaluate_shared_activation, evaluate_fused_projections
+from moss_cpu_regression import evaluate_encoder_q8, evaluate, run_environment, variant_settings, parse_storage, evaluate_storage, evaluate_candidate_reference, token_fingerprint, evaluate_token_traces, evaluate_shared_activation, evaluate_fused_projections
 
 
 class RegressionGateTest(unittest.TestCase):
@@ -166,6 +166,24 @@ class RegressionGateTest(unittest.TestCase):
         eos={**row,"tokens":1,"phaseProfile":{"decode":{"graphs":0,"fusedQ8Nodes":0}}}
         gate=evaluate_fused_projections([eos],settings)
         self.assertTrue(gate["passed"]);self.assertEqual(gate["singleEosRunsWithoutDecode"],1)
+
+    def test_requested_encoder_route_requires_executed_callbacks_and_actual_workers(self):
+        settings={"65584":{"opt":65584},"48":{"opt":48}}
+        valid={"graphs":2,"encoderQ8Nodes":288,"encoderQ8Executions":288,
+               "encoderQ8Failures":0,"encoderQ8MinWorkers":16,"encoderQ8MaxWorkers":16}
+        row=self.row("65584",repeat=0,phaseProfile={"whisper":valid})
+        gate=evaluate_encoder_q8([row],settings)
+        self.assertTrue(gate["passed"]);self.assertEqual(gate["exercisedRuns"],1)
+        for bad in (None,{}, {**valid,"graphs":0},{**valid,"encoderQ8Nodes":0},
+                    {**valid,"encoderQ8Executions":287},{**valid,"encoderQ8Failures":1},
+                    {**valid,"encoderQ8MinWorkers":8},{**valid,"encoderQ8MaxWorkers":32}):
+            self.assertFalse(evaluate_encoder_q8([{**row,"phaseProfile":{"whisper":bad}}],settings)["passed"])
+
+    def test_encoder_route_counters_must_be_in_whisper_and_reference_keeps_old_schema(self):
+        settings={"65584":{"opt":65584},"48":{"opt":48}}
+        self.assertTrue(evaluate_encoder_q8([self.row("48",phaseProfile=None)],settings)["passed"])
+        row=self.row("65584",repeat=0,phaseProfile={"decode":{"encoderQ8Nodes":288}})
+        self.assertFalse(evaluate_encoder_q8([row],settings)["passed"])
 
 
 if __name__ == "__main__":

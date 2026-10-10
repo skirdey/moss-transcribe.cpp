@@ -45,6 +45,7 @@ set(MT_SRC
   src/cpu_q8.cpp
   src/cpu_activation.cpp
   src/cpu_projection.cpp
+  src/cpu_encoder_q8.cpp
   src/cpu_profile.cpp
   src/qwen3_decoder.cpp
   src/generate.cpp
@@ -56,6 +57,7 @@ set(MT_SRC
 )
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   set_source_files_properties(src/cpu_q8.cpp PROPERTIES COMPILE_OPTIONS "-march=native;-ffp-contract=off")
+  set_source_files_properties(src/cpu_encoder_q8.cpp PROPERTIES COMPILE_OPTIONS "-march=native;-ffp-contract=off")
 endif()
 if(MT_SHARED)
   add_library(moss-transcribe SHARED ${MT_SRC})

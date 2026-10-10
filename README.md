@@ -599,3 +599,13 @@ conversions,15 CTests and34 Python checks pass with exact ordinary F32 GGML
 output and quantized bytes. Large encoder matrices improve1.29–1.41×; small
 projections regress. Actual encoder routing and complete-model gates remain;
 production is unchanged and the original full-input10× goal is unachieved.
+
+### Selective exact encoder VNNI integration
+
+The [real encoder report](cpu-lab/encoder-vnni.md) adds research bit65536 for
+three measured M1500 Q8 shapes at16 CPU workers, with per-encode context
+ownership and ordinary fallback.16 CTests/36 Python checks pass;14 real chunks
+match21.5 million output floats, and48 fresh full-input runs preserve complete
+outputs/tokens/EOS with observed routes and passing latency gates. Speech
+medians are1.022–1.032× faster than same-build opt48. All numeric evidence is
+public, production remains unchanged, and the original10× goal is unachieved.
