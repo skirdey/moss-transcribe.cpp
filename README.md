@@ -557,3 +557,14 @@ and panel codes/scales. Sixteen of 28 normal timing controls improve, including
 1.15x for a 4096-wide projection at 16 workers, but the 1500-row encoder-shaped
 control is 26.6% slower. It adds no MOSS route or production change. Full numeric
 evidence, the initial link-target failure and its exact repair are public.
+
+### Single-team VNNI panel packing
+
+The [parallel packing report](cpu-lab/vnni-parallel.md) pairs serial and worker-owned
+packing with an ordinary GGML control. All 78 arithmetic and 111 protected
+benchmark records match output bits, operand bytes and initialized panel tails.
+Fifteen CTests and 34 Python checks pass. Packing overhead falls, but all three
+encoder-shaped matrices remain 15–25% slower than ordinary GGML; no model route
+or promotion follows. Separate stage diagnostics and exact-binary disassembly
+identify compute-loop half-conversion calls and stack spills for the next test.
+The original full-input 10× goal remains active and unachieved.
