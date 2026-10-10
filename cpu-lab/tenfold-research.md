@@ -447,3 +447,79 @@ gate/up paths, retaining ordinary weights and reference matrix operations.
 Use matched production, frozen fastest opt48 and same-build opt48 controls,
 including long speech/silence and full text/speaker/timestamp/token/EOS gates.
 The original quiet reference and tenfold objective remain unchanged and active.
+
+## Actual-model shared conversion, 2026-10-09
+
+The [full report](shared-model.md) integrates shape-aware block/cast reuse
+into actual Qwen and Whisper projections without weight copies or new matrix
+arithmetic. Research bits8192/16384 are off by default. Native validation
+passed all 13 CTests and 33 Python gate/parser tests on hp-fury; the actual
+Qwen layer/cache fixture has zero float-bit differences across decode and
+prefill at 1/16 workers. The failed CPY/DUP fixture attempt is retained with
+an exact source reverse patch and build/test provenance.
+
+The [72-run paired pilot](shared-model-pilot-v2.json) includes production,
+frozen fastest opt48, same-build opt48, decoder reuse, encoder reuse and both.
+All output hashes, counts and EOS match; all 48 numeric runs match complete
+same-build token hashes. Artifact and route gates pass. The original runner
+exited1: combined reuse failed German latency against frozen opt48 (+5.98%)
+and same-build opt48 (+5.31%). Real-empty speech failed production for every
+opt48 control/candidate (+15.87% to +20.20%). No candidate passes all controls
+or is promoted. Shared host load spans 23.59-32.44, and unchanged phases
+also vary; the apparent isolated encoder improvement cannot establish causality.
+
+Production and automatic processing were restored and health verified. The
+quiet opt48 baseline and tenfold objective are unchanged, active and unachieved.
+The report adds three primary papers with explicit hardware/numerical limits.
+Next test one exact-dot CPU operation per decode projection group with
+ordinary weights and private per-worker conversion; preserve prefill fallback,
+actual layer/cache bits, complete token sequences and all three latency gates.
+
+## Exact-dot projection fusion, 2026-10-09
+
+The [projection fusion report](fused-projection.md) combines eligible one-row
+Qwen Q/K/V and gate/up operations while retaining ordinary Q8 weights and the
+pinned converter/dot routines. Private per-worker activation conversion avoids
+a custom barrier or shared mutable scratch. Research bit 32768 is off by default;
+prefill and unsupported shapes fall back. Fifteen native CTests and 34 Python
+checks pass. Protected projection and actual layer/cache tests preserve float
+bits and operands across repeated input updates. At 16 workers, valid protected
+graph probes observe 1.208x Q/K/V and 1.183x gate/up; slower 8-worker cases remain.
+
+The [48-run full-input pilot](fused-projection-pilot-v1.json) passes complete
+outputs, EOS, artifacts, observed routes, complete same-build token hashes and
+all three latency controls. Speech medians are only 0.2–2.7% faster than same-build
+opt48. Two repeats and shared host load 14.36–30.01 establish neither statistical
+confidence nor quiet-host causality. Silence is 0.29% slower than frozen opt48,
+within the fixed five-percent rejection gate. Production remains unchanged,
+automatic processing was restored and API identity/health verified. The quiet
+opt48 reference and tenfold objective remain unchanged, active and unachieved.
+
+Next arithmetic probe: sparse AMX columns preserve eight separate four-code
+integer sums, original float FMA chains and the final horizontal-add tree.
+Require supported-hardware exact arithmetic and protected timing before any
+actual-model integration. Full-model gates remain mandatory for a new route.
+
+## Sparse AMX exact-order arithmetic, 2026-10-09
+
+The [AMX probe report](amx-lanes.md) tests separate four-code integer sums,
+original half-scale products and pinned FMA/horizontal-add order without a
+packed checkpoint copy. The native GCC body runs on hp-fury. All 96 arithmetic
+and 144 protected timing records preserve float bits and raw Q8 operands,
+including literal -128 PSIGNB correction and finite half-scale extremes. Fifteen
+native CTests and 34 Python checks pass; unsupported machines return 77 without
+portable fallback timing. It is an owned-vector probe, not a model route.
+
+Thirty-five of 36 normal shape/worker timing controls are slower. Representative
+16-worker widths are 2.4–3.0x slower than pinned SIMD; the sole higher ratio is
+K96/N17 at 16 workers, 5.008 to 4.945 microseconds (1.0129x). All measurements,
+including this tiny case, source/test/binary/library/log hashes and limits are
+retained. Panels/configuration are included; input quantization, loading and
+full generation are excluded. Shared OpenMP timings are unpinned. Reject this
+version for model integration; arithmetic exactness does not establish speed.
+
+Production/automatic processing were restored and API identity/health verified.
+The original quiet opt48 reference and tenfold objective remain unchanged,
+active and unachieved. Next isolate layout/scale/gather overhead before proposing
+a concrete new arithmetic version. Any actual-model integration requires all
+protected layer/cache, complete output/token/EOS and matched latency gates.

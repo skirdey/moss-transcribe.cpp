@@ -1,0 +1,4908 @@
+{
+  "protocol": "Sequential fresh processes, 16 threads, pinned model, alternating variant order each round, warm filesystem cache. Production auto processing paused; API stays available. Wall includes load. Shared host; no hardware counter support. Candidate OPT@THREADS labels override per-run threads; -passive sets OMP_WAIT_POLICY=PASSIVE/GOMP_SPINCOUNT=0. Default variants clear inherited wait/dynamic/thread-limit settings.",
+  "modelSha256": "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c",
+  "binarySha256": {
+    "baseline": "90c7424f2e7b20403a92d6bdcc2130dbff6bba147169ffeeb21572e473484815",
+    "candidate": "b455589c32dd15e2f7d0c9758386a9f5582c59f38bb44b3efa026e8822dbba76",
+    "cache-reference": "bb8bd09737c1063657f4bb0dde0c114bc63cde1a528518950c19007295387825"
+  },
+  "libraries": {
+    "/home/stan/hw-moss-fused-projection-model-v1/build/third_party/ggml/src/libggml-base.so": "1803ea657fb6bfe625bda7eca496ec39da2f59f15dcde40460c52c30a9fb34cd",
+    "/home/stan/hw-moss-fused-projection-model-v1/build/third_party/ggml/src/libggml-cpu.so": "9bf422f40ab842684229cc2fbda2eb34f1dfd1f96d072dec83de7cc20a15b330",
+    "/home/stan/hw-moss-fused-projection-model-v1/build/third_party/ggml/src/libggml.so": "0095f2e0dc4b2ecd86b1ba97449b13dcabf6ff1e30cb0b1864330cd4bc7d2fd3"
+  },
+  "sourceCommit": "f2176e6fab24c9ea0b32e85fa98a7c814ba93e05",
+  "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 57 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  32\nOn-line CPU(s) list:                     0-31\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Xeon(R) Gold 5416S\nCPU family:                              6\nModel:                                   143\nThread(s) per core:                      2\nCore(s) per socket:                      16\nSocket(s):                               1\nStepping:                                8\nCPU(s) scaling MHz:                      56%\nCPU max MHz:                             4000.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                4000.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cat_l2 cdp_l3 cdp_l2 ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb intel_pt avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local split_lock_detect user_shstk avx_vnni avx512_bf16 wbnoinvd dtherm ida arat pln pts hwp hwp_act_window hwp_pkg_req hfi vnmi avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid bus_lock_detect cldemote movdiri movdir64b enqcmd fsrm md_clear serialize tsxldtrk pconfig arch_lbr ibt amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities\nVirtualization:                          VT-x\nL1d cache:                               768 KiB (16 instances)\nL1i cache:                               512 KiB (16 instances)\nL2 cache:                                32 MiB (16 instances)\nL3 cache:                                30 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-31\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Vulnerable\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+  "runs": [
+    {
+      "case": "meeting-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 33.300685432739556,
+      "maxRssKiB": 1586768,
+      "hostLoadBefore": [
+        30.01416015625,
+        28.76171875,
+        28.826171875
+      ],
+      "hostLoadAfter": [
+        29.6806640625,
+        28.72509765625,
+        28.8076171875
+      ],
+      "timing": {
+        "load": 1.040107,
+        "inference": 32.091414
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 20.096116313245147,
+      "maxRssKiB": 1701624,
+      "hostLoadBefore": [
+        29.6806640625,
+        28.72509765625,
+        28.8076171875
+      ],
+      "hostLoadAfter": [
+        28.44970703125,
+        28.47509765625,
+        28.72216796875
+      ],
+      "timing": {
+        "load": 0.981282,
+        "inference": 18.939155
+      },
+      "profile": {
+        "prefill": 2.235155,
+        "embedding": 0.016553,
+        "decoder": 7.271696,
+        "logits": 1.158741
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "48",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 20.262695842888206,
+      "maxRssKiB": 1702016,
+      "hostLoadBefore": [
+        28.44970703125,
+        28.47509765625,
+        28.72216796875
+      ],
+      "hostLoadAfter": [
+        27.50634765625,
+        28.2255859375,
+        28.63330078125
+      ],
+      "timing": {
+        "load": 1.021145,
+        "inference": 19.071913
+      },
+      "profile": {
+        "prefill": 2.249596,
+        "embedding": 0.017437,
+        "decoder": 7.267084,
+        "logits": 1.158579
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000965882,
+          "inputSeconds": 0.000191603,
+          "computeSeconds": 0.002789863,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.981128261,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 6.737438775,
+          "buildSeconds": 0.002325368,
+          "allocateSeconds": 0.000343378,
+          "inputSeconds": 0.000777115,
+          "computeSeconds": 6.725432207,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.017155235,
+          "buildSeconds": 2.809e-05,
+          "allocateSeconds": 2.1894e-05,
+          "inputSeconds": 0.001797838,
+          "computeSeconds": 0.012994128,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 2.249594072,
+          "buildSeconds": 0.00031811,
+          "allocateSeconds": 0.000407435,
+          "inputSeconds": 0.002878617,
+          "computeSeconds": 2.244985005,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 7.266817793,
+          "buildSeconds": 0.168426646,
+          "allocateSeconds": 0.197202484,
+          "inputSeconds": 0.000699646,
+          "computeSeconds": 6.898523285,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 1.157792477,
+          "buildSeconds": 0.011576634,
+          "allocateSeconds": 0.007623599,
+          "inputSeconds": 0.00026024,
+          "computeSeconds": 1.069484119,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "45884f669b443c45618ce2f69d640d9de01b7231bd9d7145bed9ed4e077bbc88",
+        "count": 674
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "32816",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 19.792525534052402,
+      "maxRssKiB": 1701708,
+      "hostLoadBefore": [
+        27.50634765625,
+        28.2255859375,
+        28.63330078125
+      ],
+      "hostLoadAfter": [
+        25.96826171875,
+        27.77197265625,
+        28.47265625
+      ],
+      "timing": {
+        "load": 0.972452,
+        "inference": 18.60056
+      },
+      "profile": {
+        "prefill": 2.231077,
+        "embedding": 0.01709,
+        "decoder": 6.830559,
+        "logits": 1.160696
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000997455,
+          "inputSeconds": 0.00018217,
+          "computeSeconds": 0.00274313,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.976302196,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 6.711163474,
+          "buildSeconds": 0.003153102,
+          "allocateSeconds": 0.000398351,
+          "inputSeconds": 0.000885371,
+          "computeSeconds": 6.697389343,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.025004539,
+          "buildSeconds": 2.7643e-05,
+          "allocateSeconds": 1.9643e-05,
+          "inputSeconds": 0.001666817,
+          "computeSeconds": 0.021152474,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 2.231074771,
+          "buildSeconds": 0.00031101,
+          "allocateSeconds": 0.000382046,
+          "inputSeconds": 0.003176331,
+          "computeSeconds": 2.226150189,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 6.830283061,
+          "buildSeconds": 0.179362035,
+          "allocateSeconds": 0.194886123,
+          "inputSeconds": 0.000747342,
+          "computeSeconds": 6.453541078,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 37688,
+          "fusedQ8Consumers": 94220
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 1.159971903,
+          "buildSeconds": 0.011243556,
+          "allocateSeconds": 0.007609158,
+          "inputSeconds": 0.000254632,
+          "computeSeconds": 1.072616738,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "45884f669b443c45618ce2f69d640d9de01b7231bd9d7145bed9ed4e077bbc88",
+        "count": 674
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 25.422898002900183,
+      "maxRssKiB": 1538008,
+      "hostLoadBefore": [
+        25.96826171875,
+        27.77197265625,
+        28.47265625
+      ],
+      "hostLoadAfter": [
+        23.8505859375,
+        27.06591796875,
+        28.21337890625
+      ],
+      "timing": {
+        "load": 1.015195,
+        "inference": 24.198221
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 17.290802887175232,
+      "maxRssKiB": 1652632,
+      "hostLoadBefore": [
+        23.8505859375,
+        27.06591796875,
+        28.21337890625
+      ],
+      "hostLoadAfter": [
+        25.736328125,
+        27.32470703125,
+        28.2802734375
+      ],
+      "timing": {
+        "load": 1.02699,
+        "inference": 16.055923
+      },
+      "profile": {
+        "prefill": 2.233206,
+        "embedding": 0.011779,
+        "decoder": 4.85259,
+        "logits": 0.870126
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "48",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 17.292745439801365,
+      "maxRssKiB": 1653064,
+      "hostLoadBefore": [
+        25.736328125,
+        27.32470703125,
+        28.2802734375
+      ],
+      "hostLoadAfter": [
+        26.18115234375,
+        27.3291015625,
+        28.265625
+      ],
+      "timing": {
+        "load": 1.022066,
+        "inference": 16.087035
+      },
+      "profile": {
+        "prefill": 2.17286,
+        "embedding": 0.011336,
+        "decoder": 4.837052,
+        "logits": 0.790435
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 458,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000624732,
+          "inputSeconds": 0.000118239,
+          "computeSeconds": 0.00188541,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.978055405,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 6.708010332,
+          "buildSeconds": 0.003111311,
+          "allocateSeconds": 0.000385973,
+          "inputSeconds": 0.000856826,
+          "computeSeconds": 6.694406556,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.028256641,
+          "buildSeconds": 3.0781e-05,
+          "allocateSeconds": 2.2507e-05,
+          "inputSeconds": 0.001996127,
+          "computeSeconds": 0.024614776,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 2.172857236,
+          "buildSeconds": 0.000305691,
+          "allocateSeconds": 0.000385629,
+          "inputSeconds": 0.003375602,
+          "computeSeconds": 2.167880235,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 457,
+          "graphs": 457,
+          "totalSeconds": 4.836866662,
+          "buildSeconds": 0.111786328,
+          "allocateSeconds": 0.131642893,
+          "inputSeconds": 0.000451751,
+          "computeSeconds": 4.591775374,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 458,
+          "graphs": 458,
+          "totalSeconds": 0.789872589,
+          "buildSeconds": 0.007695408,
+          "allocateSeconds": 0.005113193,
+          "inputSeconds": 0.000165115,
+          "computeSeconds": 0.730576284,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "9a9a44f38ee96ccdf058c8414354c4b9e6460d39318254fa2acad5fba52c3324",
+        "count": 458
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "32816",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 17.377346861176193,
+      "maxRssKiB": 1653460,
+      "hostLoadBefore": [
+        26.18115234375,
+        27.3291015625,
+        28.265625
+      ],
+      "hostLoadAfter": [
+        25.880859375,
+        27.15380859375,
+        28.1865234375
+      ],
+      "timing": {
+        "load": 1.030566,
+        "inference": 16.16469
+      },
+      "profile": {
+        "prefill": 2.292827,
+        "embedding": 0.01176,
+        "decoder": 4.808681,
+        "logits": 0.81784
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 458,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000682557,
+          "inputSeconds": 0.000130648,
+          "computeSeconds": 0.002301312,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.982122632,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 6.664781663,
+          "buildSeconds": 0.002641038,
+          "allocateSeconds": 0.000357272,
+          "inputSeconds": 0.000722168,
+          "computeSeconds": 6.65305249,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.01447933,
+          "buildSeconds": 2.9285e-05,
+          "allocateSeconds": 2.2306e-05,
+          "inputSeconds": 0.001852399,
+          "computeSeconds": 0.010996856,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 2.292825519,
+          "buildSeconds": 0.00023772,
+          "allocateSeconds": 0.000272015,
+          "inputSeconds": 0.002249477,
+          "computeSeconds": 2.289135527,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 457,
+          "graphs": 457,
+          "totalSeconds": 4.808495824,
+          "buildSeconds": 0.121533353,
+          "allocateSeconds": 0.132033636,
+          "inputSeconds": 0.000445851,
+          "computeSeconds": 4.553232592,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 25592,
+          "fusedQ8Consumers": 63980
+        },
+        "logits": {
+          "calls": 458,
+          "graphs": 458,
+          "totalSeconds": 0.817326098,
+          "buildSeconds": 0.007872203,
+          "allocateSeconds": 0.005249876,
+          "inputSeconds": 0.000167463,
+          "computeSeconds": 0.754441237,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "9a9a44f38ee96ccdf058c8414354c4b9e6460d39318254fa2acad5fba52c3324",
+        "count": 458
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 26.31683552917093,
+      "maxRssKiB": 1546036,
+      "hostLoadBefore": [
+        25.880859375,
+        27.15380859375,
+        28.1865234375
+      ],
+      "hostLoadAfter": [
+        27.283203125,
+        27.39599609375,
+        28.240234375
+      ],
+      "timing": {
+        "load": 1.016977,
+        "inference": 25.097849
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 17.742857167031616,
+      "maxRssKiB": 1660620,
+      "hostLoadBefore": [
+        27.283203125,
+        27.39599609375,
+        28.240234375
+      ],
+      "hostLoadAfter": [
+        28.68505859375,
+        27.7109375,
+        28.32666015625
+      ],
+      "timing": {
+        "load": 1.0193,
+        "inference": 16.538746
+      },
+      "profile": {
+        "prefill": 2.150174,
+        "embedding": 0.011896,
+        "decoder": 5.324202,
+        "logits": 0.85745
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "48",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 18.07727697212249,
+      "maxRssKiB": 1660548,
+      "hostLoadBefore": [
+        28.68505859375,
+        27.7109375,
+        28.32666015625
+      ],
+      "hostLoadAfter": [
+        29.8076171875,
+        28.00390625,
+        28.4130859375
+      ],
+      "timing": {
+        "load": 1.014757,
+        "inference": 16.852647
+      },
+      "profile": {
+        "prefill": 2.201469,
+        "embedding": 0.012109,
+        "decoder": 5.36965,
+        "logits": 0.864867
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000715122,
+          "inputSeconds": 0.00012745,
+          "computeSeconds": 0.001919499,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.992180068,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 6.811678338,
+          "buildSeconds": 0.00281606,
+          "allocateSeconds": 0.000399102,
+          "inputSeconds": 0.00091847,
+          "computeSeconds": 6.797645928,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.020558859,
+          "buildSeconds": 3.1723e-05,
+          "allocateSeconds": 2.1627e-05,
+          "inputSeconds": 0.001755427,
+          "computeSeconds": 0.017021472,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 2.2014673,
+          "buildSeconds": 0.000323392,
+          "allocateSeconds": 0.000368518,
+          "inputSeconds": 0.003394651,
+          "computeSeconds": 2.196159984,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 5.369467462,
+          "buildSeconds": 0.121566293,
+          "allocateSeconds": 0.141030111,
+          "inputSeconds": 0.000472655,
+          "computeSeconds": 5.10507371,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 0.864282574,
+          "buildSeconds": 0.008232787,
+          "allocateSeconds": 0.00554584,
+          "inputSeconds": 0.000186505,
+          "computeSeconds": 0.800497781,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "40e08a522ef5e1f55c3978da4bddee4fec30ccc1660853919d150c961a5753f8",
+        "count": 490
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "32816",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 17.49629045603797,
+      "maxRssKiB": 1660060,
+      "hostLoadBefore": [
+        29.8076171875,
+        28.00390625,
+        28.4130859375
+      ],
+      "hostLoadAfter": [
+        29.76611328125,
+        28.0908203125,
+        28.43212890625
+      ],
+      "timing": {
+        "load": 1.009074,
+        "inference": 16.306889
+      },
+      "profile": {
+        "prefill": 2.26562,
+        "embedding": 0.012428,
+        "decoder": 4.922807,
+        "logits": 0.846304
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000712879,
+          "inputSeconds": 0.000131171,
+          "computeSeconds": 0.00200527,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.984612566,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 6.677044885,
+          "buildSeconds": 0.003083277,
+          "allocateSeconds": 0.000435999,
+          "inputSeconds": 0.000907115,
+          "computeSeconds": 6.663773177,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.031027538,
+          "buildSeconds": 2.2359e-05,
+          "allocateSeconds": 1.6831e-05,
+          "inputSeconds": 0.001342987,
+          "computeSeconds": 0.027858852,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 2.265617823,
+          "buildSeconds": 0.000160618,
+          "allocateSeconds": 0.000173488,
+          "inputSeconds": 0.002018203,
+          "computeSeconds": 2.262090827,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 4.922627095,
+          "buildSeconds": 0.129178959,
+          "allocateSeconds": 0.14463666,
+          "inputSeconds": 0.00044955,
+          "computeSeconds": 4.647026333,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 27384,
+          "fusedQ8Consumers": 68460
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 0.845752648,
+          "buildSeconds": 0.008145019,
+          "allocateSeconds": 0.005509661,
+          "inputSeconds": 0.000191001,
+          "computeSeconds": 0.781778165,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "40e08a522ef5e1f55c3978da4bddee4fec30ccc1660853919d150c961a5753f8",
+        "count": 490
+      }
+    },
+    {
+      "case": "meeting-120s",
+      "variant": "baseline",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "duration": 120.0,
+      "outputSha256": "11506b7234b219e0a4d6e1e8b61104743b1bc10e4390d8d2645a749d7d0757e0",
+      "returncode": 0,
+      "tokens": 1331,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 93.58523887768388,
+      "maxRssKiB": 1974516,
+      "hostLoadBefore": [
+        29.76611328125,
+        28.0908203125,
+        28.43212890625
+      ],
+      "hostLoadAfter": [
+        24.1884765625,
+        27.23583984375,
+        28.13134765625
+      ],
+      "timing": {
+        "load": 1.002803,
+        "inference": 92.47963
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "meeting-120s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "duration": 120.0,
+      "outputSha256": "11506b7234b219e0a4d6e1e8b61104743b1bc10e4390d8d2645a749d7d0757e0",
+      "returncode": 0,
+      "tokens": 1331,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 32.93123326590285,
+      "maxRssKiB": 2082236,
+      "hostLoadBefore": [
+        24.1884765625,
+        27.23583984375,
+        28.13134765625
+      ],
+      "hostLoadAfter": [
+        21.35546875,
+        26.255859375,
+        27.77587890625
+      ],
+      "timing": {
+        "load": 0.626969,
+        "inference": 32.198096
+      },
+      "profile": {
+        "prefill": 4.573162,
+        "embedding": 0.023442,
+        "decoder": 13.857798,
+        "logits": 1.807228
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "meeting-120s",
+      "variant": "48",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "duration": 120.0,
+      "outputSha256": "11506b7234b219e0a4d6e1e8b61104743b1bc10e4390d8d2645a749d7d0757e0",
+      "returncode": 0,
+      "tokens": 1331,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 33.031521521974355,
+      "maxRssKiB": 2083176,
+      "hostLoadBefore": [
+        21.35546875,
+        26.255859375,
+        27.77587890625
+      ],
+      "hostLoadAfter": [
+        19.6611328125,
+        25.29296875,
+        27.396484375
+      ],
+      "timing": {
+        "load": 0.640583,
+        "inference": 32.282064
+      },
+      "profile": {
+        "prefill": 4.572946,
+        "embedding": 0.025193,
+        "decoder": 13.916546,
+        "logits": 1.813136
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 1331,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000922915,
+          "inputSeconds": 0.000263299,
+          "computeSeconds": 0.003220392,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 4,
+          "graphs": 0,
+          "totalSeconds": 0.775197591,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 4,
+          "graphs": 4,
+          "totalSeconds": 10.617984578,
+          "buildSeconds": 0.002085051,
+          "allocateSeconds": 0.000350297,
+          "inputSeconds": 0.000641857,
+          "computeSeconds": 10.607836867,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.025607295,
+          "buildSeconds": 2.5305e-05,
+          "allocateSeconds": 1.9514e-05,
+          "inputSeconds": 0.002899913,
+          "computeSeconds": 0.021649649,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.572944878,
+          "buildSeconds": 0.000146131,
+          "allocateSeconds": 0.010914712,
+          "inputSeconds": 0.011102874,
+          "computeSeconds": 4.549461336,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 1330,
+          "graphs": 1330,
+          "totalSeconds": 13.916286252,
+          "buildSeconds": 0.209834058,
+          "allocateSeconds": 0.264415894,
+          "inputSeconds": 0.000762974,
+          "computeSeconds": 13.438388153,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 1331,
+          "graphs": 1331,
+          "totalSeconds": 1.811629521,
+          "buildSeconds": 0.017163895,
+          "allocateSeconds": 0.010850845,
+          "inputSeconds": 0.000346999,
+          "computeSeconds": 1.661636648,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "5d46b404fbfe138b553fa9e51b5cf73e516f0d92dcb4c35bbb67e713a21abfb6",
+        "count": 1331
+      }
+    },
+    {
+      "case": "meeting-120s",
+      "variant": "32816",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "duration": 120.0,
+      "outputSha256": "11506b7234b219e0a4d6e1e8b61104743b1bc10e4390d8d2645a749d7d0757e0",
+      "returncode": 0,
+      "tokens": 1331,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 32.58111569704488,
+      "maxRssKiB": 2082892,
+      "hostLoadBefore": [
+        19.6611328125,
+        25.29296875,
+        27.396484375
+      ],
+      "hostLoadAfter": [
+        18.328125,
+        24.3837890625,
+        27.0234375
+      ],
+      "timing": {
+        "load": 0.625943,
+        "inference": 31.831871
+      },
+      "profile": {
+        "prefill": 4.612786,
+        "embedding": 0.022322,
+        "decoder": 13.40544,
+        "logits": 1.809318
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 1331,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000949553,
+          "inputSeconds": 0.000209121,
+          "computeSeconds": 0.003020668,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 4,
+          "graphs": 0,
+          "totalSeconds": 0.783047145,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 4,
+          "graphs": 4,
+          "totalSeconds": 10.637652198,
+          "buildSeconds": 0.002157028,
+          "allocateSeconds": 0.000347854,
+          "inputSeconds": 0.000655211,
+          "computeSeconds": 10.627552924,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.025359326,
+          "buildSeconds": 2.5465e-05,
+          "allocateSeconds": 1.9137e-05,
+          "inputSeconds": 0.002908848,
+          "computeSeconds": 0.021374029,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.612784876,
+          "buildSeconds": 0.000144439,
+          "allocateSeconds": 0.011121282,
+          "inputSeconds": 0.01118095,
+          "computeSeconds": 4.589082956,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 1330,
+          "graphs": 1330,
+          "totalSeconds": 13.405185671,
+          "buildSeconds": 0.226698081,
+          "allocateSeconds": 0.259854994,
+          "inputSeconds": 0.000657326,
+          "computeSeconds": 12.915419868,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 74480,
+          "fusedQ8Consumers": 186200
+        },
+        "logits": {
+          "calls": 1331,
+          "graphs": 1331,
+          "totalSeconds": 1.808034062,
+          "buildSeconds": 0.015901833,
+          "allocateSeconds": 0.009856229,
+          "inputSeconds": 0.000343742,
+          "computeSeconds": 1.660397537,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "5d46b404fbfe138b553fa9e51b5cf73e516f0d92dcb4c35bbb67e713a21abfb6",
+        "count": 1331
+      }
+    },
+    {
+      "case": "silence-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "duration": 60.0,
+      "outputSha256": "b49c522f61160d38ddcd9661d6449546fa21ff3c5ac526bd6bb859341179ca47",
+      "returncode": 0,
+      "tokens": 13,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.68259908305481,
+      "maxRssKiB": 1438972,
+      "hostLoadBefore": [
+        18.328125,
+        24.3837890625,
+        27.0234375
+      ],
+      "hostLoadAfter": [
+        18.197265625,
+        24.15625,
+        26.9208984375
+      ],
+      "timing": {
+        "load": 0.634696,
+        "inference": 7.946119
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "silence-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "duration": 60.0,
+      "outputSha256": "b49c522f61160d38ddcd9661d6449546fa21ff3c5ac526bd6bb859341179ca47",
+      "returncode": 0,
+      "tokens": 13,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.582892050035298,
+      "maxRssKiB": 1553180,
+      "hostLoadBefore": [
+        18.197265625,
+        24.15625,
+        26.9208984375
+      ],
+      "hostLoadAfter": [
+        18.0126953125,
+        23.919921875,
+        26.81396484375
+      ],
+      "timing": {
+        "load": 0.61485,
+        "inference": 7.820989
+      },
+      "profile": {
+        "prefill": 1.734533,
+        "embedding": 0.000207,
+        "decoder": 0.100798,
+        "logits": 0.018277
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "silence-60s",
+      "variant": "48",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "duration": 60.0,
+      "outputSha256": "b49c522f61160d38ddcd9661d6449546fa21ff3c5ac526bd6bb859341179ca47",
+      "returncode": 0,
+      "tokens": 13,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.633924653753638,
+      "maxRssKiB": 1553536,
+      "hostLoadBefore": [
+        18.0126953125,
+        23.919921875,
+        26.81396484375
+      ],
+      "hostLoadAfter": [
+        16.72998046875,
+        23.5556640625,
+        26.6806640625
+      ],
+      "timing": {
+        "load": 0.633612,
+        "inference": 7.881472
+      },
+      "profile": {
+        "prefill": 1.761045,
+        "embedding": 0.000232,
+        "decoder": 0.097957,
+        "logits": 0.017944
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 13,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 2.517e-05,
+          "inputSeconds": 3.254e-06,
+          "computeSeconds": 0.000344507,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.382292436,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.405749502,
+          "buildSeconds": 0.001752437,
+          "allocateSeconds": 0.000204917,
+          "inputSeconds": 0.00048,
+          "computeSeconds": 5.396534265,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014002554,
+          "buildSeconds": 2.3689e-05,
+          "allocateSeconds": 1.7909e-05,
+          "inputSeconds": 0.001452142,
+          "computeSeconds": 0.010960377,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.761044495,
+          "buildSeconds": 0.000148093,
+          "allocateSeconds": 0.000170777,
+          "inputSeconds": 0.001886465,
+          "computeSeconds": 1.757963337,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 12,
+          "graphs": 12,
+          "totalSeconds": 0.097952421,
+          "buildSeconds": 0.001914334,
+          "allocateSeconds": 0.002399987,
+          "inputSeconds": 7.433e-06,
+          "computeSeconds": 0.093605846,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 13,
+          "graphs": 13,
+          "totalSeconds": 0.017930752,
+          "buildSeconds": 0.000171115,
+          "allocateSeconds": 0.000118157,
+          "inputSeconds": 3.934e-06,
+          "computeSeconds": 0.016412715,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "b002cb29037ea564cfdff126e6299c313583d4fbbc7daf0405e4f322fedac7ab",
+        "count": 13
+      }
+    },
+    {
+      "case": "silence-60s",
+      "variant": "32816",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "duration": 60.0,
+      "outputSha256": "b49c522f61160d38ddcd9661d6449546fa21ff3c5ac526bd6bb859341179ca47",
+      "returncode": 0,
+      "tokens": 13,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.582309762015939,
+      "maxRssKiB": 1553240,
+      "hostLoadBefore": [
+        16.72998046875,
+        23.5556640625,
+        26.6806640625
+      ],
+      "hostLoadAfter": [
+        15.66650390625,
+        23.0947265625,
+        26.49609375
+      ],
+      "timing": {
+        "load": 0.625284,
+        "inference": 7.827977
+      },
+      "profile": {
+        "prefill": 1.734923,
+        "embedding": 0.000231,
+        "decoder": 0.095118,
+        "logits": 0.018263
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 13,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 2.2465e-05,
+          "inputSeconds": 3.824e-06,
+          "computeSeconds": 0.000339674,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.389330075,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.376977387,
+          "buildSeconds": 0.001808637,
+          "allocateSeconds": 0.000200389,
+          "inputSeconds": 0.000509505,
+          "computeSeconds": 5.367594034,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.01400726,
+          "buildSeconds": 2.3442e-05,
+          "allocateSeconds": 1.5581e-05,
+          "inputSeconds": 0.001463079,
+          "computeSeconds": 0.010957569,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.734921436,
+          "buildSeconds": 0.000151948,
+          "allocateSeconds": 0.000165255,
+          "inputSeconds": 0.001927563,
+          "computeSeconds": 1.731786871,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 12,
+          "graphs": 12,
+          "totalSeconds": 0.095115309,
+          "buildSeconds": 0.001989538,
+          "allocateSeconds": 0.002261836,
+          "inputSeconds": 5.737e-06,
+          "computeSeconds": 0.090838442,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 672,
+          "fusedQ8Consumers": 1680
+        },
+        "logits": {
+          "calls": 13,
+          "graphs": 13,
+          "totalSeconds": 0.018250498,
+          "buildSeconds": 0.000182056,
+          "allocateSeconds": 0.000120313,
+          "inputSeconds": 3.657e-06,
+          "computeSeconds": 0.016702723,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "b002cb29037ea564cfdff126e6299c313583d4fbbc7daf0405e4f322fedac7ab",
+        "count": 13
+      }
+    },
+    {
+      "case": "empty-real-60s",
+      "variant": "baseline",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "duration": 60.0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returncode": 1,
+      "tokens": 1,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.486766381189227,
+      "maxRssKiB": 1436592,
+      "hostLoadBefore": [
+        15.66650390625,
+        23.0947265625,
+        26.49609375
+      ],
+      "hostLoadAfter": [
+        16.0322265625,
+        22.9267578125,
+        26.40478515625
+      ],
+      "timing": {
+        "load": 0.630024,
+        "inference": 7.727522
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "empty-real-60s",
+      "variant": "cache-reference",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "duration": 60.0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returncode": 1,
+      "tokens": 1,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.432599298655987,
+      "maxRssKiB": 1550292,
+      "hostLoadBefore": [
+        16.0322265625,
+        22.9267578125,
+        26.40478515625
+      ],
+      "hostLoadAfter": [
+        16.18115234375,
+        22.73095703125,
+        26.3037109375
+      ],
+      "timing": {
+        "load": 0.615642,
+        "inference": 7.67961
+      },
+      "profile": {
+        "prefill": 1.71767,
+        "embedding": 0.0,
+        "decoder": 0.0,
+        "logits": 0.001597
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "empty-real-60s",
+      "variant": "48",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "duration": 60.0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returncode": 1,
+      "tokens": 1,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.581918830052018,
+      "maxRssKiB": 1550740,
+      "hostLoadBefore": [
+        16.18115234375,
+        22.73095703125,
+        26.3037109375
+      ],
+      "hostLoadAfter": [
+        16.3271484375,
+        22.65234375,
+        26.2587890625
+      ],
+      "timing": {
+        "load": 0.657243,
+        "inference": 7.794725
+      },
+      "profile": {
+        "prefill": 1.723502,
+        "embedding": 0.0,
+        "decoder": 0.0,
+        "logits": 0.001558
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 1,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 1.4923e-05,
+          "inputSeconds": 6.03e-07,
+          "computeSeconds": 0.000305888,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.387889959,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.473488034,
+          "buildSeconds": 0.001781323,
+          "allocateSeconds": 0.000207502,
+          "inputSeconds": 0.000508467,
+          "computeSeconds": 5.464125775,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014021546,
+          "buildSeconds": 2.3388e-05,
+          "allocateSeconds": 1.6067e-05,
+          "inputSeconds": 0.001467439,
+          "computeSeconds": 0.010924323,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.723500849,
+          "buildSeconds": 0.000149487,
+          "allocateSeconds": 0.00017213,
+          "inputSeconds": 0.001873159,
+          "computeSeconds": 1.72040882,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 0,
+          "graphs": 0,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.001555661,
+          "buildSeconds": 2.0868e-05,
+          "allocateSeconds": 1.5128e-05,
+          "inputSeconds": 4.79e-07,
+          "computeSeconds": 0.001413568,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "2b9bdd33a55fc11679a639da8943f5591f3f5c8a6fc876f755be52437c01fdeb",
+        "count": 1
+      }
+    },
+    {
+      "case": "empty-real-60s",
+      "variant": "32816",
+      "repeat": 0,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "duration": 60.0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returncode": 1,
+      "tokens": 1,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.432215794920921,
+      "maxRssKiB": 1550312,
+      "hostLoadBefore": [
+        16.3271484375,
+        22.65234375,
+        26.2587890625
+      ],
+      "hostLoadAfter": [
+        16.5048828125,
+        22.48193359375,
+        26.16455078125
+      ],
+      "timing": {
+        "load": 0.612951,
+        "inference": 7.695047
+      },
+      "profile": {
+        "prefill": 1.718253,
+        "embedding": 0.0,
+        "decoder": 0.0,
+        "logits": 0.001565
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 1,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 1.4438e-05,
+          "inputSeconds": 7.35e-07,
+          "computeSeconds": 0.000308961,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.38839919,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.380843582,
+          "buildSeconds": 0.001843802,
+          "allocateSeconds": 0.000204635,
+          "inputSeconds": 0.000500946,
+          "computeSeconds": 5.371511715,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.013891591,
+          "buildSeconds": 2.4304e-05,
+          "allocateSeconds": 1.773e-05,
+          "inputSeconds": 0.001539756,
+          "computeSeconds": 0.010697223,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.718251589,
+          "buildSeconds": 0.000156057,
+          "allocateSeconds": 0.000170704,
+          "inputSeconds": 0.001896754,
+          "computeSeconds": 1.715140599,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 0,
+          "graphs": 0,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.00156259,
+          "buildSeconds": 2.3825e-05,
+          "allocateSeconds": 1.6243e-05,
+          "inputSeconds": 5.07e-07,
+          "computeSeconds": 0.001417792,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "2b9bdd33a55fc11679a639da8943f5591f3f5c8a6fc876f755be52437c01fdeb",
+        "count": 1
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "32816",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 14.995086547918618,
+      "maxRssKiB": 1702356,
+      "hostLoadBefore": [
+        16.5048828125,
+        22.48193359375,
+        26.16455078125
+      ],
+      "hostLoadAfter": [
+        15.8017578125,
+        22.02001953125,
+        25.953125
+      ],
+      "timing": {
+        "load": 0.625027,
+        "inference": 14.266875
+      },
+      "profile": {
+        "prefill": 1.732436,
+        "embedding": 0.011766,
+        "decoder": 5.43177,
+        "logits": 0.913462
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000489278,
+          "inputSeconds": 0.000113058,
+          "computeSeconds": 0.001685813,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.383813562,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.426998889,
+          "buildSeconds": 0.001762789,
+          "allocateSeconds": 0.000199361,
+          "inputSeconds": 0.000487217,
+          "computeSeconds": 5.417712408,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014038268,
+          "buildSeconds": 2.5573e-05,
+          "allocateSeconds": 1.8006e-05,
+          "inputSeconds": 0.001521872,
+          "computeSeconds": 0.01086861,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.732435073,
+          "buildSeconds": 0.000151223,
+          "allocateSeconds": 0.000169717,
+          "inputSeconds": 0.00188473,
+          "computeSeconds": 1.729323225,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 5.431620143,
+          "buildSeconds": 0.113933035,
+          "allocateSeconds": 0.131413347,
+          "inputSeconds": 0.000352613,
+          "computeSeconds": 5.184691491,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 37688,
+          "fusedQ8Consumers": 94220
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 0.912847227,
+          "buildSeconds": 0.007855909,
+          "allocateSeconds": 0.005013146,
+          "inputSeconds": 0.000175177,
+          "computeSeconds": 0.838332179,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "45884f669b443c45618ce2f69d640d9de01b7231bd9d7145bed9ed4e077bbc88",
+        "count": 674
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "48",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 15.245450530201197,
+      "maxRssKiB": 1701956,
+      "hostLoadBefore": [
+        15.8017578125,
+        22.02001953125,
+        25.953125
+      ],
+      "hostLoadAfter": [
+        16.56640625,
+        21.88671875,
+        25.84619140625
+      ],
+      "timing": {
+        "load": 0.612388,
+        "inference": 14.530805
+      },
+      "profile": {
+        "prefill": 1.730133,
+        "embedding": 0.010519,
+        "decoder": 5.695065,
+        "logits": 0.912147
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 674,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000440817,
+          "inputSeconds": 0.00011217,
+          "computeSeconds": 0.001565578,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.386118032,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.426845817,
+          "buildSeconds": 0.001793337,
+          "allocateSeconds": 0.000203481,
+          "inputSeconds": 0.0004983,
+          "computeSeconds": 5.417551699,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014182986,
+          "buildSeconds": 2.6134e-05,
+          "allocateSeconds": 1.637e-05,
+          "inputSeconds": 0.00152142,
+          "computeSeconds": 0.011040862,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.730132113,
+          "buildSeconds": 0.000155757,
+          "allocateSeconds": 0.000169096,
+          "inputSeconds": 0.001895883,
+          "computeSeconds": 1.727016396,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 673,
+          "graphs": 673,
+          "totalSeconds": 5.694932113,
+          "buildSeconds": 0.105260479,
+          "allocateSeconds": 0.132081962,
+          "inputSeconds": 0.000359304,
+          "computeSeconds": 5.456240871,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 674,
+          "graphs": 674,
+          "totalSeconds": 0.911598044,
+          "buildSeconds": 0.007280346,
+          "allocateSeconds": 0.004962396,
+          "inputSeconds": 0.000160783,
+          "computeSeconds": 0.838025817,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "45884f669b443c45618ce2f69d640d9de01b7231bd9d7145bed9ed4e077bbc88",
+        "count": 674
+      }
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 15.195288019254804,
+      "maxRssKiB": 1702000,
+      "hostLoadBefore": [
+        16.56640625,
+        21.88671875,
+        25.84619140625
+      ],
+      "hostLoadAfter": [
+        16.8046875,
+        21.67919921875,
+        25.71435546875
+      ],
+      "timing": {
+        "load": 0.616692,
+        "inference": 14.44756
+      },
+      "profile": {
+        "prefill": 1.729381,
+        "embedding": 0.010522,
+        "decoder": 5.671366,
+        "logits": 0.91195
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "meeting-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "duration": 60.0,
+      "outputSha256": "df58920d99cb354955b90ff4206ab5428a8c4fd817b724f37b0c2a4dfa292bf5",
+      "returncode": 0,
+      "tokens": 674,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 25.61451918212697,
+      "maxRssKiB": 1586696,
+      "hostLoadBefore": [
+        16.8046875,
+        21.67919921875,
+        25.71435546875
+      ],
+      "hostLoadAfter": [
+        17.0869140625,
+        21.35107421875,
+        25.498046875
+      ],
+      "timing": {
+        "load": 0.625026,
+        "inference": 24.892953
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "32816",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 12.840862274169922,
+      "maxRssKiB": 1653148,
+      "hostLoadBefore": [
+        17.0869140625,
+        21.35107421875,
+        25.498046875
+      ],
+      "hostLoadAfter": [
+        17.140625,
+        21.15380859375,
+        25.36669921875
+      ],
+      "timing": {
+        "load": 0.635168,
+        "inference": 12.075511
+      },
+      "profile": {
+        "prefill": 1.730047,
+        "embedding": 0.007367,
+        "decoder": 3.592189,
+        "logits": 0.618901
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 458,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000294728,
+          "inputSeconds": 6.8536e-05,
+          "computeSeconds": 0.001151463,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.401174369,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.409485748,
+          "buildSeconds": 0.001779755,
+          "allocateSeconds": 0.000206481,
+          "inputSeconds": 0.000501734,
+          "computeSeconds": 5.400205406,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014208742,
+          "buildSeconds": 2.8133e-05,
+          "allocateSeconds": 1.8794e-05,
+          "inputSeconds": 0.001518517,
+          "computeSeconds": 0.011066725,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.730045331,
+          "buildSeconds": 0.000149868,
+          "allocateSeconds": 0.000170676,
+          "inputSeconds": 0.001889333,
+          "computeSeconds": 1.726936029,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 457,
+          "graphs": 457,
+          "totalSeconds": 3.592099692,
+          "buildSeconds": 0.075411414,
+          "allocateSeconds": 0.08772857,
+          "inputSeconds": 0.00021704,
+          "computeSeconds": 3.428089215,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 25592,
+          "fusedQ8Consumers": 63980
+        },
+        "logits": {
+          "calls": 458,
+          "graphs": 458,
+          "totalSeconds": 0.618520332,
+          "buildSeconds": 0.005069901,
+          "allocateSeconds": 0.003207469,
+          "inputSeconds": 0.000122122,
+          "computeSeconds": 0.568650856,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "9a9a44f38ee96ccdf058c8414354c4b9e6460d39318254fa2acad5fba52c3324",
+        "count": 458
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "48",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 12.990601200144738,
+      "maxRssKiB": 1653664,
+      "hostLoadBefore": [
+        17.140625,
+        21.15380859375,
+        25.36669921875
+      ],
+      "hostLoadAfter": [
+        16.013671875,
+        20.771484375,
+        25.1962890625
+      ],
+      "timing": {
+        "load": 0.625236,
+        "inference": 12.252246
+      },
+      "profile": {
+        "prefill": 1.729208,
+        "embedding": 0.007417,
+        "decoder": 3.757861,
+        "logits": 0.61962
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 458,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000304034,
+          "inputSeconds": 6.2616e-05,
+          "computeSeconds": 0.001135052,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.388377328,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.427939143,
+          "buildSeconds": 0.001744281,
+          "allocateSeconds": 0.000197909,
+          "inputSeconds": 0.000481353,
+          "computeSeconds": 5.418693107,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014161925,
+          "buildSeconds": 2.3011e-05,
+          "allocateSeconds": 1.8235e-05,
+          "inputSeconds": 0.001497394,
+          "computeSeconds": 0.011047527,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.729207344,
+          "buildSeconds": 0.000149816,
+          "allocateSeconds": 0.000168476,
+          "inputSeconds": 0.001892116,
+          "computeSeconds": 1.726106636,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 457,
+          "graphs": 457,
+          "totalSeconds": 3.757734474,
+          "buildSeconds": 0.071088988,
+          "allocateSeconds": 0.088787805,
+          "inputSeconds": 0.000256969,
+          "computeSeconds": 3.596942342,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 458,
+          "graphs": 458,
+          "totalSeconds": 0.619242947,
+          "buildSeconds": 0.005211753,
+          "allocateSeconds": 0.003181496,
+          "inputSeconds": 0.000107922,
+          "computeSeconds": 0.569264414,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "9a9a44f38ee96ccdf058c8414354c4b9e6460d39318254fa2acad5fba52c3324",
+        "count": 458
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 13.192101177293807,
+      "maxRssKiB": 1653028,
+      "hostLoadBefore": [
+        16.013671875,
+        20.771484375,
+        25.1962890625
+      ],
+      "hostLoadAfter": [
+        15.2158203125,
+        20.34521484375,
+        24.984375
+      ],
+      "timing": {
+        "load": 0.617154,
+        "inference": 12.429054
+      },
+      "profile": {
+        "prefill": 1.727852,
+        "embedding": 0.007195,
+        "decoder": 3.781775,
+        "logits": 0.622908
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "dinner-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "duration": 60.0,
+      "outputSha256": "a763a47d7520da2c36145a73953ab8eb8da4fb3d9ac0daeecf127a2fee5f68f0",
+      "returncode": 0,
+      "tokens": 458,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 19.252793779131025,
+      "maxRssKiB": 1538844,
+      "hostLoadBefore": [
+        15.2158203125,
+        20.34521484375,
+        24.984375
+      ],
+      "hostLoadAfter": [
+        15.86474609375,
+        20.16015625,
+        24.82421875
+      ],
+      "timing": {
+        "load": 0.626732,
+        "inference": 18.480386
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "32816",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 13.14192990027368,
+      "maxRssKiB": 1660528,
+      "hostLoadBefore": [
+        15.86474609375,
+        20.16015625,
+        24.82421875
+      ],
+      "hostLoadAfter": [
+        14.91845703125,
+        19.8232421875,
+        24.66455078125
+      ],
+      "timing": {
+        "load": 0.627266,
+        "inference": 12.411087
+      },
+      "profile": {
+        "prefill": 1.765617,
+        "embedding": 0.007772,
+        "decoder": 3.860237,
+        "logits": 0.662992
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000362022,
+          "inputSeconds": 8.429e-05,
+          "computeSeconds": 0.001228944,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.386568594,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.405322038,
+          "buildSeconds": 0.001778455,
+          "allocateSeconds": 0.000211031,
+          "inputSeconds": 0.000486087,
+          "computeSeconds": 5.396074246,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014148665,
+          "buildSeconds": 2.5872e-05,
+          "allocateSeconds": 1.7865e-05,
+          "inputSeconds": 0.001509333,
+          "computeSeconds": 0.011010871,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.765615507,
+          "buildSeconds": 0.000157708,
+          "allocateSeconds": 0.000170994,
+          "inputSeconds": 0.001900059,
+          "computeSeconds": 1.762495125,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 3.860152787,
+          "buildSeconds": 0.081255348,
+          "allocateSeconds": 0.093346413,
+          "inputSeconds": 0.000265201,
+          "computeSeconds": 3.684615475,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 27384,
+          "fusedQ8Consumers": 68460
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 0.662589922,
+          "buildSeconds": 0.005482346,
+          "allocateSeconds": 0.003618466,
+          "inputSeconds": 0.000124337,
+          "computeSeconds": 0.608819775,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "40e08a522ef5e1f55c3978da4bddee4fec30ccc1660853919d150c961a5753f8",
+        "count": 490
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "48",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 13.392324944026768,
+      "maxRssKiB": 1660740,
+      "hostLoadBefore": [
+        14.91845703125,
+        19.8232421875,
+        24.66455078125
+      ],
+      "hostLoadAfter": [
+        14.36376953125,
+        19.44384765625,
+        24.46142578125
+      ],
+      "timing": {
+        "load": 0.630409,
+        "inference": 12.620911
+      },
+      "profile": {
+        "prefill": 1.7683,
+        "embedding": 0.007971,
+        "decoder": 4.047833,
+        "logits": 0.663206
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 490,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.00032588,
+          "inputSeconds": 7.2322e-05,
+          "computeSeconds": 0.001215799,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.391786002,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.419381804,
+          "buildSeconds": 0.001802502,
+          "allocateSeconds": 0.000215257,
+          "inputSeconds": 0.000511542,
+          "computeSeconds": 5.41006087,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014104501,
+          "buildSeconds": 2.4357e-05,
+          "allocateSeconds": 1.8828e-05,
+          "inputSeconds": 0.00145373,
+          "computeSeconds": 0.011040879,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.768299118,
+          "buildSeconds": 0.000144258,
+          "allocateSeconds": 0.000171141,
+          "inputSeconds": 0.001883245,
+          "computeSeconds": 1.765217895,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 489,
+          "graphs": 489,
+          "totalSeconds": 4.047734941,
+          "buildSeconds": 0.076338644,
+          "allocateSeconds": 0.09512176,
+          "inputSeconds": 0.000227407,
+          "computeSeconds": 3.875244051,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 490,
+          "graphs": 490,
+          "totalSeconds": 0.662795812,
+          "buildSeconds": 0.005614731,
+          "allocateSeconds": 0.003597049,
+          "inputSeconds": 0.000128129,
+          "computeSeconds": 0.609011369,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "40e08a522ef5e1f55c3978da4bddee4fec30ccc1660853919d150c961a5753f8",
+        "count": 490
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 13.39241848886013,
+      "maxRssKiB": 1660044,
+      "hostLoadBefore": [
+        14.36376953125,
+        19.44384765625,
+        24.46142578125
+      ],
+      "hostLoadAfter": [
+        15.1083984375,
+        19.3564453125,
+        24.3515625
+      ],
+      "timing": {
+        "load": 0.622431,
+        "inference": 12.630247
+      },
+      "profile": {
+        "prefill": 1.779258,
+        "embedding": 0.008014,
+        "decoder": 4.046834,
+        "logits": 0.663488
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "duration": 60.0,
+      "outputSha256": "17b7233af0b7eaa564e76e1a883d7bd7d0e80cd3712fddfabf866209fc9b94c5",
+      "returncode": 0,
+      "tokens": 490,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 19.904773152898997,
+      "maxRssKiB": 1545752,
+      "hostLoadBefore": [
+        15.1083984375,
+        19.3564453125,
+        24.3515625
+      ],
+      "hostLoadAfter": [
+        15.70263671875,
+        19.2177734375,
+        24.19921875
+      ],
+      "timing": {
+        "load": 0.620614,
+        "inference": 19.17125
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "meeting-120s",
+      "variant": "32816",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "duration": 120.0,
+      "outputSha256": "11506b7234b219e0a4d6e1e8b61104743b1bc10e4390d8d2645a749d7d0757e0",
+      "returncode": 0,
+      "tokens": 1331,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 32.54136345908046,
+      "maxRssKiB": 2083464,
+      "hostLoadBefore": [
+        15.70263671875,
+        19.2177734375,
+        24.19921875
+      ],
+      "hostLoadAfter": [
+        16.41943359375,
+        19.05224609375,
+        23.98486328125
+      ],
+      "timing": {
+        "load": 0.630898,
+        "inference": 31.772936
+      },
+      "profile": {
+        "prefill": 4.598358,
+        "embedding": 0.023432,
+        "decoder": 13.418673,
+        "logits": 1.811308
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 1331,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000893161,
+          "inputSeconds": 0.000214108,
+          "computeSeconds": 0.002963351,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 4,
+          "graphs": 0,
+          "totalSeconds": 0.80354347,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 4,
+          "graphs": 4,
+          "totalSeconds": 10.557860456,
+          "buildSeconds": 0.002304888,
+          "allocateSeconds": 0.000353806,
+          "inputSeconds": 0.0006931,
+          "computeSeconds": 10.547567093,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.027030606,
+          "buildSeconds": 2.5405e-05,
+          "allocateSeconds": 1.9454e-05,
+          "inputSeconds": 0.003067933,
+          "computeSeconds": 0.022856108,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.598356746,
+          "buildSeconds": 0.000146316,
+          "allocateSeconds": 0.012991012,
+          "inputSeconds": 0.011197157,
+          "computeSeconds": 4.572702862,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 1330,
+          "graphs": 1330,
+          "totalSeconds": 13.418389503,
+          "buildSeconds": 0.22290814,
+          "allocateSeconds": 0.256736943,
+          "inputSeconds": 0.000682856,
+          "computeSeconds": 12.935861528,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 74480,
+          "fusedQ8Consumers": 186200
+        },
+        "logits": {
+          "calls": 1331,
+          "graphs": 1331,
+          "totalSeconds": 1.809998144,
+          "buildSeconds": 0.016641246,
+          "allocateSeconds": 0.010971659,
+          "inputSeconds": 0.000308085,
+          "computeSeconds": 1.660731291,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "5d46b404fbfe138b553fa9e51b5cf73e516f0d92dcb4c35bbb67e713a21abfb6",
+        "count": 1331
+      }
+    },
+    {
+      "case": "meeting-120s",
+      "variant": "48",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "duration": 120.0,
+      "outputSha256": "11506b7234b219e0a4d6e1e8b61104743b1bc10e4390d8d2645a749d7d0757e0",
+      "returncode": 0,
+      "tokens": 1331,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 32.88081195065752,
+      "maxRssKiB": 2083432,
+      "hostLoadBefore": [
+        16.41943359375,
+        19.05224609375,
+        23.98486328125
+      ],
+      "hostLoadAfter": [
+        16.810546875,
+        18.85595703125,
+        23.7353515625
+      ],
+      "timing": {
+        "load": 0.627614,
+        "inference": 32.14761
+      },
+      "profile": {
+        "prefill": 4.580084,
+        "embedding": 0.022689,
+        "decoder": 13.822282,
+        "logits": 1.810846
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 1331,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.000829852,
+          "inputSeconds": 0.000220024,
+          "computeSeconds": 0.002953179,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 4,
+          "graphs": 0,
+          "totalSeconds": 0.771067833,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 4,
+          "graphs": 4,
+          "totalSeconds": 10.581162872,
+          "buildSeconds": 0.002245919,
+          "allocateSeconds": 0.000345096,
+          "inputSeconds": 0.000676527,
+          "computeSeconds": 10.571006918,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.025251004,
+          "buildSeconds": 2.4805e-05,
+          "allocateSeconds": 1.9456e-05,
+          "inputSeconds": 0.002927555,
+          "computeSeconds": 0.021227816,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 4.580083101,
+          "buildSeconds": 0.000154459,
+          "allocateSeconds": 0.010699663,
+          "inputSeconds": 0.011270737,
+          "computeSeconds": 4.556657528,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 1330,
+          "graphs": 1330,
+          "totalSeconds": 13.822004993,
+          "buildSeconds": 0.20632046,
+          "allocateSeconds": 0.259949127,
+          "inputSeconds": 0.000747171,
+          "computeSeconds": 13.352494193,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 1331,
+          "graphs": 1331,
+          "totalSeconds": 1.809474827,
+          "buildSeconds": 0.016155161,
+          "allocateSeconds": 0.010181736,
+          "inputSeconds": 0.000308198,
+          "computeSeconds": 1.662368698,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "5d46b404fbfe138b553fa9e51b5cf73e516f0d92dcb4c35bbb67e713a21abfb6",
+        "count": 1331
+      }
+    },
+    {
+      "case": "meeting-120s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "duration": 120.0,
+      "outputSha256": "11506b7234b219e0a4d6e1e8b61104743b1bc10e4390d8d2645a749d7d0757e0",
+      "returncode": 0,
+      "tokens": 1331,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 32.93158166529611,
+      "maxRssKiB": 2083084,
+      "hostLoadBefore": [
+        16.810546875,
+        18.85595703125,
+        23.7353515625
+      ],
+      "hostLoadAfter": [
+        17.14697265625,
+        18.740234375,
+        23.54052734375
+      ],
+      "timing": {
+        "load": 0.626403,
+        "inference": 32.197994
+      },
+      "profile": {
+        "prefill": 4.607103,
+        "embedding": 0.02277,
+        "decoder": 13.828917,
+        "logits": 1.806534
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "meeting-120s",
+      "variant": "baseline",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "duration": 120.0,
+      "outputSha256": "11506b7234b219e0a4d6e1e8b61104743b1bc10e4390d8d2645a749d7d0757e0",
+      "returncode": 0,
+      "tokens": 1331,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 78.96678596176207,
+      "maxRssKiB": 1975140,
+      "hostLoadBefore": [
+        17.14697265625,
+        18.740234375,
+        23.54052734375
+      ],
+      "hostLoadAfter": [
+        17.0224609375,
+        18.22607421875,
+        22.9541015625
+      ],
+      "timing": {
+        "load": 0.629742,
+        "inference": 78.217836
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "silence-60s",
+      "variant": "32816",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "duration": 60.0,
+      "outputSha256": "b49c522f61160d38ddcd9661d6449546fa21ff3c5ac526bd6bb859341179ca47",
+      "returncode": 0,
+      "tokens": 13,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.63319840002805,
+      "maxRssKiB": 1553600,
+      "hostLoadBefore": [
+        17.0224609375,
+        18.22607421875,
+        22.9541015625
+      ],
+      "hostLoadAfter": [
+        17.0185546875,
+        18.185546875,
+        22.8896484375
+      ],
+      "timing": {
+        "load": 0.628976,
+        "inference": 7.874008
+      },
+      "profile": {
+        "prefill": 1.735257,
+        "embedding": 0.000232,
+        "decoder": 0.095692,
+        "logits": 0.018376
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 13,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 2.4322e-05,
+          "inputSeconds": 3.541e-06,
+          "computeSeconds": 0.000342635,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.395944975,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.418797032,
+          "buildSeconds": 0.001827986,
+          "allocateSeconds": 0.00020713,
+          "inputSeconds": 0.000511424,
+          "computeSeconds": 5.409377693,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014155665,
+          "buildSeconds": 2.4311e-05,
+          "allocateSeconds": 1.8002e-05,
+          "inputSeconds": 0.001563846,
+          "computeSeconds": 0.010948185,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.735255527,
+          "buildSeconds": 0.000147251,
+          "allocateSeconds": 0.000168032,
+          "inputSeconds": 0.001881989,
+          "computeSeconds": 1.732165705,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 12,
+          "graphs": 12,
+          "totalSeconds": 0.0956885,
+          "buildSeconds": 0.00207486,
+          "allocateSeconds": 0.002313664,
+          "inputSeconds": 7.478e-06,
+          "computeSeconds": 0.09127295,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 672,
+          "fusedQ8Consumers": 1680
+        },
+        "logits": {
+          "calls": 13,
+          "graphs": 13,
+          "totalSeconds": 0.018364504,
+          "buildSeconds": 0.000175054,
+          "allocateSeconds": 0.000116314,
+          "inputSeconds": 4.536e-06,
+          "computeSeconds": 0.016827469,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "b002cb29037ea564cfdff126e6299c313583d4fbbc7daf0405e4f322fedac7ab",
+        "count": 13
+      }
+    },
+    {
+      "case": "silence-60s",
+      "variant": "48",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "duration": 60.0,
+      "outputSha256": "b49c522f61160d38ddcd9661d6449546fa21ff3c5ac526bd6bb859341179ca47",
+      "returncode": 0,
+      "tokens": 13,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.58303907699883,
+      "maxRssKiB": 1554044,
+      "hostLoadBefore": [
+        17.0185546875,
+        18.185546875,
+        22.8896484375
+      ],
+      "hostLoadAfter": [
+        17.236328125,
+        18.1953125,
+        22.84228515625
+      ],
+      "timing": {
+        "load": 0.611831,
+        "inference": 7.848602
+      },
+      "profile": {
+        "prefill": 1.729977,
+        "embedding": 0.000208,
+        "decoder": 0.099229,
+        "logits": 0.018198
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 13,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 2.3468e-05,
+          "inputSeconds": 3.629e-06,
+          "computeSeconds": 0.000321876,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.399012959,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.395370124,
+          "buildSeconds": 0.001776086,
+          "allocateSeconds": 0.000203839,
+          "inputSeconds": 0.000495866,
+          "computeSeconds": 5.386104494,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014011052,
+          "buildSeconds": 2.3751e-05,
+          "allocateSeconds": 1.7372e-05,
+          "inputSeconds": 0.001446544,
+          "computeSeconds": 0.010951601,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.729975029,
+          "buildSeconds": 0.000147847,
+          "allocateSeconds": 0.00017008,
+          "inputSeconds": 0.001889998,
+          "computeSeconds": 1.726878435,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 12,
+          "graphs": 12,
+          "totalSeconds": 0.099225762,
+          "buildSeconds": 0.001901334,
+          "allocateSeconds": 0.002334596,
+          "inputSeconds": 5.944e-06,
+          "computeSeconds": 0.094961973,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 13,
+          "graphs": 13,
+          "totalSeconds": 0.018187158,
+          "buildSeconds": 0.000153587,
+          "allocateSeconds": 0.000113413,
+          "inputSeconds": 3.37e-06,
+          "computeSeconds": 0.016687879,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "b002cb29037ea564cfdff126e6299c313583d4fbbc7daf0405e4f322fedac7ab",
+        "count": 13
+      }
+    },
+    {
+      "case": "silence-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "duration": 60.0,
+      "outputSha256": "b49c522f61160d38ddcd9661d6449546fa21ff3c5ac526bd6bb859341179ca47",
+      "returncode": 0,
+      "tokens": 13,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.583183002192527,
+      "maxRssKiB": 1553196,
+      "hostLoadBefore": [
+        17.236328125,
+        18.1953125,
+        22.84228515625
+      ],
+      "hostLoadAfter": [
+        17.21728515625,
+        18.17529296875,
+        22.810546875
+      ],
+      "timing": {
+        "load": 0.622561,
+        "inference": 7.837268
+      },
+      "profile": {
+        "prefill": 1.718461,
+        "embedding": 0.000211,
+        "decoder": 0.099732,
+        "logits": 0.018219
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "silence-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "duration": 60.0,
+      "outputSha256": "b49c522f61160d38ddcd9661d6449546fa21ff3c5ac526bd6bb859341179ca47",
+      "returncode": 0,
+      "tokens": 13,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.632956126704812,
+      "maxRssKiB": 1438676,
+      "hostLoadBefore": [
+        17.21728515625,
+        18.17529296875,
+        22.810546875
+      ],
+      "hostLoadAfter": [
+        16.0791015625,
+        17.8916015625,
+        22.66796875
+      ],
+      "timing": {
+        "load": 0.619056,
+        "inference": 7.88968
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "empty-real-60s",
+      "variant": "32816",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "duration": 60.0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returncode": 1,
+      "tokens": 1,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.432618513703346,
+      "maxRssKiB": 1550168,
+      "hostLoadBefore": [
+        16.0791015625,
+        17.8916015625,
+        22.66796875
+      ],
+      "hostLoadAfter": [
+        16.294921875,
+        17.87841796875,
+        22.61181640625
+      ],
+      "timing": {
+        "load": 0.624836,
+        "inference": 7.69898
+      },
+      "profile": {
+        "prefill": 1.718822,
+        "embedding": 0.0,
+        "decoder": 0.0,
+        "logits": 0.001575
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 1,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 1.2911e-05,
+          "inputSeconds": 6.83e-07,
+          "computeSeconds": 0.000292021,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.384870016,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.389198798,
+          "buildSeconds": 0.00177848,
+          "allocateSeconds": 0.00020302,
+          "inputSeconds": 0.000499262,
+          "computeSeconds": 5.379932006,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.013882772,
+          "buildSeconds": 2.4338e-05,
+          "allocateSeconds": 1.8257e-05,
+          "inputSeconds": 0.001447029,
+          "computeSeconds": 0.010848563,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.718820534,
+          "buildSeconds": 0.000147974,
+          "allocateSeconds": 0.000175925,
+          "inputSeconds": 0.001899727,
+          "computeSeconds": 1.715705428,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 0,
+          "graphs": 0,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.001571973,
+          "buildSeconds": 2.4881e-05,
+          "allocateSeconds": 1.5717e-05,
+          "inputSeconds": 4.06e-07,
+          "computeSeconds": 0.001425997,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "2b9bdd33a55fc11679a639da8943f5591f3f5c8a6fc876f755be52437c01fdeb",
+        "count": 1
+      }
+    },
+    {
+      "case": "empty-real-60s",
+      "variant": "48",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "duration": 60.0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returncode": 1,
+      "tokens": 1,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.492403461132199,
+      "maxRssKiB": 1550492,
+      "hostLoadBefore": [
+        16.294921875,
+        17.87841796875,
+        22.61181640625
+      ],
+      "hostLoadAfter": [
+        15.2021484375,
+        17.60009765625,
+        22.470703125
+      ],
+      "timing": {
+        "load": 0.628862,
+        "inference": 7.749428
+      },
+      "profile": {
+        "prefill": 1.741273,
+        "embedding": 0.0,
+        "decoder": 0.0,
+        "logits": 0.001685
+      },
+      "phaseProfile": {
+        "other": {
+          "calls": 0,
+          "graphs": 1,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 1.3004e-05,
+          "inputSeconds": 6.11e-07,
+          "computeSeconds": 0.000303736,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "mel": {
+          "calls": 2,
+          "graphs": 0,
+          "totalSeconds": 0.39341436,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "whisper": {
+          "calls": 2,
+          "graphs": 2,
+          "totalSeconds": 5.40660584,
+          "buildSeconds": 0.001792221,
+          "allocateSeconds": 0.000201579,
+          "inputSeconds": 0.000502794,
+          "computeSeconds": 5.397339354,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "adaptor": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.014069784,
+          "buildSeconds": 2.5155e-05,
+          "allocateSeconds": 1.8016e-05,
+          "inputSeconds": 0.001538521,
+          "computeSeconds": 0.010907155,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "prefill": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 1.74127192,
+          "buildSeconds": 0.000155487,
+          "allocateSeconds": 0.000167948,
+          "inputSeconds": 0.001886799,
+          "computeSeconds": 1.738183807,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "decode": {
+          "calls": 0,
+          "graphs": 0,
+          "totalSeconds": 0.0,
+          "buildSeconds": 0.0,
+          "allocateSeconds": 0.0,
+          "inputSeconds": 0.0,
+          "computeSeconds": 0.0,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        },
+        "logits": {
+          "calls": 1,
+          "graphs": 1,
+          "totalSeconds": 0.001682326,
+          "buildSeconds": 2.1498e-05,
+          "allocateSeconds": 1.4654e-05,
+          "inputSeconds": 4.44e-07,
+          "computeSeconds": 0.001540858,
+          "sharedQ8Nodes": 0,
+          "sharedQ8CastNodes": 0,
+          "sharedQ8Consumers": 0,
+          "fusedQ8Nodes": 0,
+          "fusedQ8Consumers": 0
+        }
+      },
+      "modelStorage": null,
+      "tokenTrace": {
+        "sha256": "2b9bdd33a55fc11679a639da8943f5591f3f5c8a6fc876f755be52437c01fdeb",
+        "count": 1
+      }
+    },
+    {
+      "case": "empty-real-60s",
+      "variant": "cache-reference",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "duration": 60.0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returncode": 1,
+      "tokens": 1,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.432428427040577,
+      "maxRssKiB": 1550868,
+      "hostLoadBefore": [
+        15.2021484375,
+        17.60009765625,
+        22.470703125
+      ],
+      "hostLoadAfter": [
+        15.42626953125,
+        17.60693359375,
+        22.4462890625
+      ],
+      "timing": {
+        "load": 0.613958,
+        "inference": 7.714598
+      },
+      "profile": {
+        "prefill": 1.730421,
+        "embedding": 0.0,
+        "decoder": 0.0,
+        "logits": 0.001583
+      },
+      "phaseProfile": null,
+      "modelStorage": null
+    },
+    {
+      "case": "empty-real-60s",
+      "variant": "baseline",
+      "repeat": 1,
+      "threads": 16,
+      "phaseThreads": {},
+      "waitPolicy": "default",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "duration": 60.0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returncode": 1,
+      "tokens": 1,
+      "stop": "eos",
+      "complete": true,
+      "concurrentMoss": false,
+      "wallSeconds": 8.496084530372173,
+      "maxRssKiB": 1435868,
+      "hostLoadBefore": [
+        15.42626953125,
+        17.60693359375,
+        22.4462890625
+      ],
+      "hostLoadAfter": [
+        15.7490234375,
+        17.603515625,
+        22.39306640625
+      ],
+      "timing": {
+        "load": 0.636351,
+        "inference": 7.71542
+      },
+      "profile": {},
+      "phaseProfile": null,
+      "modelStorage": null
+    }
+  ],
+  "harnessSha256": "00c9d4cac7046520500aafe0ccde4fac3195a64c8f297986d5891415851dedf1",
+  "traceReaderSha256": "150a5ebc415127d76e6ed0cc24b44d2106550118bc8fe60e7dd309fd93717392",
+  "sourceTree": "c2f63127427b6732cd5240ea42e9940d47570bce",
+  "sourceClean": true,
+  "threads": 16,
+  "variantSettings": {
+    "baseline": {
+      "opt": 0,
+      "threads": 16,
+      "waitPolicy": "default",
+      "phaseThreads": {}
+    },
+    "cache-reference": {
+      "opt": 48,
+      "threads": 16,
+      "waitPolicy": "default",
+      "phaseThreads": {}
+    },
+    "48": {
+      "opt": 48,
+      "threads": 16,
+      "waitPolicy": "default",
+      "phaseThreads": {}
+    },
+    "32816": {
+      "opt": 32816,
+      "threads": 16,
+      "waitPolicy": "default",
+      "phaseThreads": {}
+    }
+  },
+  "phaseProfiling": true,
+  "tokenTracingSameBuild": true,
+  "sourceSha256": {
+    "src/audio_adaptor.cpp": "f74e6d37ca1743db58192076e017615b38bad287db59f6854f5fbccbfb46ba27",
+    "src/audio_adaptor.hpp": "28a869e7b61dca4d8714e666f42f522fabed02ee3548e17e3c3a43d7b2ca9ce5",
+    "src/audio_encoder.cpp": "e14d4e6ab81410c5935c9550634ea8a7136fe9b017c440e01ab987a759102275",
+    "src/audio_encoder.hpp": "e806d772246567aaef102ac6c0256beae0acf85dcc6cb2fe6c849bc4717a2c90",
+    "src/audio_io.cpp": "58afc26038a602f3f7776e5dbe347f2967a38dcb194a9272c55ddeb0333798e0",
+    "src/audio_io.hpp": "5c157587c0aae23a6b24cfce10c24affa30fe9b7d027ac044b97267b285ab281",
+    "src/audio_span.cpp": "3444e83c6b18406d4db40b822653985b8ac74392749284b62da5a3b81f163c6f",
+    "src/audio_span.hpp": "2aa9c7463f263f91b42bc381087aaebb2e724ec7ec491ebe5c73b69c6bee8b25",
+    "src/backend.cpp": "5a4d7dffe9fe9bf283688dd2a50c6260e312809e32668f14b89e7171fe8eb38d",
+    "src/backend.hpp": "06d70fdeef7cc13094e15d99533ca3af08aedbbc8992ed89a023f77922498bc2",
+    "src/cli.cpp": "aed5c7e01f7ca2b3f0371edbc78ed7321effba842339ac0085317fe5d9630a28",
+    "src/common.cpp": "6ed693a6dead299bb10622ea277ed9d07d5eced97f15cb1d3b89d68eebe4cefc",
+    "src/common.hpp": "af2b2b4f9b6528e534c6661bb05528d4e9f6bb1489226980c53fbf85a2998cb1",
+    "src/config.hpp": "010b0568cb664e34af6542bebbe750cdfb6ad9ded4feea307a403d3850927904",
+    "src/cpu_activation.cpp": "c441ca1b809ce632f505b49530424a1a8ec869226dcf9ca37ec81a5b020b8bd2",
+    "src/cpu_activation.hpp": "4f70b0c185510c38b6fc7223528765ba4e5652acd14ca669b73d5df7884d469f",
+    "src/cpu_profile.cpp": "bbaba56faaa8a41afd0b1783441b0314c0db7e412e337699f9e95f213d250feb",
+    "src/cpu_profile.hpp": "7917a73f69b383260035e74ea5decb2bd1151f404001718bfd0a8cdffa9ae95b",
+    "src/cpu_projection.cpp": "7e2aa43c27d1a40201efb26dcb07aec0a5142aebade72f442bb7790321da0684",
+    "src/cpu_projection.hpp": "e817a684b127f1998315883225b7b67bb47a7f34217fba1f7f6f2ecafa85c2fb",
+    "src/cpu_q8.cpp": "6b9815078262dcbd2b111b7fdc057f4a248e17911c2654019962e9f1a3db45f6",
+    "src/cpu_q8.hpp": "c04db806345eca28e90b860c8a30f4924cc2937ff24fe7ced8a29a96728e0c23",
+    "src/cpu_softmax.cpp": "f9bd82df53f4140756219516daf71f7c8c5e106ef77f7c369cd9e308cc776673",
+    "src/cpu_softmax.hpp": "fada005cbc7328f29cd018fc20aa107d1f167e32744705e44152a9bdadd42590",
+    "src/fft.cpp": "3ae3ad6260748d2c800bd580763bf205fc8ea27def1a8bcb8aea3482fc4cb71e",
+    "src/fft.hpp": "daa215fc289f14368c0c693c2efdcc2842437dd92edeac5bb19404efd57085e7",
+    "src/generate.cpp": "e2ccefd9cec0e9bb832f50bfae8f8bd7a5ec49c6b1539fa9869f2af657b20c6b",
+    "src/generate.hpp": "22354fb77fc43f74955f0da44c78c36686ad4b400ad0eab4e605988deaf358a7",
+    "src/ggml_extend.hpp": "198f246cb40305b283a9498bdfa43290a8c35a50f59a512fe11b303edc381c0f",
+    "src/mel.cpp": "524e463c6888e3373341585f24bbf410d55af1ac937b446ca2bced74225a08a2",
+    "src/mel.hpp": "b516ad6ef09bb8bca815f00dc17933caaa3ea78d2f3c29a28f34bbe3436cdd09",
+    "src/model_loader.cpp": "941ee930045af558aeb5b085b63312fdc590251775ed062d1c748534a43604dc",
+    "src/model_loader.hpp": "19ac9db05508b0aba3aaef8ce3f3d96b542fcc63b13f7f1f5b3eb0600b24ed99",
+    "src/moss_transcribe_capi.cpp": "5116d2e88b53ede36b2a332fd2b896a125b48fb6e53c2c357a6700100757fa36",
+    "src/qwen3.cpp": "be923bedc763ffcd36c91bdacb8d27541dbc15ff81b741cc05975eb708d17521",
+    "src/qwen3.hpp": "0b4f260515741533c0408808cf0c040bf25d01f83b2e2c3acfe9e01f440bda81",
+    "src/qwen3_decoder.cpp": "c567cc24775a542a7c91b6b018aebb9b92dd9cf892cfc033eaf4f2e8ae8ecc45",
+    "src/qwen3_decoder.hpp": "14fb8dccde78b569235fecc18a7eedbe7aa0705f41306d94209238cb55816df5",
+    "src/subtitle.cpp": "d9b47b76d366a2a4c7a8e78e45a54a50301d5437440738890392d0cce829cdda",
+    "src/subtitle.hpp": "24a6f1e18939f289b72fb64fefc2ffd7f54b78443df054bdb408f5383099b438",
+    "src/tokenizer.cpp": "2ab86907d56c8c5eeec6a7210674019834c2fc5216a27357ec099d9c0bfac637",
+    "src/tokenizer.hpp": "5220bfcaba7ea63089dd2573fa8797e3c4df9bf0ece23386e90a9fdab7c2403f",
+    "src/transcribe.cpp": "d80930ac6ee4d9d80489bc46333199562e018f729e1e0852988f15435caac901",
+    "src/transcribe.hpp": "25873e76e6649eef604bfaba491dc8b3a042121188281b210cd4045f559d9549",
+    "src/transcript_parser.cpp": "51c9b2c3e2b07475075b2dd7b576aceb3dcd87342978ae4373e8d01a2fcca0cd",
+    "src/transcript_parser.hpp": "3df79a9d2c6202c6609709d346c84e40ee6ea74e8ad1275110f1b20abcaea8bd",
+    "src/whisper_encoder.cpp": "e78d4ff377850521b4fb5e9802c05d8fa1f531aa948cc6a1439f1d01f3b007f3",
+    "src/whisper_encoder.hpp": "948798c44ba93af336c1a7e14eb7dfe46e664b176d6d20929b113bceb0587227",
+    "CMakeLists.txt": "f36f1abd0c6bc810b3336ce14e4eb86bb228c08cb64384f5b74c5000843ab805",
+    "third_party/pocketfft/LICENSE.md": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056",
+    "third_party/pocketfft/README.md": "ea59c3a5225b45084bd3e4aa6d959b796a47c5392d506f9884b73da22510248e",
+    "third_party/pocketfft/pocketfft_hdronly.h": "3e9a05318d8e3b1446bda1c4617e6a103cdd23599ae0a776a92a6e8800e92fdc"
+  },
+  "referenceRoot": "/home/stan/hw-moss-softmax-v1",
+  "referenceOpt": 48,
+  "referenceLibraries": {
+    "/home/stan/hw-moss-softmax-v1/build/third_party/ggml/src/libggml-base.so": "42bd51826f227dbcb96a7552252bceb0bfd2e50a282406d4099cc78de1999166",
+    "/home/stan/hw-moss-softmax-v1/build/third_party/ggml/src/libggml-cpu.so": "dee88b8684c0380888314831b83016d309709cc7ff1b968961e5e85b262a0a79",
+    "/home/stan/hw-moss-softmax-v1/build/third_party/ggml/src/libggml.so": "3daebdf5d96b54a2a2016ca626cf02c2a5f22eb72a3bdff19eea44b2df4d6af8"
+  },
+  "productionLibraries": {
+    "/home/stan/hw-moss-api/lib/libggml-base.so": "0c8dd498fd349ba17bbc090afe4274fde3e65955caff4afd692e444f764a2523",
+    "/home/stan/hw-moss-api/lib/libggml-cpu.so": "c153ebcf094813a3c4daa3db594a5d6e14d1c9fc9772eb28ac22c17107e9262d",
+    "/home/stan/hw-moss-api/lib/libggml.so": "a6e942d5f8310743f9829d20967165302a0e18d123b7cd3e9ff46c8079fecff2"
+  },
+  "warmupDiscarded": true,
+  "ggmlCommit": "eced84c86f8b012c752c016f7fe789adea168e1e",
+  "physicalCoreAffinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "timeoutSeconds": 300.0,
+  "artifactGate": {
+    "passed": true,
+    "changed": []
+  },
+  "storageGate": {
+    "passed": true,
+    "failures": []
+  },
+  "sharedActivationGate": {
+    "passed": true,
+    "failures": []
+  },
+  "fusedProjectionGate": {
+    "passed": true,
+    "failures": [],
+    "exercisedRuns": 10,
+    "singleEosRunsWithoutDecode": 2
+  },
+  "gate": {
+    "passed": true,
+    "failures": [],
+    "comparisons": [
+      {
+        "case": "dinner-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 22.337845891015604,
+        "candidateSeconds": 15.109104567673057,
+        "speedup": 1.4784361171746023,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653460,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 22.337845891015604,
+        "candidateSeconds": 15.141673319973052,
+        "speedup": 1.4752560974585442,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653664,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 22.337845891015604,
+        "candidateSeconds": 15.24145203223452,
+        "speedup": 1.4655982805163672,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653028,
+        "speedPass": true
+      },
+      {
+        "case": "empty-real-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 8.4914254557807,
+        "candidateSeconds": 8.432417154312134,
+        "speedup": 1.0069977920196216,
+        "exactOutputParity": true,
+        "maxRssKiB": 1550312,
+        "speedPass": true
+      },
+      {
+        "case": "empty-real-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 8.4914254557807,
+        "candidateSeconds": 8.537161145592108,
+        "speedup": 0.9946427519603489,
+        "exactOutputParity": true,
+        "maxRssKiB": 1550740,
+        "speedPass": true
+      },
+      {
+        "case": "empty-real-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 8.4914254557807,
+        "candidateSeconds": 8.432513862848282,
+        "speedup": 1.0069862432354804,
+        "exactOutputParity": true,
+        "maxRssKiB": 1550868,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-120s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 86.27601241972297,
+        "candidateSeconds": 32.56123957806267,
+        "speedup": 2.6496538073399796,
+        "exactOutputParity": true,
+        "maxRssKiB": 2083464,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-120s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 86.27601241972297,
+        "candidateSeconds": 32.956166736315936,
+        "speedup": 2.6179019274305166,
+        "exactOutputParity": true,
+        "maxRssKiB": 2083432,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-120s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 86.27601241972297,
+        "candidateSeconds": 32.93140746559948,
+        "speedup": 2.6198701804606404,
+        "exactOutputParity": true,
+        "maxRssKiB": 2083084,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 29.457602307433262,
+        "candidateSeconds": 17.39380604098551,
+        "speedup": 1.6935685173228616,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702356,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 29.457602307433262,
+        "candidateSeconds": 17.7540731865447,
+        "speedup": 1.6592024826031655,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702016,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 29.457602307433262,
+        "candidateSeconds": 17.645702166249976,
+        "speedup": 1.6693924690497892,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702000,
+        "speedPass": true
+      },
+      {
+        "case": "silence-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 8.657777604879811,
+        "candidateSeconds": 8.607754081021994,
+        "speedup": 1.0058114490013261,
+        "exactOutputParity": true,
+        "maxRssKiB": 1553600,
+        "speedPass": true
+      },
+      {
+        "case": "silence-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 8.657777604879811,
+        "candidateSeconds": 8.608481865376234,
+        "speedup": 1.005726414979376,
+        "exactOutputParity": true,
+        "maxRssKiB": 1554044,
+        "speedPass": true
+      },
+      {
+        "case": "silence-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 8.657777604879811,
+        "candidateSeconds": 8.583037526113912,
+        "speedup": 1.008707882091684,
+        "exactOutputParity": true,
+        "maxRssKiB": 1553196,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 23.110804341034964,
+        "candidateSeconds": 15.319110178155825,
+        "speedup": 1.5086257669188678,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660528,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 23.110804341034964,
+        "candidateSeconds": 15.73480095807463,
+        "speedup": 1.4687700468924705,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660740,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "cache-reference",
+        "repeats": 2,
+        "baselineSeconds": 23.110804341034964,
+        "candidateSeconds": 15.567637827945873,
+        "speedup": 1.4845414954058191,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660620,
+        "speedPass": true
+      }
+    ]
+  },
+  "cacheReferenceGate": {
+    "passed": true,
+    "failures": [],
+    "comparisons": [
+      {
+        "case": "dinner-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 15.24145203223452,
+        "candidateSeconds": 15.109104567673057,
+        "speedup": 1.0087594512281441,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653460,
+        "speedPass": true
+      },
+      {
+        "case": "dinner-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 15.24145203223452,
+        "candidateSeconds": 15.141673319973052,
+        "speedup": 1.0065896754046233,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653664,
+        "speedPass": true
+      },
+      {
+        "case": "empty-real-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 8.432513862848282,
+        "candidateSeconds": 8.432417154312134,
+        "speedup": 1.000011468661284,
+        "exactOutputParity": true,
+        "maxRssKiB": 1550312,
+        "speedPass": true
+      },
+      {
+        "case": "empty-real-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 8.432513862848282,
+        "candidateSeconds": 8.537161145592108,
+        "speedup": 0.9877421450808788,
+        "exactOutputParity": true,
+        "maxRssKiB": 1550740,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-120s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 32.93140746559948,
+        "candidateSeconds": 32.56123957806267,
+        "speedup": 1.0113683598147227,
+        "exactOutputParity": true,
+        "maxRssKiB": 2083464,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-120s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 32.93140746559948,
+        "candidateSeconds": 32.956166736315936,
+        "speedup": 0.9992487211600014,
+        "exactOutputParity": true,
+        "maxRssKiB": 2083432,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 17.645702166249976,
+        "candidateSeconds": 17.39380604098551,
+        "speedup": 1.014481944013341,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702356,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 17.645702166249976,
+        "candidateSeconds": 17.7540731865447,
+        "speedup": 0.9938959911251882,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702016,
+        "speedPass": true
+      },
+      {
+        "case": "silence-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 8.583037526113912,
+        "candidateSeconds": 8.607754081021994,
+        "speedup": 0.9971285709750264,
+        "exactOutputParity": true,
+        "maxRssKiB": 1553600,
+        "speedPass": true
+      },
+      {
+        "case": "silence-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 8.583037526113912,
+        "candidateSeconds": 8.608481865376234,
+        "speedup": 0.9970442710270832,
+        "exactOutputParity": true,
+        "maxRssKiB": 1554044,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 15.567637827945873,
+        "candidateSeconds": 15.319110178155825,
+        "speedup": 1.0162233737403648,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660528,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "48",
+        "repeats": 2,
+        "baselineSeconds": 15.567637827945873,
+        "candidateSeconds": 15.73480095807463,
+        "speedup": 0.9893762157796491,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660740,
+        "speedPass": true
+      }
+    ]
+  },
+  "candidateReference": "48",
+  "candidateReferenceGate": {
+    "passed": true,
+    "failures": [],
+    "comparisons": [
+      {
+        "case": "dinner-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 15.141673319973052,
+        "candidateSeconds": 15.109104567673057,
+        "speedup": 1.0021555713082877,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653460,
+        "speedPass": true
+      },
+      {
+        "case": "empty-real-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 8.537161145592108,
+        "candidateSeconds": 8.432417154312134,
+        "speedup": 1.0124215855742396,
+        "exactOutputParity": true,
+        "maxRssKiB": 1550312,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-120s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 32.956166736315936,
+        "candidateSeconds": 32.56123957806267,
+        "speedup": 1.0121287507284993,
+        "exactOutputParity": true,
+        "maxRssKiB": 2083464,
+        "speedPass": true
+      },
+      {
+        "case": "meeting-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 17.7540731865447,
+        "candidateSeconds": 17.39380604098551,
+        "speedup": 1.0207123814483319,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702356,
+        "speedPass": true
+      },
+      {
+        "case": "silence-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 8.608481865376234,
+        "candidateSeconds": 8.607754081021994,
+        "speedup": 1.0000845498543975,
+        "exactOutputParity": true,
+        "maxRssKiB": 1553600,
+        "speedPass": true
+      },
+      {
+        "case": "vox-vmaiq-60s",
+        "variant": "32816",
+        "repeats": 2,
+        "baselineSeconds": 15.73480095807463,
+        "candidateSeconds": 15.319110178155825,
+        "speedup": 1.027135439009477,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660528,
+        "speedPass": true
+      }
+    ]
+  },
+  "tokenTraceGate": {
+    "passed": true,
+    "failures": [],
+    "scope": "Complete same-build greedy token IDs including unique EOS; old production/frozen binaries retain full-output/count/EOS checks."
+  }
+}
