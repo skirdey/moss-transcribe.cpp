@@ -97,6 +97,18 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64" AND CMAKE_CXX_COMPILER_ID MATCH
   endif()
 endif()
 
+# Exact inline-half conversion probe with paired unchanged-kernel controls.
+add_executable(moss_vnni_q8_inline ${CMAKE_SOURCE_DIR}/cpu-lab/moss_vnni_q8_inline.cpp)
+target_include_directories(moss_vnni_q8_inline PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
+target_link_libraries(moss_vnni_q8_inline PRIVATE moss-transcribe)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(moss_vnni_q8_inline PRIVATE -march=native -ffp-contract=off)
+  find_package(OpenMP)
+  if(OpenMP_CXX_FOUND)
+    target_link_libraries(moss_vnni_q8_inline PRIVATE OpenMP::OpenMP_CXX)
+  endif()
+endif()
+
 mt_add_test(test_mel)
 set_tests_properties(test_mel PROPERTIES LABELS "model")
 

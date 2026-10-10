@@ -568,3 +568,14 @@ encoder-shaped matrices remain 15–25% slower than ordinary GGML; no model rout
 or promotion follows. Separate stage diagnostics and exact-binary disassembly
 identify compute-loop half-conversion calls and stack spills for the next test.
 The original full-input 10× goal remains active and unachieved.
+
+### Exact inline F16C conversion
+
+The [inline conversion report](cpu-lab/vnni-inline.md) retains a failed half-zero
+rounding audit and its precise repair. The repaired native build passes all
+2,097,152 half-conversion comparisons, 78 arithmetic and 111 protected benchmark
+records, 15 CTests and 34 Python checks. Inline conversion improves 23 of 30
+paired totals; the encoder expansion is 1.22× faster than ordinary GGML while
+contraction remains 19.6% slower. Exact-binary disassembly confirms converter
+calls and vector stack traffic are absent from the new inner block loop. It
+adds no model route; the original full-input tenfold goal remains unachieved.
