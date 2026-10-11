@@ -57,6 +57,7 @@ public:
 private:
     // Standalone CPU research probe only; no production batch/rewind API.
     friend class CpuTargetBatchAudit;
+    friend class CpuSpeculativeDecoder;
     // The friend may observe the built graph before allocation and after compute.
     // Production callers supply no hook. Captures must own their copied values.
     using AuditHook = std::function<void(ggml_cgraph*, bool before_compute)>;

@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include "tokenizer.hpp"
 #include "generate.hpp"
+#include "cpu_speculative.hpp"
 
 #include "backend.hpp"
 #include "common.hpp"
@@ -234,6 +235,10 @@ static bool empty_marker_loop(const std::string& text) {
 std::vector<int32_t> greedy_generate(Qwen3Decoder& dec, ModelLoader& m,
                                      const std::vector<float>& fused, int seq,
                                      int max_new, int eos) {
+    const char* research = std::getenv("MTD_CPU_OPT");
+    if (research && (std::atoi(research)&524288) && (std::atoi(research)&262160)==262160 &&
+        ggml_backend_is_cpu(backend()))
+        return cpu_speculative_generate(dec,m,fused,seq,max_new,eos);
     std::vector<int32_t> ids;
     const int H = dec.hidden();
     if (H <= 0 || seq <= 0 || max_new <= 0) {
