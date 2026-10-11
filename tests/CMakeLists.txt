@@ -44,6 +44,11 @@ target_link_libraries(moss_causal_context_bench PRIVATE moss-transcribe)
 add_executable(moss_speculative_gate ${CMAKE_SOURCE_DIR}/cpu-lab/moss_speculative_gate.cpp)
 target_include_directories(moss_speculative_gate PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(moss_speculative_gate PRIVATE moss-transcribe)
+
+# Actual private audio diagnostic; deliberately not an automatic model test.
+add_executable(moss_speculative_audio_gate ${CMAKE_SOURCE_DIR}/cpu-lab/moss_speculative_audio_gate.cpp)
+target_include_directories(moss_speculative_audio_gate PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(moss_speculative_audio_gate PRIVATE moss-transcribe)
 add_executable(moss_target_batch_trace ${CMAKE_SOURCE_DIR}/cpu-lab/moss_target_batch_trace.cpp)
 target_include_directories(moss_target_batch_trace PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 target_link_libraries(moss_target_batch_trace PRIVATE moss-transcribe)
