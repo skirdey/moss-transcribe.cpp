@@ -1,8 +1,19 @@
 # moss-transcribe.cpp
 
-CPU research: the [past-only speculative prototype](cpu-lab/strict-speculative.md)
-passes controlled native fixtures but is rejected by full-audio output and latency
-gates. It is disabled by default; production remains on the validated serial path.
+**CPU optimizations: 1.58× overall speedup (37% less wall time), 1.71× on recorded speech.**
+
+Measured on 24 clips totaling 17.9 minutes of audio, with three runs per setting and 288 measurements. Every clip keeps the same words, speaker labels and timestamps. Times include loading the model.
+
+| Scope | Original CPU | Optimized CPU | Speedup |
+|---|---:|---:|---:|
+|All 24 clips|403.80s|254.98s|**1.58×**|
+|14 recorded speech clips|357.30s|208.73s|**1.71×**|
+|8 short generated speech clips|31.64s|31.39s|**1.01×**|
+|2 silence / empty controls|14.86s|14.86s|**1.00×**|
+
+The largest measured gain is **2.24×** for two-minute speech: **67.09s → 29.98s**. Short clips and silence show almost no gain.
+
+[Full comparison, every clip, method and numeric evidence](cpu-lab/cpu-speedup.md). The live API still uses the original build; these figures describe the tested optimized build. The 10× target remains open.
 
 **Brought to you by the [LocalAI](https://github.com/mudler/LocalAI) team**, the folks behind LocalAI, the open-source AI engine that runs any model (LLMs, vision, voice, image, video) on any hardware, no GPU required.
 
@@ -298,7 +309,7 @@ The preparer verifies the pinned parquet hash and emits 16 kHz PCM16 cuts plus c
 human references. See the dataset card for CC BY 4.0 terms and cite VoxConverse (Chung
 et al., 2020), with Hugging Face packaging by diarizers-community.
 
-`moss_cpu_regression.py` is currently a host-specific paired runner for hp-fury: the
+`moss_cpu_regression.py` is currently a host-specific paired runner for the CPU test system: the
 candidate root has `source/` and `build/`; reference binary and model/audio paths are
 explicit in its source. Supply `--variants baseline 16 --pin-physical --repeats 3`
 and a unique `--name`. Public cases are `vox-rcxzg-60s`, `vox-fsaal-60s`, and
@@ -323,7 +334,7 @@ Bits 1/2/4 are archived experiments without demonstrated end-to-end improvement.
 bounded CPU API and client. The server serializes inference, rejects incomplete results,
 and retries marker loops with bounded repetition penalties. API and client retain
 pinned production provenance; the optimized candidate is not deployed to production.
-`moss-api.service` and `setup_moss_api.py` preserve the historical hp-fury installation
+`moss-api.service` and `setup_moss_api.py` preserve the historical the CPU test system installation
 recipe using the existing pinned production checkout/assets. The recipe enables user
 lingering, boot startup and crash recovery; it does not reboot the shared machine.
 It is host-specific, not a general-purpose installer. Never commit its generated token
@@ -384,7 +395,7 @@ baseline paths are configurable, and before/after artifact hashes reject mutated
 source or binaries. Run the three-way comparison, for example:
 
 ```bash
-python3 cpu-lab/moss_cpu_regression.py --root /home/stan/hw-moss-softmax-v1 \
+python3 cpu-lab/moss_cpu_regression.py --root "$BENCH_ROOT" \
   --variants baseline cache-reference 48 --pin-physical --repeats 3 --name confirm
 ```
 
@@ -472,7 +483,7 @@ binary. The route is archived; ordinary inference retains the original loader.
 `moss_cpu_regression.py --candidate-reference 48` now also compares candidate
 variants against that control in the same compiled binary, alongside production
 and frozen-reference gates. The final copied build passed ten native CTests and
-five output/EOS smokes; the updated harness passed 28 Python tests on hp-fury.
+five output/EOS smokes; the updated harness passed 28 Python tests on the CPU test system.
 Full numeric reports and exact source/test hashes accompany the report. Loader
 diagnostics and these busy-host trials do not establish a new end-to-end gain.
 
@@ -501,7 +512,7 @@ The [actual-model report](cpu-lab/shared-model.md) adds guarded, explicit
 research switches for Qwen Q/K/V and gate/up conversion reuse (8192) and
 Whisper Q/K/V (16384). They retain ordinary weights and matrix operations and
 are off by default. Thirteen native CTests, including real Qwen layer/cache
-float-bit comparisons, and 33 Python gate/parser tests pass on hp-fury.
+float-bit comparisons, and 33 Python gate/parser tests pass on the CPU test system.
 
 All [72 paired full-input runs](cpu-lab/shared-model-pilot-v2.json) completed
 with identical output/count/EOS; the 48 numeric runs also match complete

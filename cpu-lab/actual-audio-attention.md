@@ -62,7 +62,7 @@ controls pass; the retained state mismatch remains a failure to repair.
   Native source15c655fa431c6a216071adb16f9fba61de9eec71 and public
   [ab34d33](https://github.com/skirdey/moss-transcribe.cpp/commit/ab34d3305a4f466dd658a481b510de25d6e066a3)
   have identical tree8fe99d5a966e8d161c016617123229b260e14c55.
-- Native GCC13.3 Release on hp-fury passes23 default CTest in26.02s and46
+- Native GCC13.3 Release on the CPU test system passes23 default CTest in26.02s and46
   existing Python controls. The later numeric collector passes17 mutation and
   coverage checks, alongside those46 Python checks, on the laptop.
 - This diagnostic intentionally retains the known private audio boundary.
