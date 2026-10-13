@@ -1,5 +1,9 @@
 # moss-transcribe.cpp
 
+CPU research: the [past-only speculative prototype](cpu-lab/strict-speculative.md)
+passes controlled native fixtures but is rejected by full-audio output and latency
+gates. It is disabled by default; production remains on the validated serial path.
+
 **Brought to you by the [LocalAI](https://github.com/mudler/LocalAI) team**, the folks behind LocalAI, the open-source AI engine that runs any model (LLMs, vision, voice, image, video) on any hardware, no GPU required.
 
 [![Model on Hugging Face](https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-md.svg)](https://huggingface.co/mudler/moss-transcribe.cpp-gguf)
