@@ -55,6 +55,12 @@ target_link_libraries(moss_target_batch_trace PRIVATE moss-transcribe)
 add_test(NAME moss_target_batch_trace_metadata COMMAND moss_target_batch_trace --audit-metadata)
 add_test(NAME moss_target_batch_context_layout COMMAND moss_target_batch_trace --audit-context-layout)
 add_test(NAME moss_target_batch_capture_allocation COMMAND moss_target_batch_trace --audit-allocation)
+
+# Protected real-audio attention attribution; no automatic model execution.
+add_executable(moss_audio_attention_trace ${CMAKE_SOURCE_DIR}/cpu-lab/moss_audio_attention_trace.cpp)
+target_include_directories(moss_audio_attention_trace PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
+target_link_libraries(moss_audio_attention_trace PRIVATE moss-transcribe)
+add_test(NAME moss_audio_attention_metadata COMMAND moss_audio_attention_trace --audit-generic-metadata)
 target_include_directories(test_cpu_projection PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 target_include_directories(test_cpu_activation PRIVATE ${CMAKE_SOURCE_DIR}/third_party/ggml/src)
 

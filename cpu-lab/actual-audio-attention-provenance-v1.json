@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "sourceCommit": "15c655fa431c6a216071adb16f9fba61de9eec71",
+    "sourceTree": "8fe99d5a966e8d161c016617123229b260e14c55",
+    "sourceClean": true,
+    "ggmlCommit": "eced84c86f8b012c752c016f7fe789adea168e1e",
+    "traceBinarySha256": "6a09ca2020b170779c306e287cc855b64d0cb084be2efa547a1a38bd5dd61a48",
+    "traceLogSha256": "8ca1ffb99ada97b5c3fb668b6157afb328079642fdc1124613b0d6bc005dd8fb",
+    "ctestLogSha256": "70b87eda97d3fd2877b0347776554ea4b8adf0d622f6b20ad140469421add231",
+    "pythonTestsLogSha256": "24bc89b499f8f17d2294f88729b25b88bdaf37d3e4786215430f8efdce9ef28a",
+    "sourceFilesSha256": {
+      "cpu-lab/moss_audio_attention_trace.cpp": "0fdc213bbc6b69da44f60da22bc645af067ca8b726d672699f6f171ca5401ecf",
+      "tests/CMakeLists.txt": "2ed08a137778577671c976b5979a3fefae95fcf3461ef41a6a68b4d35ed35030"
+    },
+    "nativeCtestExit": 0,
+    "nativePythonExit": 0,
+    "traceExit": 0,
+    "modelSha256": "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c",
+    "publicSourceCommit": "ab34d3305a4f466dd658a481b510de25d6e066a3"
+  },
+  "ctestSummary": [
+    "      Start 31: test_subtitle_postprocess",
+    "22/23 Test #31: test_subtitle_postprocess ..............   Passed    0.00 sec",
+    "      Start 32: test_subtitle_export",
+    "23/23 Test #32: test_subtitle_export ...................   Passed    0.00 sec",
+    "",
+    "100% tests passed, 0 tests failed out of 23",
+    "",
+    "Total Test time (real) =  26.02 sec"
+  ],
+  "pythonSummary": [
+    "..............................................",
+    "----------------------------------------------------------------------",
+    "Ran 46 tests in 0.005s",
+    "",
+    "OK"
+  ],
+  "method": "Frozen native GCC13.3 Release, Xeon Gold 5416S, 16 physical workers; protected actual-audio capture, no timing.",
+  "nativeCtestCount": 23,
+  "nativeCtestSeconds": 26.02,
+  "nativePythonCount": 46,
+  "laterLaptopCollectorChecks": 17
+}
