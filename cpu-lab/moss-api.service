@@ -5,8 +5,9 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 EnvironmentFile=%h/.config/moss-api/service.env
-ExecStart=/usr/bin/python3 %h/hw-moss-api/moss_api.py
-WorkingDirectory=%h/hw-moss-api
+ExecStart=/usr/bin/python3 %h/moss-api/moss_api.py
+WorkingDirectory=%h/moss-api
+CPUAffinity=0-15
 Restart=always
 RestartSec=5
 TimeoutStopSec=15

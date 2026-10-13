@@ -25,7 +25,21 @@ MAX_BYTES = 4_000_000
 MAX_SECONDS = 120
 POLICY = "moss-cpp-cpu-marker-retries-v2"
 MODEL_SHA256 = "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c"
-COMMIT = "190a569c13b4b247450f2fb3b2a431244e84833e"
+COMMIT = "8382623c2014f85881f0680a0d8f10ce414b20b0"
+CPU_OPT = 48
+
+
+def inference_environment(base, penalty):
+    env = dict(base)
+    for name in ("OMP_WAIT_POLICY", "GOMP_SPINCOUNT", "OMP_THREAD_LIMIT"):
+        env.pop(name, None)
+    for phase in ("WHISPER", "ADAPTOR", "PREFILL", "DECODE", "LOGITS"):
+        env.pop("MTD_THREADS_" + phase, None)
+    env.update({"MTD_DEVICE": "cpu", "MTD_CPU_OPT": str(CPU_OPT),
+                "MTD_THREADS": "16", "OMP_NUM_THREADS": "16", "OMP_DYNAMIC": "FALSE",
+                "MTD_PROFILE": "0", "MTD_TRACE_TOKENS": "0", "MTD_LOOP_GUARD": "1",
+                "MTD_REPETITION_PENALTY": str(penalty)})
+    return env
 
 
 def digest(path):
@@ -45,12 +59,16 @@ class Runtime:
         self.model = Path(os.environ["MOSS_CPP_MODEL"])
         if digest(self.model) != MODEL_SHA256:
             raise ValueError("MOSS weights do not match pinned Q8 digest")
+        binary_sha = digest(self.binary)
+        expected_binary_sha = os.environ["MOSS_CPP_EXPECTED_SHA256"]
+        if not re.fullmatch(r"[0-9a-f]{64}", expected_binary_sha) or binary_sha != expected_binary_sha:
+            raise ValueError("MOSS binary does not match the validated deployment digest")
         self.slot = threading.Lock()
         self.identity = {"backend": "moss-transcribe.cpp", "device": "cpu", "quantization": "q8_0",
                          "sourceCommit": COMMIT, "modelRepository": "mudler/moss-transcribe.cpp-gguf",
                          "modelRevision": "54e4bbd17da3f84adf1c1bcf7791b9b9266f741e",
-                         "modelSha256": MODEL_SHA256, "binarySha256": digest(self.binary),
-                         "threads": 16, "policy": POLICY, "maxAudioSeconds": MAX_SECONDS}
+                         "modelSha256": MODEL_SHA256, "binarySha256": binary_sha,
+                         "cpuOpt": CPU_OPT, "threads": 16, "policy": POLICY, "maxAudioSeconds": MAX_SECONDS}
 
     def infer(self, audio, max_tokens):
         with wave.open(io.BytesIO(audio)) as wav:
@@ -72,8 +90,7 @@ class Runtime:
                 if remaining <= 0:
                     raise RuntimeError("MOSS inference exceeded 240 seconds")
                 attempt_started = time.perf_counter()
-                env = {**os.environ, "MTD_DEVICE": "cpu", "MTD_THREADS": "16", "OMP_NUM_THREADS": "16",
-                       "MTD_LOOP_GUARD": "1", "MTD_REPETITION_PENALTY": str(penalty)}
+                env = inference_environment(os.environ, penalty)
                 proc = subprocess.Popen([str(self.binary), "transcribe", str(self.model), str(path),
                                          "--max-new", str(max_tokens)], env=env, stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True, start_new_session=True)

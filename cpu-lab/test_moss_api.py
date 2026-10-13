@@ -119,3 +119,29 @@ def test_eos_only_is_complete_empty_output_despite_upstream_cli_exit_one(monkeyp
     result = runtime.infer(wav_bytes(), 512)
     assert result["text"] == "" and result["segments"] == []
     assert result["stopReason"] == "eos" and result["generationTokens"] == 1
+
+
+def test_inference_environment_forces_validated_profile():
+    base={"MTD_CPU_OPT":"786480", "MTD_THREADS_WHISPER":"1", "MTD_THREADS_DECODE":"2",
+          "OMP_DYNAMIC":"TRUE", "OMP_NUM_THREADS":"32", "OMP_WAIT_POLICY":"PASSIVE",
+          "MTD_TRACE_TOKENS":"1", "LD_LIBRARY_PATH":"example-libraries"}
+    result=api.inference_environment(base,1.1)
+    assert result["MTD_CPU_OPT"]=="48" and result["OMP_NUM_THREADS"]=="16"
+    assert result["OMP_DYNAMIC"]=="FALSE" and result["MTD_TRACE_TOKENS"]=="0"
+    assert result["MTD_REPETITION_PENALTY"]=="1.1"
+    assert "MTD_THREADS_WHISPER" not in result and "MTD_THREADS_DECODE" not in result
+    assert "OMP_WAIT_POLICY" not in result and result["LD_LIBRARY_PATH"]==base["LD_LIBRARY_PATH"]
+    assert base["MTD_CPU_OPT"]=="786480"
+
+
+def test_startup_rejects_wrong_deployment_binary(monkeypatch,tmp_path):
+    binary=tmp_path/'program';binary.write_bytes(b'example program')
+    model=tmp_path/'model.gguf';model.write_bytes(b'example model')
+    monkeypatch.setenv('MOSS_API_TOKEN','x'*48)
+    monkeypatch.setenv('MOSS_CPP_BINARY',str(binary));monkeypatch.setenv('MOSS_CPP_MODEL',str(model))
+    monkeypatch.setattr(api,'MODEL_SHA256',api.digest(model))
+    monkeypatch.setenv('MOSS_CPP_EXPECTED_SHA256','0'*64)
+    with pytest.raises(ValueError,match='deployment digest'):api.Runtime()
+    monkeypatch.setenv('MOSS_CPP_EXPECTED_SHA256',api.digest(binary))
+    runtime=api.Runtime()
+    assert runtime.identity['cpuOpt']==48 and runtime.identity['binarySha256']==api.digest(binary)
