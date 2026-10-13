@@ -1,0 +1,2873 @@
+{
+  "schema": "cpu-speedup-summary-v2",
+  "corpus": "larger-corpus-v1",
+  "cases": [
+    {
+      "case": "meeting-60s",
+      "origin": "existing-fixture",
+      "group": "meeting",
+      "category": "recorded-speech",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "durationSeconds": 60.0,
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 21.907282661646605,
+          "minWallSeconds": 21.858365102205426,
+          "maxWallSeconds": 22.15743176313117,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 13.79338452918455,
+          "minWallSeconds": 13.692179561126977,
+          "maxWallSeconds": 13.89291684795171,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 22.05838128598407,
+          "minWallSeconds": 21.821146256290376,
+          "maxWallSeconds": 22.15872531477362,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 13.843146190978587,
+          "minWallSeconds": 13.741791484877467,
+          "maxWallSeconds": 13.891233223024756,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "meeting-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 21.907282661646605,
+        "candidateSeconds": 13.843146190978587,
+        "speedup": 1.5825363945028132,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702480,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "meeting-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 13.79338452918455,
+        "candidateSeconds": 13.843146190978587,
+        "speedup": 0.9964053213693238,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702480,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "meeting-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 22.05838128598407,
+        "candidateSeconds": 13.843146190978587,
+        "speedup": 1.5934514438891971,
+        "exactOutputParity": true,
+        "maxRssKiB": 1702480,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "dinner-60s",
+      "origin": "existing-fixture",
+      "group": "dinner-60s",
+      "category": "recorded-speech",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "durationSeconds": 60.0,
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 16.647665707860142,
+          "minWallSeconds": 16.597414740826935,
+          "maxWallSeconds": 16.74875903315842,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 11.588456056080759,
+          "minWallSeconds": 11.53871628595516,
+          "maxWallSeconds": 11.939017597120255,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 16.54775514313951,
+          "minWallSeconds": 16.497970530297607,
+          "maxWallSeconds": 17.2477855742909,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 11.739611856639385,
+          "minWallSeconds": 11.488532375078648,
+          "maxWallSeconds": 11.788080760277808,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "dinner-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 16.647665707860142,
+        "candidateSeconds": 11.739611856639385,
+        "speedup": 1.4180763309005815,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653684,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "dinner-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 11.588456056080759,
+        "candidateSeconds": 11.739611856639385,
+        "speedup": 0.9871242931704646,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653684,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "dinner-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 16.54775514313951,
+        "candidateSeconds": 11.739611856639385,
+        "speedup": 1.4095657799606773,
+        "exactOutputParity": true,
+        "maxRssKiB": 1653684,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "origin": "existing-fixture",
+      "group": "vox-vmaiq-60s",
+      "category": "recorded-speech",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "durationSeconds": 60.0,
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 17.398446104023606,
+          "minWallSeconds": 17.2476763590239,
+          "maxWallSeconds": 17.499217526987195,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 11.989284104201943,
+          "minWallSeconds": 11.888061234727502,
+          "maxWallSeconds": 12.039171154145151,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 17.347784859128296,
+          "minWallSeconds": 17.248509571887553,
+          "maxWallSeconds": 17.449647463858128,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 11.988992005120963,
+          "minWallSeconds": 11.988729785662144,
+          "maxWallSeconds": 12.038009806070477,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "vox-vmaiq-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 17.398446104023606,
+        "candidateSeconds": 11.988992005120963,
+        "speedup": 1.4512017437823008,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660628,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "vox-vmaiq-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 11.989284104201943,
+        "candidateSeconds": 11.988992005120963,
+        "speedup": 1.0000243639399256,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660628,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "vox-vmaiq-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 17.347784859128296,
+        "candidateSeconds": 11.988992005120963,
+        "speedup": 1.4469760970495589,
+        "exactOutputParity": true,
+        "maxRssKiB": 1660628,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "meeting-120s",
+      "origin": "existing-fixture",
+      "group": "meeting",
+      "category": "recorded-speech",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "durationSeconds": 120.0,
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 67.09325708122924,
+          "minWallSeconds": 66.94526991294697,
+          "maxWallSeconds": 67.9963215449825,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 29.884369490202516,
+          "minWallSeconds": 29.772904884070158,
+          "maxWallSeconds": 29.974611096084118,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 67.89729725196958,
+          "minWallSeconds": 66.44427641294897,
+          "maxWallSeconds": 69.39937112899497,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 29.975263598375022,
+          "minWallSeconds": 29.880429222248495,
+          "maxWallSeconds": 30.377500182017684,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "meeting-120s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 67.09325708122924,
+        "candidateSeconds": 29.975263598375022,
+        "speedup": 2.238287475305685,
+        "exactOutputParity": true,
+        "maxRssKiB": 2083604,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "meeting-120s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 29.884369490202516,
+        "candidateSeconds": 29.975263598375022,
+        "speedup": 0.9969676961180274,
+        "exactOutputParity": true,
+        "maxRssKiB": 2083604,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "meeting-120s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 67.89729725196958,
+        "candidateSeconds": 29.975263598375022,
+        "speedup": 2.2651109315232287,
+        "exactOutputParity": true,
+        "maxRssKiB": 2083604,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "silence-60s",
+      "origin": "existing-fixture",
+      "group": "silence-60s",
+      "category": "control",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "durationSeconds": 60.0,
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 7.531321893911809,
+          "minWallSeconds": 7.52916100807488,
+          "maxWallSeconds": 7.58115759305656,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 7.435041673947126,
+          "minWallSeconds": 7.43247564509511,
+          "maxWallSeconds": 7.480471453163773,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 7.531166402623057,
+          "minWallSeconds": 7.529114944394678,
+          "maxWallSeconds": 7.5809350069612265,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 7.4802643046714365,
+          "minWallSeconds": 7.435172826983035,
+          "maxWallSeconds": 7.4807961490005255,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "silence-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 7.531321893911809,
+        "candidateSeconds": 7.4802643046714365,
+        "speedup": 1.0068256397315383,
+        "exactOutputParity": true,
+        "maxRssKiB": 1554260,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "silence-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 7.435041673947126,
+        "candidateSeconds": 7.4802643046714365,
+        "speedup": 0.9939544073735377,
+        "exactOutputParity": true,
+        "maxRssKiB": 1554260,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "silence-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 7.531166402623057,
+        "candidateSeconds": 7.4802643046714365,
+        "speedup": 1.006804852860591,
+        "exactOutputParity": true,
+        "maxRssKiB": 1554260,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "empty-real-60s",
+      "origin": "existing-fixture",
+      "group": "empty-real-60s",
+      "category": "control",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "durationSeconds": 60.0,
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 7.329918175935745,
+          "minWallSeconds": 7.328611234202981,
+          "maxWallSeconds": 7.330088042188436,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 7.330286530312151,
+          "minWallSeconds": 7.330220635049045,
+          "maxWallSeconds": 7.379267049022019,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 7.330308513715863,
+          "minWallSeconds": 7.279166928958148,
+          "maxWallSeconds": 7.330613465979695,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 7.380476843565702,
+          "minWallSeconds": 7.380352132022381,
+          "maxWallSeconds": 7.380598769057542,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "empty-real-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 7.329918175935745,
+        "candidateSeconds": 7.380476843565702,
+        "speedup": 0.9931496746481856,
+        "exactOutputParity": true,
+        "maxRssKiB": 1551060,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "empty-real-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 7.330286530312151,
+        "candidateSeconds": 7.380476843565702,
+        "speedup": 0.9931995839405271,
+        "exactOutputParity": true,
+        "maxRssKiB": 1551060,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "empty-real-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 7.330308513715863,
+        "candidateSeconds": 7.380476843565702,
+        "speedup": 0.9932025625290626,
+        "exactOutputParity": true,
+        "maxRssKiB": 1551060,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "vox-fsaal-60s",
+      "origin": "existing-fixture",
+      "group": "vox-fsaal-60s",
+      "category": "recorded-speech",
+      "inputSha256": "107e167f468f09127869af35cc505b9ec2f7719e7e76acc78cb074a2b2835803",
+      "durationSeconds": 60.0,
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 19.55307142296806,
+          "minWallSeconds": 19.503297267947346,
+          "maxWallSeconds": 19.553164640907198,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 12.841213623993099,
+          "minWallSeconds": 12.790807306300849,
+          "maxWallSeconds": 12.98979235580191,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 19.55352903297171,
+          "minWallSeconds": 19.503271834924817,
+          "maxWallSeconds": 19.751998856198043,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 12.941268966067582,
+          "minWallSeconds": 12.89058364322409,
+          "maxWallSeconds": 12.989849565085024,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "vox-fsaal-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 19.55307142296806,
+        "candidateSeconds": 12.941268966067582,
+        "speedup": 1.510908356378098,
+        "exactOutputParity": true,
+        "maxRssKiB": 1680936,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "vox-fsaal-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 12.841213623993099,
+        "candidateSeconds": 12.941268966067582,
+        "speedup": 0.992268506099608,
+        "exactOutputParity": true,
+        "maxRssKiB": 1680936,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "vox-fsaal-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 19.55352903297171,
+        "candidateSeconds": 12.941268966067582,
+        "speedup": 1.5109437168983724,
+        "exactOutputParity": true,
+        "maxRssKiB": 1680936,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "vox-rcxzg-60s",
+      "origin": "existing-fixture",
+      "group": "vox-rcxzg-60s",
+      "category": "recorded-speech",
+      "inputSha256": "5f5fcb7046e6607d723b079e808471a77fcb522df286f7261554f0a0483cbc25",
+      "durationSeconds": 60.0,
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 19.60335657419637,
+          "minWallSeconds": 19.501766534987837,
+          "maxWallSeconds": 19.803830789402127,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 12.84074833523482,
+          "minWallSeconds": 12.839079333934933,
+          "maxWallSeconds": 13.040928293950856,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 19.5533399078995,
+          "minWallSeconds": 19.55166776943952,
+          "maxWallSeconds": 19.903763868846,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 12.890866443980485,
+          "minWallSeconds": 12.889533142093569,
+          "maxWallSeconds": 12.9913189439103,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "vox-rcxzg-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 19.60335657419637,
+        "candidateSeconds": 12.890866443980485,
+        "speedup": 1.5207167539425053,
+        "exactOutputParity": true,
+        "maxRssKiB": 1681776,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "vox-rcxzg-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 12.84074833523482,
+        "candidateSeconds": 12.890866443980485,
+        "speedup": 0.9961121225665116,
+        "exactOutputParity": true,
+        "maxRssKiB": 1681776,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "vox-rcxzg-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 19.5533399078995,
+        "candidateSeconds": 12.890866443980485,
+        "speedup": 1.5168367458364382,
+        "exactOutputParity": true,
+        "maxRssKiB": 1681776,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "conversation-a-20pct-30s",
+      "origin": "new-excerpt",
+      "group": "conversation-a",
+      "category": "recorded-speech",
+      "sourceDuration": 4748.550375,
+      "offsetSeconds": 949.71,
+      "requestedSeconds": 30,
+      "durationSeconds": 30.0,
+      "inputSha256": "5ff8b278f4769c7e5256b610b423eb8bf2da4530eb08d8cc0f2c034fcacfcb3a",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 8.231317454017699,
+          "minWallSeconds": 8.130159297026694,
+          "maxWallSeconds": 8.33130604494363,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 6.5282397721894085,
+          "minWallSeconds": 6.527119800914079,
+          "maxWallSeconds": 6.578228794969618,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 8.280471249017864,
+          "minWallSeconds": 8.231609359849244,
+          "maxWallSeconds": 8.280620912089944,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 6.528598352801055,
+          "minWallSeconds": 6.477696835063398,
+          "maxWallSeconds": 6.6284916661679745,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "conversation-a-20pct-30s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 8.231317454017699,
+        "candidateSeconds": 6.528598352801055,
+        "speedup": 1.260809290019519,
+        "exactOutputParity": true,
+        "maxRssKiB": 1520408,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "conversation-a-20pct-30s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 6.5282397721894085,
+        "candidateSeconds": 6.528598352801055,
+        "speedup": 0.9999450754063478,
+        "exactOutputParity": true,
+        "maxRssKiB": 1520408,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "conversation-a-20pct-30s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 8.280471249017864,
+        "candidateSeconds": 6.528598352801055,
+        "speedup": 1.2683382866500248,
+        "exactOutputParity": true,
+        "maxRssKiB": 1520408,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "conversation-a-50pct-60s",
+      "origin": "new-excerpt",
+      "group": "conversation-a",
+      "category": "recorded-speech",
+      "sourceDuration": 4748.550375,
+      "offsetSeconds": 2374.275,
+      "requestedSeconds": 60,
+      "durationSeconds": 60.0,
+      "inputSha256": "d8d2ad879abb193249457ef5e80f6e22974125ee0e6aa69864e4eff4119c6292",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 21.807511903811246,
+          "minWallSeconds": 21.805978971067816,
+          "maxWallSeconds": 21.85775788128376,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 13.792448517866433,
+          "minWallSeconds": 13.74236379377544,
+          "maxWallSeconds": 14.043313965201378,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 21.807654103729874,
+          "minWallSeconds": 21.80739153502509,
+          "maxWallSeconds": 22.058011448942125,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 13.793082032818347,
+          "minWallSeconds": 13.741306704003364,
+          "maxWallSeconds": 13.893158907070756,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "conversation-a-50pct-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 21.807511903811246,
+        "candidateSeconds": 13.793082032818347,
+        "speedup": 1.5810470677926727,
+        "exactOutputParity": true,
+        "maxRssKiB": 1701184,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "conversation-a-50pct-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 13.792448517866433,
+        "candidateSeconds": 13.793082032818347,
+        "speedup": 0.9999540700946745,
+        "exactOutputParity": true,
+        "maxRssKiB": 1701184,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "conversation-a-50pct-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 21.807654103729874,
+        "candidateSeconds": 13.793082032818347,
+        "speedup": 1.58105737730278,
+        "exactOutputParity": true,
+        "maxRssKiB": 1701184,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "conversation-a-80pct-120s",
+      "origin": "new-excerpt",
+      "group": "conversation-a",
+      "category": "recorded-speech",
+      "sourceDuration": 4748.550375,
+      "offsetSeconds": 3798.84,
+      "requestedSeconds": 120,
+      "durationSeconds": 120.0,
+      "inputSha256": "98f808632a51b25d234ac2db7e51228737b1ded683fd9127f2c48fb6fb7fb105",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 60.584429304115474,
+          "minWallSeconds": 60.48259071726352,
+          "maxWallSeconds": 61.93448660289869,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 28.272104491014034,
+          "minWallSeconds": 28.171108012087643,
+          "maxWallSeconds": 28.571666312869638,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 60.733112735208124,
+          "minWallSeconds": 60.08176736626774,
+          "maxWallSeconds": 61.63474089605734,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 28.472736824303865,
+          "minWallSeconds": 28.371801293920726,
+          "maxWallSeconds": 28.67239705612883,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "conversation-a-80pct-120s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 60.584429304115474,
+        "candidateSeconds": 28.472736824303865,
+        "speedup": 2.1278049130985397,
+        "exactOutputParity": true,
+        "maxRssKiB": 2054888,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "conversation-a-80pct-120s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 28.272104491014034,
+        "candidateSeconds": 28.472736824303865,
+        "speedup": 0.9929535283338631,
+        "exactOutputParity": true,
+        "maxRssKiB": 2054888,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "conversation-a-80pct-120s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 60.733112735208124,
+        "candidateSeconds": 28.472736824303865,
+        "speedup": 2.1330268709317513,
+        "exactOutputParity": true,
+        "maxRssKiB": 2054888,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "conversation-b-20pct-30s",
+      "origin": "new-excerpt",
+      "group": "conversation-b",
+      "category": "recorded-speech",
+      "sourceDuration": 1332.0,
+      "offsetSeconds": 266.4,
+      "requestedSeconds": 30,
+      "durationSeconds": 30.0,
+      "inputSha256": "e33a75dffe1a2cac5a9e14276aa180fd94d80a021ac9f92a088511d4847c18f3",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 8.031044993083924,
+          "minWallSeconds": 7.981051955837756,
+          "maxWallSeconds": 8.08138982905075,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 6.378132538869977,
+          "minWallSeconds": 6.3778050118125975,
+          "maxWallSeconds": 6.428279872983694,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 7.981068222317845,
+          "minWallSeconds": 7.980987905990332,
+          "maxWallSeconds": 8.031384687870741,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 6.428088020998985,
+          "minWallSeconds": 6.427387109026313,
+          "maxWallSeconds": 6.428351137787104,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "conversation-b-20pct-30s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 8.031044993083924,
+        "candidateSeconds": 6.428088020998985,
+        "speedup": 1.2493676139543317,
+        "exactOutputParity": true,
+        "maxRssKiB": 1517868,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "conversation-b-20pct-30s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 6.378132538869977,
+        "candidateSeconds": 6.428088020998985,
+        "speedup": 0.9922285628376875,
+        "exactOutputParity": true,
+        "maxRssKiB": 1517868,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "conversation-b-20pct-30s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 7.981068222317845,
+        "candidateSeconds": 6.428088020998985,
+        "speedup": 1.2415928649772148,
+        "exactOutputParity": true,
+        "maxRssKiB": 1517868,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "conversation-b-50pct-60s",
+      "origin": "new-excerpt",
+      "group": "conversation-b",
+      "category": "recorded-speech",
+      "sourceDuration": 1332.0,
+      "offsetSeconds": 666.0,
+      "requestedSeconds": 60,
+      "durationSeconds": 60.0,
+      "inputSha256": "d8f1cb1729d6a1d21a458cf37861efa1a599591c685fdc2041347fd890202280",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 23.359887158032507,
+          "minWallSeconds": 23.310912976041436,
+          "maxWallSeconds": 23.461065971292555,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 14.394218088127673,
+          "minWallSeconds": 14.39399586012587,
+          "maxWallSeconds": 14.394666518084705,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 23.310490012168884,
+          "minWallSeconds": 23.310255508869886,
+          "maxWallSeconds": 23.51004261430353,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 14.393908192869276,
+          "minWallSeconds": 14.359157731290907,
+          "maxWallSeconds": 14.443764595780522,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "conversation-b-50pct-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 23.359887158032507,
+        "candidateSeconds": 14.393908192869276,
+        "speedup": 1.6229009414972486,
+        "exactOutputParity": true,
+        "maxRssKiB": 1713428,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "conversation-b-50pct-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 14.394218088127673,
+        "candidateSeconds": 14.393908192869276,
+        "speedup": 1.000021529611989,
+        "exactOutputParity": true,
+        "maxRssKiB": 1713428,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "conversation-b-50pct-60s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 23.310490012168884,
+        "candidateSeconds": 14.393908192869276,
+        "speedup": 1.6194691323456456,
+        "exactOutputParity": true,
+        "maxRssKiB": 1713428,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "conversation-b-80pct-120s",
+      "origin": "new-excerpt",
+      "group": "conversation-b",
+      "category": "recorded-speech",
+      "sourceDuration": 1332.0,
+      "offsetSeconds": 1065.6,
+      "requestedSeconds": 120,
+      "durationSeconds": 120.0,
+      "inputSha256": "1240bc02cba4db75d0aac4d3fca8d384c4d075dcdfac1c8f0c6ad76c681b823f",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 44.65061820903793,
+          "minWallSeconds": 44.502353601157665,
+          "maxWallSeconds": 45.20287701813504,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 24.213642715010792,
+          "minWallSeconds": 24.21209516422823,
+          "maxWallSeconds": 24.214558620005846,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 44.75377729162574,
+          "minWallSeconds": 44.60297140991315,
+          "maxWallSeconds": 45.3000550433062,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 24.26358275488019,
+          "minWallSeconds": 24.262530489824712,
+          "maxWallSeconds": 24.314238715916872,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "conversation-b-80pct-120s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 44.65061820903793,
+        "candidateSeconds": 24.26358275488019,
+        "speedup": 1.8402318676559524,
+        "exactOutputParity": true,
+        "maxRssKiB": 1977640,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "conversation-b-80pct-120s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 24.213642715010792,
+        "candidateSeconds": 24.26358275488019,
+        "speedup": 0.9979417697553609,
+        "exactOutputParity": true,
+        "maxRssKiB": 1977640,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "conversation-b-80pct-120s",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 44.75377729162574,
+        "candidateSeconds": 24.26358275488019,
+        "speedup": 1.8444834690632943,
+        "exactOutputParity": true,
+        "maxRssKiB": 1977640,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "room-mix",
+      "origin": "local-fixture",
+      "group": "room-turns",
+      "category": "recorded-speech",
+      "durationSeconds": 33.81925,
+      "inputSha256": "dde7ae986077b3413ef4b121dcaef3f74a7ddbcd64b1a6c7c2e79b5bd670e001",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 13.290711164008826,
+          "minWallSeconds": 13.239693401847035,
+          "maxWallSeconds": 13.441951680928469,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 10.336057869717479,
+          "minWallSeconds": 10.234366570133716,
+          "maxWallSeconds": 10.385971595998853,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 13.290999796241522,
+          "minWallSeconds": 13.289674278348684,
+          "maxWallSeconds": 13.391783353872597,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 10.335922069847584,
+          "minWallSeconds": 10.23511571297422,
+          "maxWallSeconds": 10.336162913125008,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "room-mix",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 13.290711164008826,
+        "candidateSeconds": 10.335922069847584,
+        "speedup": 1.2858757132835865,
+        "exactOutputParity": true,
+        "maxRssKiB": 1564816,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "room-mix",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 10.336057869717479,
+        "candidateSeconds": 10.335922069847584,
+        "speedup": 1.000013138631365,
+        "exactOutputParity": true,
+        "maxRssKiB": 1564816,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "room-mix",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 13.290999796241522,
+        "candidateSeconds": 10.335922069847584,
+        "speedup": 1.285903638439247,
+        "exactOutputParity": true,
+        "maxRssKiB": 1564816,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "room-sequential",
+      "origin": "local-fixture",
+      "group": "room-turns",
+      "category": "recorded-speech",
+      "durationSeconds": 43.8839375,
+      "inputSha256": "07a5db764d869581d1a7fa0f6ffdc1f04928589826b1da72bd32a558a48ace7f",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 15.144860705826432,
+          "minWallSeconds": 15.094865053892136,
+          "maxWallSeconds": 15.1449702847749,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 11.137075185775757,
+          "minWallSeconds": 11.08772827591747,
+          "maxWallSeconds": 11.138134327717125,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 15.094640834257007,
+          "minWallSeconds": 15.094176299870014,
+          "maxWallSeconds": 15.144819525070488,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 11.137446960434318,
+          "minWallSeconds": 11.085099774878472,
+          "maxWallSeconds": 11.13761174492538,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "room-sequential",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 15.144860705826432,
+        "candidateSeconds": 11.137446960434318,
+        "speedup": 1.3598143954919306,
+        "exactOutputParity": true,
+        "maxRssKiB": 1605740,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "room-sequential",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 11.137075185775757,
+        "candidateSeconds": 11.137446960434318,
+        "speedup": 0.9999666194003095,
+        "exactOutputParity": true,
+        "maxRssKiB": 1605740,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "room-sequential",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 15.094640834257007,
+        "candidateSeconds": 11.137446960434318,
+        "speedup": 1.3553052946407365,
+        "exactOutputParity": true,
+        "maxRssKiB": 1605740,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "synthetic-de",
+      "origin": "local-fixture",
+      "group": "synthetic-de",
+      "category": "synthetic-speech",
+      "durationSeconds": 4.4076875,
+      "inputSha256": "deca53218f29abfaaba2332fd178a7ee01d9b2b5b34fe558f77317cc3d9b2239",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 3.9735327498055995,
+          "minWallSeconds": 3.9721866282634437,
+          "maxWallSeconds": 3.973600049968809,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 3.9235263080336154,
+          "minWallSeconds": 3.9218357829377055,
+          "maxWallSeconds": 3.9235628028400242,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 3.973489159718156,
+          "minWallSeconds": 3.971954839769751,
+          "maxWallSeconds": 3.973546253051609,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 3.9234659308567643,
+          "minWallSeconds": 3.9219740401022136,
+          "maxWallSeconds": 3.923569138161838,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "synthetic-de",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.9735327498055995,
+        "candidateSeconds": 3.9234659308567643,
+        "speedup": 1.0127608649676492,
+        "exactOutputParity": true,
+        "maxRssKiB": 1386460,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "synthetic-de",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.9235263080336154,
+        "candidateSeconds": 3.9234659308567643,
+        "speedup": 1.0000153887348369,
+        "exactOutputParity": true,
+        "maxRssKiB": 1386460,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "synthetic-de",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.973489159718156,
+        "candidateSeconds": 3.9234659308567643,
+        "speedup": 1.0127497548705535,
+        "exactOutputParity": true,
+        "maxRssKiB": 1386460,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "synthetic-en",
+      "origin": "local-fixture",
+      "group": "synthetic-en",
+      "category": "synthetic-speech",
+      "durationSeconds": 4.560875,
+      "inputSha256": "dc67d0c87874ed39ba53928aac72bf87998777bf82470bb0fe6e466e741606ed",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 3.9220677227713168,
+          "minWallSeconds": 3.8732060259208083,
+          "maxWallSeconds": 3.923301588743925,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 3.923519214615226,
+          "minWallSeconds": 3.9224290512502193,
+          "maxWallSeconds": 3.92354230908677,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 3.92342325206846,
+          "minWallSeconds": 3.923212742898613,
+          "maxWallSeconds": 3.973473026882857,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 3.8733345051296055,
+          "minWallSeconds": 3.873051598202437,
+          "maxWallSeconds": 3.9236488579772413,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "synthetic-en",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.9220677227713168,
+        "candidateSeconds": 3.8733345051296055,
+        "speedup": 1.0125817219187168,
+        "exactOutputParity": true,
+        "maxRssKiB": 1388376,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "synthetic-en",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.923519214615226,
+        "candidateSeconds": 3.8733345051296055,
+        "speedup": 1.0129564615240845,
+        "exactOutputParity": true,
+        "maxRssKiB": 1388376,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "synthetic-en",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.92342325206846,
+        "candidateSeconds": 3.8733345051296055,
+        "speedup": 1.0129316863473887,
+        "exactOutputParity": true,
+        "maxRssKiB": 1388376,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "synthetic-es",
+      "origin": "local-fixture",
+      "group": "synthetic-es",
+      "category": "synthetic-speech",
+      "durationSeconds": 6.23725,
+      "inputSha256": "8c30b059f8444a350ddcde5c0c98f6c891e8bb3c08b08dfdf3afbb642fc09120",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 3.973052346147597,
+          "minWallSeconds": 3.972463245037943,
+          "maxWallSeconds": 3.9736998048610985,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 3.923338766209781,
+          "minWallSeconds": 3.9220703449100256,
+          "maxWallSeconds": 3.9735425622202456,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 4.023613090161234,
+          "minWallSeconds": 4.0221644984558225,
+          "maxWallSeconds": 4.023699353914708,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 3.923853970132768,
+          "minWallSeconds": 3.9219157551415265,
+          "maxWallSeconds": 3.9735109680332243,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "synthetic-es",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.973052346147597,
+        "candidateSeconds": 3.923853970132768,
+        "speedup": 1.0125382790463948,
+        "exactOutputParity": true,
+        "maxRssKiB": 1391852,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "synthetic-es",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.923338766209781,
+        "candidateSeconds": 3.923853970132768,
+        "speedup": 0.999868699516621,
+        "exactOutputParity": true,
+        "maxRssKiB": 1391852,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "synthetic-es",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 4.023613090161234,
+        "candidateSeconds": 3.923853970132768,
+        "speedup": 1.0254237595965099,
+        "exactOutputParity": true,
+        "maxRssKiB": 1391852,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "synthetic-fr",
+      "origin": "local-fixture",
+      "group": "synthetic-fr",
+      "category": "synthetic-speech",
+      "durationSeconds": 4.9195,
+      "inputSha256": "5454a7a12431334957e7528d4d3ea6bb29d0abbf02f15236691ef4cfe6e7ebf1",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 3.9232559562660754,
+          "minWallSeconds": 3.9220570102334023,
+          "maxWallSeconds": 3.9234307957813144,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 3.8734109601937234,
+          "minWallSeconds": 3.873377915006131,
+          "maxWallSeconds": 3.92187509406358,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 3.9220417253673077,
+          "minWallSeconds": 3.873136206995696,
+          "maxWallSeconds": 3.923465343657881,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 3.9220999060198665,
+          "minWallSeconds": 3.8734637750312686,
+          "maxWallSeconds": 3.923525703139603,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "synthetic-fr",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.9232559562660754,
+        "candidateSeconds": 3.9220999060198665,
+        "speedup": 1.0002947528808317,
+        "exactOutputParity": true,
+        "maxRssKiB": 1387276,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "synthetic-fr",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.8734109601937234,
+        "candidateSeconds": 3.9220999060198665,
+        "speedup": 0.9875860006137497,
+        "exactOutputParity": true,
+        "maxRssKiB": 1387276,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "synthetic-fr",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.9220417253673077,
+        "candidateSeconds": 3.9220999060198665,
+        "speedup": 0.9999851659432567,
+        "exactOutputParity": true,
+        "maxRssKiB": 1387276,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "synthetic-hi",
+      "origin": "local-fixture",
+      "group": "synthetic-hi",
+      "category": "synthetic-speech",
+      "durationSeconds": 4.8181875,
+      "inputSha256": "d7d369ff52ebde055086ea46efd692c7d43f53ff26092d73828cd71f8e9b6c0b",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 3.9230488357134163,
+          "minWallSeconds": 3.9222269859164953,
+          "maxWallSeconds": 3.9234569519758224,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 3.922642675228417,
+          "minWallSeconds": 3.8728780299425125,
+          "maxWallSeconds": 3.9234189786948264,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 3.9731975439935923,
+          "minWallSeconds": 3.9231723765842617,
+          "maxWallSeconds": 3.9737133169546723,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 3.9234982603229582,
+          "minWallSeconds": 3.923237936105579,
+          "maxWallSeconds": 3.9235442369244993,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "synthetic-hi",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.9230488357134163,
+        "candidateSeconds": 3.9234982603229582,
+        "speedup": 0.999885453088106,
+        "exactOutputParity": true,
+        "maxRssKiB": 1387840,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "synthetic-hi",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.922642675228417,
+        "candidateSeconds": 3.9234982603229582,
+        "speedup": 0.9997819331021008,
+        "exactOutputParity": true,
+        "maxRssKiB": 1387840,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "synthetic-hi",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.9731975439935923,
+        "candidateSeconds": 3.9234982603229582,
+        "speedup": 1.0126670844162788,
+        "exactOutputParity": true,
+        "maxRssKiB": 1387840,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "synthetic-it",
+      "origin": "local-fixture",
+      "group": "synthetic-it",
+      "category": "synthetic-speech",
+      "durationSeconds": 6.0531875,
+      "inputSha256": "e93cb07a5a1db62f320131cca056ae397915a7edd92692f290c248908f8b7975",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 4.023629247676581,
+          "minWallSeconds": 4.023509054910392,
+          "maxWallSeconds": 4.02363848965615,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 3.973593059927225,
+          "minWallSeconds": 3.9732431368902326,
+          "maxWallSeconds": 3.9736467637121677,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 3.9734665737487376,
+          "minWallSeconds": 3.9732013479806483,
+          "maxWallSeconds": 4.023723414633423,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 3.9733624858781695,
+          "minWallSeconds": 3.923391483258456,
+          "maxWallSeconds": 3.97348808683455,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "synthetic-it",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 4.023629247676581,
+        "candidateSeconds": 3.9733624858781695,
+        "speedup": 1.0126509378334008,
+        "exactOutputParity": true,
+        "maxRssKiB": 1391112,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "synthetic-it",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.973593059927225,
+        "candidateSeconds": 3.9733624858781695,
+        "speedup": 1.0000580299557051,
+        "exactOutputParity": true,
+        "maxRssKiB": 1391112,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "synthetic-it",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.9734665737487376,
+        "candidateSeconds": 3.9733624858781695,
+        "speedup": 1.0000261964195156,
+        "exactOutputParity": true,
+        "maxRssKiB": 1391112,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "synthetic-ru",
+      "origin": "local-fixture",
+      "group": "synthetic-ru",
+      "category": "synthetic-speech",
+      "durationSeconds": 5.082125,
+      "inputSha256": "9e35f9657183afda96de931a3078b74641ac3c43a989280de513ff6509ecaa4a",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 4.023211366031319,
+          "minWallSeconds": 3.9733908060006797,
+          "maxWallSeconds": 4.023679585196078,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 3.9233563458546996,
+          "minWallSeconds": 3.9233343368396163,
+          "maxWallSeconds": 3.9723186502233148,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 3.973440451081842,
+          "minWallSeconds": 3.9230106491595507,
+          "maxWallSeconds": 4.0222380217164755,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 3.9735020669177175,
+          "minWallSeconds": 3.922018933109939,
+          "maxWallSeconds": 3.9735648459754884,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "synthetic-ru",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 4.023211366031319,
+        "candidateSeconds": 3.9735020669177175,
+        "speedup": 1.0125101983782687,
+        "exactOutputParity": true,
+        "maxRssKiB": 1389704,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "synthetic-ru",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.9233563458546996,
+        "candidateSeconds": 3.9735020669177175,
+        "speedup": 0.9873799685470112,
+        "exactOutputParity": true,
+        "maxRssKiB": 1389704,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "synthetic-ru",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.973440451081842,
+        "candidateSeconds": 3.9735020669177175,
+        "speedup": 0.9999844933172709,
+        "exactOutputParity": true,
+        "maxRssKiB": 1389704,
+        "speedPass": true
+      }
+    },
+    {
+      "case": "synthetic-zh",
+      "origin": "local-fixture",
+      "group": "synthetic-zh",
+      "category": "synthetic-speech",
+      "durationSeconds": 2.4479375,
+      "inputSha256": "cbaefaabee684262b47095ee0168b3742b10f326c4947d76a99a4c0d93a330cb",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 3.87340116687119,
+          "minWallSeconds": 3.8229408194310963,
+          "maxWallSeconds": 3.92221616813913,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "cache-reference": {
+          "medianWallSeconds": 3.8232106952928007,
+          "minWallSeconds": 3.823145961854607,
+          "maxWallSeconds": 3.8723333799280226,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "0": {
+          "medianWallSeconds": 3.8733764491043985,
+          "minWallSeconds": 3.8728362871333957,
+          "maxWallSeconds": 3.8734235879965127,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        },
+        "48": {
+          "medianWallSeconds": 3.8732156762853265,
+          "minWallSeconds": 3.8719196380116045,
+          "maxWallSeconds": 3.8733825753442943,
+          "allComplete": true,
+          "overlaps": 0,
+          "outputHashStable": true,
+          "tokenCountStable": true
+        }
+      },
+      "originalTo48": {
+        "case": "synthetic-zh",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.87340116687119,
+        "candidateSeconds": 3.8732156762853265,
+        "speedup": 1.0000478905904981,
+        "exactOutputParity": true,
+        "maxRssKiB": 1379280,
+        "speedPass": true
+      },
+      "quiet48To48": {
+        "case": "synthetic-zh",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.8232106952928007,
+        "candidateSeconds": 3.8732156762853265,
+        "speedup": 0.9870895438901859,
+        "exactOutputParity": true,
+        "maxRssKiB": 1379280,
+        "speedPass": true
+      },
+      "sameBuild0To48": {
+        "case": "synthetic-zh",
+        "variant": "48",
+        "repeats": 3,
+        "baselineSeconds": 3.8733764491043985,
+        "candidateSeconds": 3.8732156762853265,
+        "speedup": 1.0000415088733778,
+        "exactOutputParity": true,
+        "maxRssKiB": 1379280,
+        "speedPass": true
+      }
+    }
+  ],
+  "aggregates": {
+    "all": {
+      "caseCount": 24,
+      "inputSeconds": 1076.2299375,
+      "sumCaseMedianWallSeconds": {
+        "baseline": 403.7998999049887,
+        "cache-reference": 254.041301547084,
+        "0": 404.70782488724217,
+        "48": 254.97958821989596
+      },
+      "originalTo48Speedup": 1.5836557848573714,
+      "originalTo48LessWallPercent": 36.85496497649186,
+      "sameBuild0To48Speedup": 1.5872165600103632,
+      "quiet48To48Speedup": 0.9963201498623381,
+      "exactOriginalOutputParity": true,
+      "perCaseOriginalSpeedGatePass": true
+    },
+    "recordedSpeech": {
+      "caseCount": 14,
+      "inputSeconds": 917.7031875,
+      "sumCaseMedianWallSeconds": {
+        "baseline": 357.30346044385806,
+        "cache-reference": 207.98937531746924,
+        "0": 358.2103017256595,
+        "48": 208.73251427011564
+      },
+      "originalTo48Speedup": 1.7117767286675827,
+      "originalTo48LessWallPercent": 41.58116632544814,
+      "sameBuild0To48Speedup": 1.7161212424342684,
+      "quiet48To48Speedup": 0.9964397547011544,
+      "exactOriginalOutputParity": true,
+      "perCaseOriginalSpeedGatePass": true
+    },
+    "syntheticSpeech": {
+      "caseCount": 8,
+      "inputSeconds": 38.52675,
+      "sumCaseMedianWallSeconds": {
+        "baseline": 31.635199391283095,
+        "cache-reference": 31.286598025355488,
+        "0": 31.636048245243728,
+        "48": 31.386332801543176
+      },
+      "originalTo48Speedup": 1.0079291388169975,
+      "originalTo48LessWallPercent": 0.7866762167729302,
+      "sameBuild0To48Speedup": 1.007956184154406,
+      "quiet48To48Speedup": 0.9968223501350632,
+      "exactOriginalOutputParity": true,
+      "perCaseOriginalSpeedGatePass": true
+    },
+    "controls": {
+      "caseCount": 2,
+      "inputSeconds": 120.0,
+      "sumCaseMedianWallSeconds": {
+        "baseline": 14.861240069847554,
+        "cache-reference": 14.765328204259276,
+        "0": 14.86147491633892,
+        "48": 14.860741148237139
+      },
+      "originalTo48Speedup": 1.0000335731310732,
+      "originalTo48LessWallPercent": 0.003357200395592841,
+      "sameBuild0To48Speedup": 1.000049376279047,
+      "quiet48To48Speedup": 0.9935795299153581,
+      "exactOriginalOutputParity": true,
+      "perCaseOriginalSpeedGatePass": true
+    }
+  },
+  "measuredRuns": 288,
+  "discardedWarmups": 4,
+  "repeats": 3,
+  "summarizedOriginalAnd48Runs": 144,
+  "fullTokenTraceRuns": 144,
+  "completeRuns": 288,
+  "concurrentMossRuns": 0,
+  "selected48Gates": {
+    "originalTo48": {
+      "passed": true,
+      "failures": [],
+      "comparisons": [
+        {
+          "case": "conversation-a-20pct-30s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 8.231317454017699,
+          "candidateSeconds": 6.528598352801055,
+          "speedup": 1.260809290019519,
+          "exactOutputParity": true,
+          "maxRssKiB": 1520408,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-a-50pct-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 21.807511903811246,
+          "candidateSeconds": 13.793082032818347,
+          "speedup": 1.5810470677926727,
+          "exactOutputParity": true,
+          "maxRssKiB": 1701184,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-a-80pct-120s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 60.584429304115474,
+          "candidateSeconds": 28.472736824303865,
+          "speedup": 2.1278049130985397,
+          "exactOutputParity": true,
+          "maxRssKiB": 2054888,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-b-20pct-30s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 8.031044993083924,
+          "candidateSeconds": 6.428088020998985,
+          "speedup": 1.2493676139543317,
+          "exactOutputParity": true,
+          "maxRssKiB": 1517868,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-b-50pct-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 23.359887158032507,
+          "candidateSeconds": 14.393908192869276,
+          "speedup": 1.6229009414972486,
+          "exactOutputParity": true,
+          "maxRssKiB": 1713428,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-b-80pct-120s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 44.65061820903793,
+          "candidateSeconds": 24.26358275488019,
+          "speedup": 1.8402318676559524,
+          "exactOutputParity": true,
+          "maxRssKiB": 1977640,
+          "speedPass": true
+        },
+        {
+          "case": "dinner-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 16.647665707860142,
+          "candidateSeconds": 11.739611856639385,
+          "speedup": 1.4180763309005815,
+          "exactOutputParity": true,
+          "maxRssKiB": 1653684,
+          "speedPass": true
+        },
+        {
+          "case": "empty-real-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 7.329918175935745,
+          "candidateSeconds": 7.380476843565702,
+          "speedup": 0.9931496746481856,
+          "exactOutputParity": true,
+          "maxRssKiB": 1551060,
+          "speedPass": true
+        },
+        {
+          "case": "meeting-120s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 67.09325708122924,
+          "candidateSeconds": 29.975263598375022,
+          "speedup": 2.238287475305685,
+          "exactOutputParity": true,
+          "maxRssKiB": 2083604,
+          "speedPass": true
+        },
+        {
+          "case": "meeting-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 21.907282661646605,
+          "candidateSeconds": 13.843146190978587,
+          "speedup": 1.5825363945028132,
+          "exactOutputParity": true,
+          "maxRssKiB": 1702480,
+          "speedPass": true
+        },
+        {
+          "case": "room-mix",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 13.290711164008826,
+          "candidateSeconds": 10.335922069847584,
+          "speedup": 1.2858757132835865,
+          "exactOutputParity": true,
+          "maxRssKiB": 1564816,
+          "speedPass": true
+        },
+        {
+          "case": "room-sequential",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 15.144860705826432,
+          "candidateSeconds": 11.137446960434318,
+          "speedup": 1.3598143954919306,
+          "exactOutputParity": true,
+          "maxRssKiB": 1605740,
+          "speedPass": true
+        },
+        {
+          "case": "silence-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 7.531321893911809,
+          "candidateSeconds": 7.4802643046714365,
+          "speedup": 1.0068256397315383,
+          "exactOutputParity": true,
+          "maxRssKiB": 1554260,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-de",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.9735327498055995,
+          "candidateSeconds": 3.9234659308567643,
+          "speedup": 1.0127608649676492,
+          "exactOutputParity": true,
+          "maxRssKiB": 1386460,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-en",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.9220677227713168,
+          "candidateSeconds": 3.8733345051296055,
+          "speedup": 1.0125817219187168,
+          "exactOutputParity": true,
+          "maxRssKiB": 1388376,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-es",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.973052346147597,
+          "candidateSeconds": 3.923853970132768,
+          "speedup": 1.0125382790463948,
+          "exactOutputParity": true,
+          "maxRssKiB": 1391852,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-fr",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.9232559562660754,
+          "candidateSeconds": 3.9220999060198665,
+          "speedup": 1.0002947528808317,
+          "exactOutputParity": true,
+          "maxRssKiB": 1387276,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-hi",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.9230488357134163,
+          "candidateSeconds": 3.9234982603229582,
+          "speedup": 0.999885453088106,
+          "exactOutputParity": true,
+          "maxRssKiB": 1387840,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-it",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 4.023629247676581,
+          "candidateSeconds": 3.9733624858781695,
+          "speedup": 1.0126509378334008,
+          "exactOutputParity": true,
+          "maxRssKiB": 1391112,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-ru",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 4.023211366031319,
+          "candidateSeconds": 3.9735020669177175,
+          "speedup": 1.0125101983782687,
+          "exactOutputParity": true,
+          "maxRssKiB": 1389704,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-zh",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.87340116687119,
+          "candidateSeconds": 3.8732156762853265,
+          "speedup": 1.0000478905904981,
+          "exactOutputParity": true,
+          "maxRssKiB": 1379280,
+          "speedPass": true
+        },
+        {
+          "case": "vox-fsaal-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 19.55307142296806,
+          "candidateSeconds": 12.941268966067582,
+          "speedup": 1.510908356378098,
+          "exactOutputParity": true,
+          "maxRssKiB": 1680936,
+          "speedPass": true
+        },
+        {
+          "case": "vox-rcxzg-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 19.60335657419637,
+          "candidateSeconds": 12.890866443980485,
+          "speedup": 1.5207167539425053,
+          "exactOutputParity": true,
+          "maxRssKiB": 1681776,
+          "speedPass": true
+        },
+        {
+          "case": "vox-vmaiq-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 17.398446104023606,
+          "candidateSeconds": 11.988992005120963,
+          "speedup": 1.4512017437823008,
+          "exactOutputParity": true,
+          "maxRssKiB": 1660628,
+          "speedPass": true
+        }
+      ],
+      "reference": "baseline",
+      "candidate": "48"
+    },
+    "quiet48To48": {
+      "passed": true,
+      "failures": [],
+      "comparisons": [
+        {
+          "case": "conversation-a-20pct-30s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 6.5282397721894085,
+          "candidateSeconds": 6.528598352801055,
+          "speedup": 0.9999450754063478,
+          "exactOutputParity": true,
+          "maxRssKiB": 1520408,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-a-50pct-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 13.792448517866433,
+          "candidateSeconds": 13.793082032818347,
+          "speedup": 0.9999540700946745,
+          "exactOutputParity": true,
+          "maxRssKiB": 1701184,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-a-80pct-120s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 28.272104491014034,
+          "candidateSeconds": 28.472736824303865,
+          "speedup": 0.9929535283338631,
+          "exactOutputParity": true,
+          "maxRssKiB": 2054888,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-b-20pct-30s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 6.378132538869977,
+          "candidateSeconds": 6.428088020998985,
+          "speedup": 0.9922285628376875,
+          "exactOutputParity": true,
+          "maxRssKiB": 1517868,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-b-50pct-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 14.394218088127673,
+          "candidateSeconds": 14.393908192869276,
+          "speedup": 1.000021529611989,
+          "exactOutputParity": true,
+          "maxRssKiB": 1713428,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-b-80pct-120s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 24.213642715010792,
+          "candidateSeconds": 24.26358275488019,
+          "speedup": 0.9979417697553609,
+          "exactOutputParity": true,
+          "maxRssKiB": 1977640,
+          "speedPass": true
+        },
+        {
+          "case": "dinner-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 11.588456056080759,
+          "candidateSeconds": 11.739611856639385,
+          "speedup": 0.9871242931704646,
+          "exactOutputParity": true,
+          "maxRssKiB": 1653684,
+          "speedPass": true
+        },
+        {
+          "case": "empty-real-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 7.330286530312151,
+          "candidateSeconds": 7.380476843565702,
+          "speedup": 0.9931995839405271,
+          "exactOutputParity": true,
+          "maxRssKiB": 1551060,
+          "speedPass": true
+        },
+        {
+          "case": "meeting-120s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 29.884369490202516,
+          "candidateSeconds": 29.975263598375022,
+          "speedup": 0.9969676961180274,
+          "exactOutputParity": true,
+          "maxRssKiB": 2083604,
+          "speedPass": true
+        },
+        {
+          "case": "meeting-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 13.79338452918455,
+          "candidateSeconds": 13.843146190978587,
+          "speedup": 0.9964053213693238,
+          "exactOutputParity": true,
+          "maxRssKiB": 1702480,
+          "speedPass": true
+        },
+        {
+          "case": "room-mix",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 10.336057869717479,
+          "candidateSeconds": 10.335922069847584,
+          "speedup": 1.000013138631365,
+          "exactOutputParity": true,
+          "maxRssKiB": 1564816,
+          "speedPass": true
+        },
+        {
+          "case": "room-sequential",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 11.137075185775757,
+          "candidateSeconds": 11.137446960434318,
+          "speedup": 0.9999666194003095,
+          "exactOutputParity": true,
+          "maxRssKiB": 1605740,
+          "speedPass": true
+        },
+        {
+          "case": "silence-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 7.435041673947126,
+          "candidateSeconds": 7.4802643046714365,
+          "speedup": 0.9939544073735377,
+          "exactOutputParity": true,
+          "maxRssKiB": 1554260,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-de",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.9235263080336154,
+          "candidateSeconds": 3.9234659308567643,
+          "speedup": 1.0000153887348369,
+          "exactOutputParity": true,
+          "maxRssKiB": 1386460,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-en",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.923519214615226,
+          "candidateSeconds": 3.8733345051296055,
+          "speedup": 1.0129564615240845,
+          "exactOutputParity": true,
+          "maxRssKiB": 1388376,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-es",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.923338766209781,
+          "candidateSeconds": 3.923853970132768,
+          "speedup": 0.999868699516621,
+          "exactOutputParity": true,
+          "maxRssKiB": 1391852,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-fr",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.8734109601937234,
+          "candidateSeconds": 3.9220999060198665,
+          "speedup": 0.9875860006137497,
+          "exactOutputParity": true,
+          "maxRssKiB": 1387276,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-hi",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.922642675228417,
+          "candidateSeconds": 3.9234982603229582,
+          "speedup": 0.9997819331021008,
+          "exactOutputParity": true,
+          "maxRssKiB": 1387840,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-it",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.973593059927225,
+          "candidateSeconds": 3.9733624858781695,
+          "speedup": 1.0000580299557051,
+          "exactOutputParity": true,
+          "maxRssKiB": 1391112,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-ru",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.9233563458546996,
+          "candidateSeconds": 3.9735020669177175,
+          "speedup": 0.9873799685470112,
+          "exactOutputParity": true,
+          "maxRssKiB": 1389704,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-zh",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.8232106952928007,
+          "candidateSeconds": 3.8732156762853265,
+          "speedup": 0.9870895438901859,
+          "exactOutputParity": true,
+          "maxRssKiB": 1379280,
+          "speedPass": true
+        },
+        {
+          "case": "vox-fsaal-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 12.841213623993099,
+          "candidateSeconds": 12.941268966067582,
+          "speedup": 0.992268506099608,
+          "exactOutputParity": true,
+          "maxRssKiB": 1680936,
+          "speedPass": true
+        },
+        {
+          "case": "vox-rcxzg-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 12.84074833523482,
+          "candidateSeconds": 12.890866443980485,
+          "speedup": 0.9961121225665116,
+          "exactOutputParity": true,
+          "maxRssKiB": 1681776,
+          "speedPass": true
+        },
+        {
+          "case": "vox-vmaiq-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 11.989284104201943,
+          "candidateSeconds": 11.988992005120963,
+          "speedup": 1.0000243639399256,
+          "exactOutputParity": true,
+          "maxRssKiB": 1660628,
+          "speedPass": true
+        }
+      ],
+      "reference": "cache-reference",
+      "candidate": "48"
+    },
+    "sameBuild0To48": {
+      "passed": true,
+      "failures": [],
+      "comparisons": [
+        {
+          "case": "conversation-a-20pct-30s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 8.280471249017864,
+          "candidateSeconds": 6.528598352801055,
+          "speedup": 1.2683382866500248,
+          "exactOutputParity": true,
+          "maxRssKiB": 1520408,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-a-50pct-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 21.807654103729874,
+          "candidateSeconds": 13.793082032818347,
+          "speedup": 1.58105737730278,
+          "exactOutputParity": true,
+          "maxRssKiB": 1701184,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-a-80pct-120s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 60.733112735208124,
+          "candidateSeconds": 28.472736824303865,
+          "speedup": 2.1330268709317513,
+          "exactOutputParity": true,
+          "maxRssKiB": 2054888,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-b-20pct-30s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 7.981068222317845,
+          "candidateSeconds": 6.428088020998985,
+          "speedup": 1.2415928649772148,
+          "exactOutputParity": true,
+          "maxRssKiB": 1517868,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-b-50pct-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 23.310490012168884,
+          "candidateSeconds": 14.393908192869276,
+          "speedup": 1.6194691323456456,
+          "exactOutputParity": true,
+          "maxRssKiB": 1713428,
+          "speedPass": true
+        },
+        {
+          "case": "conversation-b-80pct-120s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 44.75377729162574,
+          "candidateSeconds": 24.26358275488019,
+          "speedup": 1.8444834690632943,
+          "exactOutputParity": true,
+          "maxRssKiB": 1977640,
+          "speedPass": true
+        },
+        {
+          "case": "dinner-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 16.54775514313951,
+          "candidateSeconds": 11.739611856639385,
+          "speedup": 1.4095657799606773,
+          "exactOutputParity": true,
+          "maxRssKiB": 1653684,
+          "speedPass": true
+        },
+        {
+          "case": "empty-real-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 7.330308513715863,
+          "candidateSeconds": 7.380476843565702,
+          "speedup": 0.9932025625290626,
+          "exactOutputParity": true,
+          "maxRssKiB": 1551060,
+          "speedPass": true
+        },
+        {
+          "case": "meeting-120s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 67.89729725196958,
+          "candidateSeconds": 29.975263598375022,
+          "speedup": 2.2651109315232287,
+          "exactOutputParity": true,
+          "maxRssKiB": 2083604,
+          "speedPass": true
+        },
+        {
+          "case": "meeting-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 22.05838128598407,
+          "candidateSeconds": 13.843146190978587,
+          "speedup": 1.5934514438891971,
+          "exactOutputParity": true,
+          "maxRssKiB": 1702480,
+          "speedPass": true
+        },
+        {
+          "case": "room-mix",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 13.290999796241522,
+          "candidateSeconds": 10.335922069847584,
+          "speedup": 1.285903638439247,
+          "exactOutputParity": true,
+          "maxRssKiB": 1564816,
+          "speedPass": true
+        },
+        {
+          "case": "room-sequential",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 15.094640834257007,
+          "candidateSeconds": 11.137446960434318,
+          "speedup": 1.3553052946407365,
+          "exactOutputParity": true,
+          "maxRssKiB": 1605740,
+          "speedPass": true
+        },
+        {
+          "case": "silence-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 7.531166402623057,
+          "candidateSeconds": 7.4802643046714365,
+          "speedup": 1.006804852860591,
+          "exactOutputParity": true,
+          "maxRssKiB": 1554260,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-de",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.973489159718156,
+          "candidateSeconds": 3.9234659308567643,
+          "speedup": 1.0127497548705535,
+          "exactOutputParity": true,
+          "maxRssKiB": 1386460,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-en",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.92342325206846,
+          "candidateSeconds": 3.8733345051296055,
+          "speedup": 1.0129316863473887,
+          "exactOutputParity": true,
+          "maxRssKiB": 1388376,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-es",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 4.023613090161234,
+          "candidateSeconds": 3.923853970132768,
+          "speedup": 1.0254237595965099,
+          "exactOutputParity": true,
+          "maxRssKiB": 1391852,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-fr",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.9220417253673077,
+          "candidateSeconds": 3.9220999060198665,
+          "speedup": 0.9999851659432567,
+          "exactOutputParity": true,
+          "maxRssKiB": 1387276,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-hi",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.9731975439935923,
+          "candidateSeconds": 3.9234982603229582,
+          "speedup": 1.0126670844162788,
+          "exactOutputParity": true,
+          "maxRssKiB": 1387840,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-it",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.9734665737487376,
+          "candidateSeconds": 3.9733624858781695,
+          "speedup": 1.0000261964195156,
+          "exactOutputParity": true,
+          "maxRssKiB": 1391112,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-ru",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.973440451081842,
+          "candidateSeconds": 3.9735020669177175,
+          "speedup": 0.9999844933172709,
+          "exactOutputParity": true,
+          "maxRssKiB": 1389704,
+          "speedPass": true
+        },
+        {
+          "case": "synthetic-zh",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 3.8733764491043985,
+          "candidateSeconds": 3.8732156762853265,
+          "speedup": 1.0000415088733778,
+          "exactOutputParity": true,
+          "maxRssKiB": 1379280,
+          "speedPass": true
+        },
+        {
+          "case": "vox-fsaal-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 19.55352903297171,
+          "candidateSeconds": 12.941268966067582,
+          "speedup": 1.5109437168983724,
+          "exactOutputParity": true,
+          "maxRssKiB": 1680936,
+          "speedPass": true
+        },
+        {
+          "case": "vox-rcxzg-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 19.5533399078995,
+          "candidateSeconds": 12.890866443980485,
+          "speedup": 1.5168367458364382,
+          "exactOutputParity": true,
+          "maxRssKiB": 1681776,
+          "speedPass": true
+        },
+        {
+          "case": "vox-vmaiq-60s",
+          "variant": "48",
+          "repeats": 3,
+          "baselineSeconds": 17.347784859128296,
+          "candidateSeconds": 11.988992005120963,
+          "speedup": 1.4469760970495589,
+          "exactOutputParity": true,
+          "maxRssKiB": 1660628,
+          "speedPass": true
+        }
+      ],
+      "reference": "0",
+      "candidate": "48"
+    }
+  },
+  "artifactGate": {
+    "passed": true,
+    "changed": []
+  },
+  "tokenTraceGate": {
+    "passed": true,
+    "failures": [],
+    "scope": "Complete same-build greedy token IDs including unique EOS; old production/frozen binaries retain full-output/count/EOS checks."
+  },
+  "sourceCommit": "35036546f5aade49479728369f6cdfe56b3855fe",
+  "sourceTree": "818f4743420e70d7c5407d6758bebc39b579273e",
+  "ggmlCommit": "eced84c86f8b012c752c016f7fe789adea168e1e",
+  "modelSha256": "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c",
+  "binarySha256": {
+    "baseline": "90c7424f2e7b20403a92d6bdcc2130dbff6bba147169ffeeb21572e473484815",
+    "candidate": "488fee1617aa52a5fcba5527a03d545fbc46e6a9457a5413faeac81725f1fb55",
+    "cache-reference": "bb8bd09737c1063657f4bb0dde0c114bc63cde1a528518950c19007295387825"
+  },
+  "generalHarnessExit": 1,
+  "generalGateFailures": {
+    "gate": [],
+    "cacheReferenceGate": [
+      "conversation-a-20pct-30s/0: median slowdown 26.84%",
+      "conversation-a-50pct-60s/0: median slowdown 58.11%",
+      "conversation-a-80pct-120s/0: median slowdown 114.82%",
+      "conversation-b-20pct-30s/0: median slowdown 25.13%",
+      "conversation-b-50pct-60s/0: median slowdown 61.94%",
+      "conversation-b-80pct-120s/0: median slowdown 84.83%",
+      "dinner-60s/0: median slowdown 42.80%",
+      "meeting-120s/0: median slowdown 127.20%",
+      "meeting-60s/0: median slowdown 59.92%",
+      "room-mix/0: median slowdown 28.59%",
+      "room-sequential/0: median slowdown 35.54%",
+      "vox-fsaal-60s/0: median slowdown 52.27%",
+      "vox-rcxzg-60s/0: median slowdown 52.28%",
+      "vox-vmaiq-60s/0: median slowdown 44.69%"
+    ],
+    "candidateReferenceGate": []
+  },
+  "aggregationMethod": "Median of each case and variant, then divide the sum of original medians by the sum of opt48 medians. No case excluded.",
+  "productionDeployed": false,
+  "tenfoldGoalAchieved": false,
+  "publicHardware": {
+    "model": "Intel Xeon Gold 5416S",
+    "physicalCores": 16,
+    "measuredThreads": 16
+  },
+  "publication": {
+    "personalMachineNamesAndPathsRemoved": true,
+    "hostActivityRemoved": true
+  },
+  "limitations": [
+    "Fresh CLI processes with warm filesystem cache; wall includes model load.",
+    "Shared host and 3 repeats; no confidence interval or absolute WER/DER measurement.",
+    "Distinct PCM inputs are not independent recordings; excerpts and room fixtures share source audio.",
+    "Synthetic clips test output retention, rather than natural-conversation accuracy.",
+    "Original/frozen builds expose output/count/EOS checks; full token IDs are compared only between same-build opt0 and opt48.",
+    "The general frozen-reference gate also compares the slower opt0 control; its failures are retained separately."
+  ],
+  "sourceReportSha256": "4d11deccfbc6085f7cee1d8161864bd819b6f8087c5b4cc6bd5c9b3507bc55cb",
+  "protocolSha256": "1e8cd8c1c789887476e1d8f8ae50a21531f9c6c6aa559aa389543cd05ebb2149",
+  "privateCaptureReportSha256": "ce0452950c661bb1e088aa0fc3abcb80c68744caef681f76b34560dd6627b02b"
+}

@@ -1,0 +1,245 @@
+{
+  "schema": "larger-corpus-v1",
+  "predeclared": true,
+  "cases": [
+    {
+      "case": "meeting-60s",
+      "origin": "existing-fixture",
+      "group": "meeting",
+      "category": "recorded-speech",
+      "inputSha256": "ab766e5824c45c30ea2b071ab4b8120167669c081b6f791d6946c7b6db79c487",
+      "durationSeconds": 60.0
+    },
+    {
+      "case": "dinner-60s",
+      "origin": "existing-fixture",
+      "group": "dinner-60s",
+      "category": "recorded-speech",
+      "inputSha256": "cfa4721726b79b79b18d343712571e278efd09dae54532972ac2f5b5cfc9da47",
+      "durationSeconds": 60.0
+    },
+    {
+      "case": "vox-vmaiq-60s",
+      "origin": "existing-fixture",
+      "group": "vox-vmaiq-60s",
+      "category": "recorded-speech",
+      "inputSha256": "8998fe577c02f29a8dc48984db7306d8e30c91aba36e90773b85f522cc9384ad",
+      "durationSeconds": 60.0
+    },
+    {
+      "case": "meeting-120s",
+      "origin": "existing-fixture",
+      "group": "meeting",
+      "category": "recorded-speech",
+      "inputSha256": "a313febb01ff5d7672ffba407ac6844fcd93ce8f849fafbe2f9bb176b7fd66a0",
+      "durationSeconds": 120.0
+    },
+    {
+      "case": "silence-60s",
+      "origin": "existing-fixture",
+      "group": "silence-60s",
+      "category": "control",
+      "inputSha256": "4c59ed976769ba50aba4a23ef2823cf795f0b555d48f4c80d41576ce9f3378b7",
+      "durationSeconds": 60.0
+    },
+    {
+      "case": "empty-real-60s",
+      "origin": "existing-fixture",
+      "group": "empty-real-60s",
+      "category": "control",
+      "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+      "durationSeconds": 60.0
+    },
+    {
+      "case": "vox-fsaal-60s",
+      "origin": "existing-fixture",
+      "group": "vox-fsaal-60s",
+      "category": "recorded-speech",
+      "inputSha256": "107e167f468f09127869af35cc505b9ec2f7719e7e76acc78cb074a2b2835803",
+      "durationSeconds": 60.0
+    },
+    {
+      "case": "vox-rcxzg-60s",
+      "origin": "existing-fixture",
+      "group": "vox-rcxzg-60s",
+      "category": "recorded-speech",
+      "inputSha256": "5f5fcb7046e6607d723b079e808471a77fcb522df286f7261554f0a0483cbc25",
+      "durationSeconds": 60.0
+    },
+    {
+      "case": "conversation-a-20pct-30s",
+      "origin": "new-excerpt",
+      "group": "conversation-a",
+      "category": "recorded-speech",
+      "sourceDuration": 4748.550375,
+      "offsetSeconds": 949.71,
+      "requestedSeconds": 30,
+      "durationSeconds": 30.0,
+      "inputSha256": "5ff8b278f4769c7e5256b610b423eb8bf2da4530eb08d8cc0f2c034fcacfcb3a"
+    },
+    {
+      "case": "conversation-a-50pct-60s",
+      "origin": "new-excerpt",
+      "group": "conversation-a",
+      "category": "recorded-speech",
+      "sourceDuration": 4748.550375,
+      "offsetSeconds": 2374.275,
+      "requestedSeconds": 60,
+      "durationSeconds": 60.0,
+      "inputSha256": "d8d2ad879abb193249457ef5e80f6e22974125ee0e6aa69864e4eff4119c6292"
+    },
+    {
+      "case": "conversation-a-80pct-120s",
+      "origin": "new-excerpt",
+      "group": "conversation-a",
+      "category": "recorded-speech",
+      "sourceDuration": 4748.550375,
+      "offsetSeconds": 3798.84,
+      "requestedSeconds": 120,
+      "durationSeconds": 120.0,
+      "inputSha256": "98f808632a51b25d234ac2db7e51228737b1ded683fd9127f2c48fb6fb7fb105"
+    },
+    {
+      "case": "conversation-b-20pct-30s",
+      "origin": "new-excerpt",
+      "group": "conversation-b",
+      "category": "recorded-speech",
+      "sourceDuration": 1332.0,
+      "offsetSeconds": 266.4,
+      "requestedSeconds": 30,
+      "durationSeconds": 30.0,
+      "inputSha256": "e33a75dffe1a2cac5a9e14276aa180fd94d80a021ac9f92a088511d4847c18f3"
+    },
+    {
+      "case": "conversation-b-50pct-60s",
+      "origin": "new-excerpt",
+      "group": "conversation-b",
+      "category": "recorded-speech",
+      "sourceDuration": 1332.0,
+      "offsetSeconds": 666.0,
+      "requestedSeconds": 60,
+      "durationSeconds": 60.0,
+      "inputSha256": "d8f1cb1729d6a1d21a458cf37861efa1a599591c685fdc2041347fd890202280"
+    },
+    {
+      "case": "conversation-b-80pct-120s",
+      "origin": "new-excerpt",
+      "group": "conversation-b",
+      "category": "recorded-speech",
+      "sourceDuration": 1332.0,
+      "offsetSeconds": 1065.6,
+      "requestedSeconds": 120,
+      "durationSeconds": 120.0,
+      "inputSha256": "1240bc02cba4db75d0aac4d3fca8d384c4d075dcdfac1c8f0c6ad76c681b823f"
+    },
+    {
+      "case": "room-mix",
+      "origin": "local-fixture",
+      "group": "room-turns",
+      "category": "recorded-speech",
+      "durationSeconds": 33.81925,
+      "inputSha256": "dde7ae986077b3413ef4b121dcaef3f74a7ddbcd64b1a6c7c2e79b5bd670e001"
+    },
+    {
+      "case": "room-sequential",
+      "origin": "local-fixture",
+      "group": "room-turns",
+      "category": "recorded-speech",
+      "durationSeconds": 43.8839375,
+      "inputSha256": "07a5db764d869581d1a7fa0f6ffdc1f04928589826b1da72bd32a558a48ace7f"
+    },
+    {
+      "case": "synthetic-de",
+      "origin": "local-fixture",
+      "group": "synthetic-de",
+      "category": "synthetic-speech",
+      "durationSeconds": 4.4076875,
+      "inputSha256": "deca53218f29abfaaba2332fd178a7ee01d9b2b5b34fe558f77317cc3d9b2239"
+    },
+    {
+      "case": "synthetic-en",
+      "origin": "local-fixture",
+      "group": "synthetic-en",
+      "category": "synthetic-speech",
+      "durationSeconds": 4.560875,
+      "inputSha256": "dc67d0c87874ed39ba53928aac72bf87998777bf82470bb0fe6e466e741606ed"
+    },
+    {
+      "case": "synthetic-es",
+      "origin": "local-fixture",
+      "group": "synthetic-es",
+      "category": "synthetic-speech",
+      "durationSeconds": 6.23725,
+      "inputSha256": "8c30b059f8444a350ddcde5c0c98f6c891e8bb3c08b08dfdf3afbb642fc09120"
+    },
+    {
+      "case": "synthetic-fr",
+      "origin": "local-fixture",
+      "group": "synthetic-fr",
+      "category": "synthetic-speech",
+      "durationSeconds": 4.9195,
+      "inputSha256": "5454a7a12431334957e7528d4d3ea6bb29d0abbf02f15236691ef4cfe6e7ebf1"
+    },
+    {
+      "case": "synthetic-hi",
+      "origin": "local-fixture",
+      "group": "synthetic-hi",
+      "category": "synthetic-speech",
+      "durationSeconds": 4.8181875,
+      "inputSha256": "d7d369ff52ebde055086ea46efd692c7d43f53ff26092d73828cd71f8e9b6c0b"
+    },
+    {
+      "case": "synthetic-it",
+      "origin": "local-fixture",
+      "group": "synthetic-it",
+      "category": "synthetic-speech",
+      "durationSeconds": 6.0531875,
+      "inputSha256": "e93cb07a5a1db62f320131cca056ae397915a7edd92692f290c248908f8b7975"
+    },
+    {
+      "case": "synthetic-ru",
+      "origin": "local-fixture",
+      "group": "synthetic-ru",
+      "category": "synthetic-speech",
+      "durationSeconds": 5.082125,
+      "inputSha256": "9e35f9657183afda96de931a3078b74641ac3c43a989280de513ff6509ecaa4a"
+    },
+    {
+      "case": "synthetic-zh",
+      "origin": "local-fixture",
+      "group": "synthetic-zh",
+      "category": "synthetic-speech",
+      "durationSeconds": 2.4479375,
+      "inputSha256": "cbaefaabee684262b47095ee0168b3742b10f326c4947d76a99a4c0d93a330cb"
+    }
+  ],
+  "caseCount": 24,
+  "variants": [
+    "baseline",
+    "cache-reference",
+    "0",
+    "48"
+  ],
+  "repeats": 3,
+  "measuredRuns": 288,
+  "discardedWarmups": 4,
+  "wallIncludesModelLoad": true,
+  "threads": 16,
+  "pinPhysical": true,
+  "timeoutSeconds": 300,
+  "candidateReference": "0",
+  "productionDeployment": false,
+  "notes": [
+    "Fixed 20/50/80 percent offsets chosen before model outcomes.",
+    "Excerpts share source groups; room and sequential fixtures share underlying turns.",
+    "Synthetic clips test multilingual output retention, not absolute transcription accuracy.",
+    "Retain every case and repetition, including incomplete outputs and speed regressions.",
+    "General cache-reference gate also tests intentionally slow opt0 control; separately evaluate opt48 against both original and immutable opt48."
+  ],
+  "totalInputSeconds": 1076.2299375,
+  "sourceGroupCount": 18,
+  "candidateBinarySha256": "488fee1617aa52a5fcba5527a03d545fbc46e6a9457a5413faeac81725f1fb55",
+  "sourceCommit": "35036546f5aade49479728369f6cdfe56b3855fe",
+  "originalBinarySha256": "90c7424f2e7b20403a92d6bdcc2130dbff6bba147169ffeeb21572e473484815",
+  "immutableQuiet48Sha256": "bb8bd09737c1063657f4bb0dde0c114bc63cde1a528518950c19007295387825"
+}
