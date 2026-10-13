@@ -145,9 +145,16 @@ private:
 
 int main(int argc, char** argv) {
     try {
-        require(argc == 2 || (argc == 3 && !std::strcmp(argv[2],"--causal-context")),
-                "usage: moss_target_batch_gate MODEL [--causal-context]");
-        const bool causal_context = argc == 3;
+        require(argc >= 2 && argc <= 4,"usage: moss_target_batch_gate MODEL [--causal-context] [--speculative-lengths]");
+        bool causal_context=false,length_sweep=false;
+        for(int i=2;i<argc;++i) {
+            if(!std::strcmp(argv[i],"--causal-context") && !causal_context)causal_context=true;
+            else if(!std::strcmp(argv[i],"--speculative-lengths") && !length_sweep)length_sweep=true;
+            else require(false,"unknown or repeated gate option");
+        }
+        require(!length_sweep || causal_context,"speculative lengths require causal context");
+        const int expected_cases=length_sweep?120:96;
+        if(length_sweep)std::printf("{\"record\":\"lengthSweep\",\"expectedCases\":120,\"minimumAppend\":1,\"maximumAppend\":5}\n");
         if (causal_context) std::printf("{\"record\":\"configuration\",\"referenceCpuOpt\":48,"
             "\"candidateCpuOpt\":262192,\"candidateScope\":\"batchAppendOnly\"}\n");
         env("MTD_DEVICE", "cpu"); env("MTD_CPU_OPT", "48"); env("MTD_THREADS", "16");
@@ -194,7 +201,7 @@ int main(int argc, char** argv) {
                 require(mt::embed_rows_f32(model.tensor("token_embd.weight"), tail_ids.data(), 8,
                         hidden, &tail), "real append token embeddings");
                 const auto saved_prefix = prefix_x, saved_tail = tail;
-                for (int count : {1,2,4,8}) {
+                for (int count : (length_sweep?std::vector<int>{1,2,3,4,5}:std::vector<int>{1,2,4,8})) {
                     mt::Qwen3Decoder serial, batch;
                     require(serial.load(model, max_seq) && batch.load(model, max_seq), "owned decoder load");
                     std::vector<float> serial_prefix, batch_prefix;
@@ -303,7 +310,7 @@ int main(int argc, char** argv) {
             ggml_backend_tensor_get(saved.tensor, actual.data(), 0, actual.size());
             for (size_t i = 0; i < actual.size(); ++i) weight_changes += actual[i] != saved.bytes[i];
         }
-        const bool gate = cases == 96 && exact_cases == cases && t1_exact == 24 && !weight_changes;
+        const bool gate = cases == size_t(expected_cases) && exact_cases == cases && t1_exact == 24 && !weight_changes;
         std::printf("{\"record\":\"summary\",\"cases\":%zu,\"exactCases\":%zu,\"driftCases\":%zu,\"exactT1Controls\":%zu,"
             "\"hiddenBitDifferences\":%zu,\"logitBitDifferences\":%zu,\"activeKvBitDifferences\":%zu,\"rollbackBitDifferences\":%zu,"
             "\"nonfiniteElements\":%zu,\"argmaxMismatches\":%zu,\"eosMismatches\":%zu,\"modelWeightBytesChecked\":%zu,"

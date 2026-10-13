@@ -880,3 +880,29 @@ Two additional primary abstracts were checked on October10:
 These are abstract-level reviews, not imported implementations or measured
 MOSS results. All new source/evidence stays MIT; private audio, token IDs,
 transcripts, model values and credentials are excluded.
+
+
+## Actual CPU speculation fails the full-input gate (October11,2026 UTC)
+
+The [implementation, complete reports and reproduction](strict-speculative.md)
+retain opt786480 as a disabled research path. Native22CTest/40Python, all120
+T1–5 state cases and114 generator control cases pass exactly. The complete
+48-run pilot nevertheless rejects the candidate: both German repeats change
+tokens/output at position217, and speech is10–41% slower than immutable48.
+Matching English/public traces save19–27% target calls while dispatching1.60–2.13x
+input work. All12 runtime counter records match independent past-only trace
+replay; this explains work, not equivalence of the changed German sequence.
+
+The real-audio diagnostic finds a large state failure at prefix859/capacity4971,
+append113/T5 row3/query990 after112 exact commits. All hidden/full logits differ
+although the first maximum still matches; weights remain unchanged. This concrete
+fixture now precedes operator attribution, repair and any further timing. The failed frozen source and full evidence remain available; no
+production promotion or corpus-quality claim follows from controlled fixtures.
+A correct repair still needs favorable batch cost/acceptance and a measured
+fallback. Encoder work and the original10x full-input target remain necessary.
+
+A primary abstract checked October11, [Lossless but Not Free, July19,2026](https://arxiv.org/abs/2607.17283),
+reports a best1.61x wall gain but three of five consumer Apple-silicon
+configurations slowing down. Its measurement of verification/draft balance is
+relevant methodology; statistical/greedy agreement there is not proof of MOSS
+raw-state equivalence or CPU gains. No implementation was imported.
