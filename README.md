@@ -13,7 +13,7 @@ Measured on 24 clips totaling 17.9 minutes of audio, with three runs per setting
 
 The largest measured gain is **2.24×** for two-minute speech: **67.09s → 29.98s**. Short clips and silence show almost no gain.
 
-[Full comparison, every clip, method and numeric evidence](cpu-lab/cpu-speedup.md). The live API still uses the original build; these figures describe the tested optimized build. The 10× target remains open.
+[Full comparison, every clip, method and numeric evidence](cpu-lab/cpu-speedup.md). The CPU API now uses this tested optimized build. [API setup and restart checks](cpu-lab/cpu-api-upgrade.md). The 10× target remains open.
 
 **Brought to you by the [LocalAI](https://github.com/mudler/LocalAI) team**, the folks behind LocalAI, the open-source AI engine that runs any model (LLMs, vision, voice, image, video) on any hardware, no GPU required.
 
@@ -331,16 +331,23 @@ already applied; do not run it on this fork, which already contains those change
 Bits 1/2/4 are archived experiments without demonstrated end-to-end improvement.
 
 `cpu-lab/moss_api.py`, `moss_output.py`, and `moss_remote.py` provide the authenticated,
-bounded CPU API and client. The server serializes inference, rejects incomplete results,
-and retries marker loops with bounded repetition penalties. API and client retain
-pinned production provenance; the optimized candidate is not deployed to production.
-`moss-api.service` and `setup_moss_api.py` preserve the historical the CPU test system installation
-recipe using the existing pinned production checkout/assets. The recipe enables user
-lingering, boot startup and crash recovery; it does not reboot the shared machine.
-It is host-specific, not a general-purpose installer. Never commit its generated token
-or `data/` directory. API tests can run with `PYTHONPATH=cpu-lab python -m pytest
-cpu-lab/test_moss_api.py` after installing pytest. The client needs NumPy, soundfile
-and SciPy for audio conversion; the API and latency harness use the Python standard library.
+bounded CPU API and laptop client. The API now uses the opt48 build tested on all
+24 clips. The installer checks its exact source tree, binary, weights and shared
+libraries before changing the service. The client rejects an unexpected build or
+optimization setting. Existing completed transcript caches remain valid because
+the model, decoding policy and checked outputs are unchanged.
+
+`moss-api.service` enables crash recovery and user boot startup.
+`setup_moss_api.py` takes private connection settings as arguments and installs
+an existing validated build; it does not rebuild it. It keeps the old executable
+and backs up the server, settings and unit. Failed startup checks restore the old
+installation. [Setup, verification and limits](cpu-lab/cpu-api-upgrade.md).
+Keep generated credentials and private connection settings outside Git.
+
+API and client checks can run with `PYTHONPATH=cpu-lab python -m pytest
+cpu-lab/test_moss_api.py cpu-lab/test_moss_remote_identity.py` after installing
+pytest. The client needs NumPy, soundfile and SciPy for audio conversion;
+the API and installer use the Python standard library.
 
 
 ### Parallel decode softmax research

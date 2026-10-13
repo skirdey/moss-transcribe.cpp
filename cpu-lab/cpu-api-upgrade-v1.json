@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "scope": "Laptop API rollout smoke checks, not a repeated speed benchmark",
+  "benchmark": "cpu-larger-corpus-v1.json",
+  "sourceCommit": "8382623c2014f85881f0680a0d8f10ce414b20b0",
+  "sourceTree": "818f4743420e70d7c5407d6758bebc39b579273e",
+  "binarySha256": "488fee1617aa52a5fcba5527a03d545fbc46e6a9457a5413faeac81725f1fb55",
+  "modelSha256": "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c",
+  "libraries": {
+    "libggml-base.so": "868cd6fc4a3034371d8781a650830f8e6dd3d1e34369e51928643d89618b5f07",
+    "libggml-cpu.so": "bcf5924c28d05aa7e125eb686c522504e46a6294d274472c0accef60c170b102",
+    "libggml.so": "edec3dd18cb788dfcbcbaf088bff5032930d5b60fe1139c5a1a156f6612911a4"
+  },
+  "cpuOpt": 48,
+  "threads": 16,
+  "checks": {
+    "serverAndClientTests": 92,
+    "applicationTests": 41,
+    "realClientRoundtrip": true,
+    "serviceRestart": true,
+    "postRestartAnswerMatches": true,
+    "active": true,
+    "enabled": true,
+    "userLinger": true,
+    "wholeMachineRebootTested": false,
+    "originalBinaryAndLibrariesPreserved": true,
+    "ingestionRestored": true,
+    "postRestoreHealth": true,
+    "unauthenticatedRequestRejected": true
+  },
+  "negativeInstallCheck": {
+    "rejectedUnvalidatedBinary": true,
+    "configurationUnchanged": true,
+    "clientSecretNotWritten": true
+  },
+  "attempts": [
+    {
+      "result": "rolled-back",
+      "reason": "Local verification interpreter lacked NumPy",
+      "rawUploadChecks": [
+        {
+          "case": "conversation-a-20pct-30s",
+          "passed": true,
+          "textAndSegmentsMatch": true,
+          "tokens": 281,
+          "eos": true,
+          "inputSha256": "5ff8b278f4769c7e5256b610b423eb8bf2da4530eb08d8cc0f2c034fcacfcb3a",
+          "laptopWallSeconds": 6.877819208995788,
+          "apiSeconds": 6.487798158079386,
+          "attempts": 1
+        },
+        {
+          "case": "empty-real-60s",
+          "passed": true,
+          "textAndSegmentsMatch": true,
+          "tokens": 1,
+          "eos": true,
+          "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+          "laptopWallSeconds": 7.749696750004659,
+          "apiSeconds": 7.2876322930678725,
+          "attempts": 1
+        },
+        {
+          "case": "synthetic-en",
+          "passed": true,
+          "textAndSegmentsMatch": true,
+          "tokens": 35,
+          "eos": true,
+          "inputSha256": "dc67d0c87874ed39ba53928aac72bf87998777bf82470bb0fe6e466e741606ed",
+          "laptopWallSeconds": 4.008792375010671,
+          "apiSeconds": 3.8690878520719707,
+          "attempts": 1
+        }
+      ],
+      "originalServiceAndClientRestored": true
+    },
+    {
+      "result": "passed",
+      "reason": "Used existing application Python environment",
+      "rawUploadChecks": [
+        {
+          "case": "conversation-a-20pct-30s",
+          "passed": true,
+          "textAndSegmentsMatch": true,
+          "tokens": 281,
+          "eos": true,
+          "inputSha256": "5ff8b278f4769c7e5256b610b423eb8bf2da4530eb08d8cc0f2c034fcacfcb3a",
+          "laptopWallSeconds": 7.001598625007318,
+          "apiSeconds": 6.469150269869715,
+          "attempts": 1
+        },
+        {
+          "case": "empty-real-60s",
+          "passed": true,
+          "textAndSegmentsMatch": true,
+          "tokens": 1,
+          "eos": true,
+          "inputSha256": "de611a28f044c96a640cda7dfd1e0b0d7c16aad83c46a1fdd6dd22da41309b79",
+          "laptopWallSeconds": 7.834966957991128,
+          "apiSeconds": 7.298272331710905,
+          "attempts": 1
+        },
+        {
+          "case": "synthetic-en",
+          "passed": true,
+          "textAndSegmentsMatch": true,
+          "tokens": 35,
+          "eos": true,
+          "inputSha256": "dc67d0c87874ed39ba53928aac72bf87998777bf82470bb0fe6e466e741606ed",
+          "laptopWallSeconds": 3.958751124999253,
+          "apiSeconds": 3.896200896706432,
+          "attempts": 1
+        }
+      ]
+    }
+  ]
+}

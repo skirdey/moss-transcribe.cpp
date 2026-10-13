@@ -91,7 +91,7 @@ MTD_DEVICE=cpu MTD_THREADS=16 MTD_CPU_OPT=48 ./build/moss-transcribe transcribe 
 
 ## Deployment and next work
 
-The live API still uses the original production build. These gains are measured in the tested optimized CLI and are available in the public source. The 10× full-input target is measured against the previous optimized reference, and remains unachieved.
+The CPU API has now been upgraded to the same tested opt48 binary and libraries. [Deployment and restart checks](cpu-api-upgrade.md) verify matching answers from a laptop. The speed figures above remain the repeated CLI benchmark; the small API checks are not a new speed benchmark. The 10× full-input target is measured against the previous optimized reference, and remains unachieved.
 
 [The failed guessing experiment](strict-speculative.md) remains disabled. Checking several guesses at once was 10–41% slower on speech and changed an answer. [The next diagnostic](actual-audio-attention.md) identifies the first rounding difference; its repair and timing checks remain pending.
 

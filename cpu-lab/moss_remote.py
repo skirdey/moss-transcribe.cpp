@@ -1,4 +1,4 @@
-"""Pinned hp-fury MOSS client: bounded uploads, complete outputs, no MLX fallback."""
+"""Pinned CPU MOSS client: bounded uploads and complete outputs."""
 from __future__ import annotations
 
 import hashlib
@@ -14,12 +14,16 @@ from pathlib import Path
 from types import SimpleNamespace
 
 MODEL_SHA256 = "ed6c35d0d527c5d03171c3eb448e2150a42c76a51e3e73aa821e351c3da8307c"
-SOURCE_COMMIT = "190a569c13b4b247450f2fb3b2a431244e84833e"
+SOURCE_COMMIT = "8382623c2014f85881f0680a0d8f10ce414b20b0"
+# The model and decoding policy are unchanged; completed output caches remain valid.
+OUTPUT_REVISION = "190a569c13b4b247450f2fb3b2a431244e84833e"
+CPU_OPT = 48
+VALIDATED_BINARY_SHA256 = "488fee1617aa52a5fcba5527a03d545fbc46e6a9457a5413faeac81725f1fb55"
 POLICY = "moss-cpp-cpu-marker-retries-v2"
 
 
 def legacy_signature():
-    return f"remote-cpu:{SOURCE_COMMIT}:{MODEL_SHA256}:moss-cpp-cpu-eos-v1"
+    return f"remote-cpu:{OUTPUT_REVISION}:{MODEL_SHA256}:moss-cpp-cpu-eos-v1"
 
 
 def configured():
@@ -27,7 +31,7 @@ def configured():
 
 
 def signature():
-    return f"remote-cpu:{SOURCE_COMMIT}:{MODEL_SHA256}:{POLICY}"
+    return f"remote-cpu:{OUTPUT_REVISION}:{MODEL_SHA256}:{POLICY}"
 
 
 def _request(route, body=None, timeout=270):
@@ -37,7 +41,7 @@ def _request(route, body=None, timeout=270):
     if body is not None:
         headers["Content-Type"] = "audio/wav"
     request = urllib.request.Request(os.environ["MOSS_API_URL"].rstrip("/") + route, data=body, headers=headers)
-    # Tailnet traffic goes directly to hp-fury, independent of HTTP proxy envs.
+    # Private API traffic bypasses HTTP proxy environment settings.
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
     try:
         with opener.open(request, timeout=timeout) as response:
@@ -55,6 +59,8 @@ def _validate_identity(identity):
     if not isinstance(identity, dict) or any(identity.get(k) != value for k, value in {
         "modelSha256": MODEL_SHA256, "sourceCommit": SOURCE_COMMIT,
         "policy": POLICY, "device": "cpu", "quantization": "q8_0",
+        "cpuOpt": CPU_OPT, "threads": 16,
+        "binarySha256": os.getenv("MOSS_API_EXPECTED_BINARY_SHA256", VALIDATED_BINARY_SHA256),
     }.items()):
         raise RuntimeError("MOSS remote model/runtime does not match the pinned identity")
 
