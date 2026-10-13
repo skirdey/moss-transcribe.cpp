@@ -126,7 +126,11 @@ query position990: all1024 hidden elements,151936 full logits and53248 active KV
 values differ. Max absolute hidden/logit errors are0.570608/0.256892, with no
 nonfinite values. The row's first maximum still matches, illustrating why argmax
 alone is insufficient. All980917056 model weight bytes remain unchanged. This
-locates a state failure but does not yet attribute it to a particular operator.
+locates a state failure. The subsequent [protected attention capture](actual-audio-attention.md)
+attributes the first intermediate mismatch to layer0 softmax, query0: masking
+to a common length992 changes arithmetic versus serial valid length988, even
+though all preceding stages and scores match. Exact own-result replay and
+null-hook observer controls pass; the repair and latency gates remain pending.
 The durable remote probe completes with declared diagnostic exit1 and both PIDs
 are absent; automatic ingestion is restored and the production API is healthy.
 
