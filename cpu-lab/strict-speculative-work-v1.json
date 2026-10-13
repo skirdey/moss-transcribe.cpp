@@ -1,0 +1,1042 @@
+{
+  "schema": "strict-speculative-work-v1",
+  "protocol": "Actual runtime counters must equal past-only replay of complete private EOS traces. Proposal rank counts distinguish dispatched, verified and accepted work. Position buckets use the committed seed offset; no token IDs are emitted. Includes rejected target inputs. Not a latency or universal parity claim.",
+  "auditScriptSha256": "8e14a3023444076023af737235fe120c2c6ff5adbc0bf2b4f80343173caa8eb1",
+  "traceReaderSha256": "150a5ebc415127d76e6ed0cc24b44d2106550118bc8fe60e7dd309fd93717392",
+  "runs": [
+    {
+      "case": "dinner-60s-786480-0",
+      "privateLogSha256": "471c9b8a5c8341c233926d08c84d1ba929a7dab940150e996bb21939622b3502",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 330,
+        "draftedCalls": 109,
+        "proposed": 436,
+        "accepted": 105,
+        "targetInputTokens": 766,
+        "rewinds": 98
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.003463641,
+        "rewindSeconds": 3.707e-06
+      },
+      "replay": {
+        "tokensIncludingEos": 436,
+        "sequentialTargetCalls": 435,
+        "oracleReplayTargetCalls": 330,
+        "callsWithDraft": 109,
+        "proposedTokens": 436,
+        "acceptedDraftTokens": 105,
+        "proposalAcceptanceFraction": 0.2408256880733945,
+        "targetInputTokenWork": 766,
+        "targetInputWorkRatio": 1.760919540229885,
+        "callReductionFactor": 1.3181818181818181,
+        "committedTokensPerCallHistogram": {
+          "1": 273,
+          "2": 33,
+          "5": 11,
+          "3": 11,
+          "4": 2
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 109,
+          "verified": 109,
+          "accepted": 57
+        },
+        "2": {
+          "dispatched": 109,
+          "verified": 57,
+          "accepted": 24
+        },
+        "3": {
+          "dispatched": 109,
+          "verified": 24,
+          "accepted": 13
+        },
+        "4": {
+          "dispatched": 109,
+          "verified": 13,
+          "accepted": 11
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 112,
+          "proposed": 60,
+          "accepted": 16,
+          "targetInputTokens": 172
+        },
+        "128": {
+          "targetCalls": 84,
+          "proposed": 164,
+          "accepted": 46,
+          "targetInputTokens": 248
+        },
+        "256": {
+          "targetCalls": 99,
+          "proposed": 140,
+          "accepted": 27,
+          "targetInputTokens": 239
+        },
+        "384": {
+          "targetCalls": 35,
+          "proposed": 72,
+          "accepted": 16,
+          "targetInputTokens": 107
+        }
+      }
+    },
+    {
+      "case": "dinner-60s-786480-1",
+      "privateLogSha256": "8c85c69bc0ef98e22b9d2823f9acb3ba6b0b0ce31ca31979df5972cc25fc9a8b",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 330,
+        "draftedCalls": 109,
+        "proposed": 436,
+        "accepted": 105,
+        "targetInputTokens": 766,
+        "rewinds": 98
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.003464579,
+        "rewindSeconds": 3.132e-06
+      },
+      "replay": {
+        "tokensIncludingEos": 436,
+        "sequentialTargetCalls": 435,
+        "oracleReplayTargetCalls": 330,
+        "callsWithDraft": 109,
+        "proposedTokens": 436,
+        "acceptedDraftTokens": 105,
+        "proposalAcceptanceFraction": 0.2408256880733945,
+        "targetInputTokenWork": 766,
+        "targetInputWorkRatio": 1.760919540229885,
+        "callReductionFactor": 1.3181818181818181,
+        "committedTokensPerCallHistogram": {
+          "1": 273,
+          "2": 33,
+          "5": 11,
+          "3": 11,
+          "4": 2
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 109,
+          "verified": 109,
+          "accepted": 57
+        },
+        "2": {
+          "dispatched": 109,
+          "verified": 57,
+          "accepted": 24
+        },
+        "3": {
+          "dispatched": 109,
+          "verified": 24,
+          "accepted": 13
+        },
+        "4": {
+          "dispatched": 109,
+          "verified": 13,
+          "accepted": 11
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 112,
+          "proposed": 60,
+          "accepted": 16,
+          "targetInputTokens": 172
+        },
+        "128": {
+          "targetCalls": 84,
+          "proposed": 164,
+          "accepted": 46,
+          "targetInputTokens": 248
+        },
+        "256": {
+          "targetCalls": 99,
+          "proposed": 140,
+          "accepted": 27,
+          "targetInputTokens": 239
+        },
+        "384": {
+          "targetCalls": 35,
+          "proposed": 72,
+          "accepted": 16,
+          "targetInputTokens": 107
+        }
+      }
+    },
+    {
+      "case": "empty-real-60s-786480-0",
+      "privateLogSha256": "e4d02b5c5c9c3ae09826899cf29008893e2d43b2555c6c3de0be2020b96a3363",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 0,
+        "draftedCalls": 0,
+        "proposed": 0,
+        "accepted": 0,
+        "targetInputTokens": 0,
+        "rewinds": 0
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.0,
+        "rewindSeconds": 0.0
+      },
+      "replay": {
+        "tokensIncludingEos": 1,
+        "sequentialTargetCalls": 0,
+        "oracleReplayTargetCalls": 0,
+        "callsWithDraft": 0,
+        "proposedTokens": 0,
+        "acceptedDraftTokens": 0,
+        "proposalAcceptanceFraction": 0,
+        "targetInputTokenWork": 0,
+        "targetInputWorkRatio": 0,
+        "callReductionFactor": 0,
+        "committedTokensPerCallHistogram": {},
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "2": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "3": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "4": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        }
+      },
+      "seedPositionBuckets": {}
+    },
+    {
+      "case": "empty-real-60s-786480-1",
+      "privateLogSha256": "c71f2178762a7a351be36b3a715a2533df17060d8ec2177969942afd599eb645",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 0,
+        "draftedCalls": 0,
+        "proposed": 0,
+        "accepted": 0,
+        "targetInputTokens": 0,
+        "rewinds": 0
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.0,
+        "rewindSeconds": 0.0
+      },
+      "replay": {
+        "tokensIncludingEos": 1,
+        "sequentialTargetCalls": 0,
+        "oracleReplayTargetCalls": 0,
+        "callsWithDraft": 0,
+        "proposedTokens": 0,
+        "acceptedDraftTokens": 0,
+        "proposalAcceptanceFraction": 0,
+        "targetInputTokenWork": 0,
+        "targetInputWorkRatio": 0,
+        "callReductionFactor": 0,
+        "committedTokensPerCallHistogram": {},
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "2": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "3": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "4": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        }
+      },
+      "seedPositionBuckets": {}
+    },
+    {
+      "case": "meeting-120s-786480-0",
+      "privateLogSha256": "9ff733b43900c8d5894d4f8afcd57063090de01bc08d7ee2cd1e875981c17b8d",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 967,
+        "draftedCalls": 467,
+        "proposed": 1861,
+        "accepted": 363,
+        "targetInputTokens": 2828,
+        "rewinds": 440
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.029899255,
+        "rewindSeconds": 1.7364e-05
+      },
+      "replay": {
+        "tokensIncludingEos": 1331,
+        "sequentialTargetCalls": 1330,
+        "oracleReplayTargetCalls": 967,
+        "callsWithDraft": 467,
+        "proposedTokens": 1861,
+        "acceptedDraftTokens": 363,
+        "proposalAcceptanceFraction": 0.1950564212788823,
+        "targetInputTokenWork": 2828,
+        "targetInputWorkRatio": 2.126315789473684,
+        "callReductionFactor": 1.375387797311272,
+        "committedTokensPerCallHistogram": {
+          "1": 763,
+          "2": 121,
+          "3": 34,
+          "5": 27,
+          "4": 22
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 467,
+          "verified": 467,
+          "accepted": 204
+        },
+        "2": {
+          "dispatched": 466,
+          "verified": 204,
+          "accepted": 83
+        },
+        "3": {
+          "dispatched": 464,
+          "verified": 83,
+          "accepted": 49
+        },
+        "4": {
+          "dispatched": 464,
+          "verified": 49,
+          "accepted": 27
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 107,
+          "proposed": 96,
+          "accepted": 21,
+          "targetInputTokens": 203
+        },
+        "128": {
+          "targetCalls": 90,
+          "proposed": 200,
+          "accepted": 39,
+          "targetInputTokens": 290
+        },
+        "256": {
+          "targetCalls": 97,
+          "proposed": 176,
+          "accepted": 30,
+          "targetInputTokens": 273
+        },
+        "384": {
+          "targetCalls": 88,
+          "proposed": 192,
+          "accepted": 40,
+          "targetInputTokens": 280
+        },
+        "512": {
+          "targetCalls": 104,
+          "proposed": 156,
+          "accepted": 26,
+          "targetInputTokens": 260
+        },
+        "640": {
+          "targetCalls": 90,
+          "proposed": 180,
+          "accepted": 36,
+          "targetInputTokens": 270
+        },
+        "768": {
+          "targetCalls": 95,
+          "proposed": 164,
+          "accepted": 33,
+          "targetInputTokens": 259
+        },
+        "896": {
+          "targetCalls": 79,
+          "proposed": 212,
+          "accepted": 49,
+          "targetInputTokens": 291
+        },
+        "1024": {
+          "targetCalls": 94,
+          "proposed": 204,
+          "accepted": 34,
+          "targetInputTokens": 298
+        },
+        "1152": {
+          "targetCalls": 92,
+          "proposed": 213,
+          "accepted": 36,
+          "targetInputTokens": 305
+        },
+        "1280": {
+          "targetCalls": 31,
+          "proposed": 68,
+          "accepted": 19,
+          "targetInputTokens": 99
+        }
+      }
+    },
+    {
+      "case": "meeting-120s-786480-1",
+      "privateLogSha256": "527815209e70c3787d6352e8f67ed8790fca3c0961a99170855bdfae0526e41e",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 967,
+        "draftedCalls": 467,
+        "proposed": 1861,
+        "accepted": 363,
+        "targetInputTokens": 2828,
+        "rewinds": 440
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.030045846,
+        "rewindSeconds": 1.7657e-05
+      },
+      "replay": {
+        "tokensIncludingEos": 1331,
+        "sequentialTargetCalls": 1330,
+        "oracleReplayTargetCalls": 967,
+        "callsWithDraft": 467,
+        "proposedTokens": 1861,
+        "acceptedDraftTokens": 363,
+        "proposalAcceptanceFraction": 0.1950564212788823,
+        "targetInputTokenWork": 2828,
+        "targetInputWorkRatio": 2.126315789473684,
+        "callReductionFactor": 1.375387797311272,
+        "committedTokensPerCallHistogram": {
+          "1": 763,
+          "2": 121,
+          "3": 34,
+          "5": 27,
+          "4": 22
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 467,
+          "verified": 467,
+          "accepted": 204
+        },
+        "2": {
+          "dispatched": 466,
+          "verified": 204,
+          "accepted": 83
+        },
+        "3": {
+          "dispatched": 464,
+          "verified": 83,
+          "accepted": 49
+        },
+        "4": {
+          "dispatched": 464,
+          "verified": 49,
+          "accepted": 27
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 107,
+          "proposed": 96,
+          "accepted": 21,
+          "targetInputTokens": 203
+        },
+        "128": {
+          "targetCalls": 90,
+          "proposed": 200,
+          "accepted": 39,
+          "targetInputTokens": 290
+        },
+        "256": {
+          "targetCalls": 97,
+          "proposed": 176,
+          "accepted": 30,
+          "targetInputTokens": 273
+        },
+        "384": {
+          "targetCalls": 88,
+          "proposed": 192,
+          "accepted": 40,
+          "targetInputTokens": 280
+        },
+        "512": {
+          "targetCalls": 104,
+          "proposed": 156,
+          "accepted": 26,
+          "targetInputTokens": 260
+        },
+        "640": {
+          "targetCalls": 90,
+          "proposed": 180,
+          "accepted": 36,
+          "targetInputTokens": 270
+        },
+        "768": {
+          "targetCalls": 95,
+          "proposed": 164,
+          "accepted": 33,
+          "targetInputTokens": 259
+        },
+        "896": {
+          "targetCalls": 79,
+          "proposed": 212,
+          "accepted": 49,
+          "targetInputTokens": 291
+        },
+        "1024": {
+          "targetCalls": 94,
+          "proposed": 204,
+          "accepted": 34,
+          "targetInputTokens": 298
+        },
+        "1152": {
+          "targetCalls": 92,
+          "proposed": 213,
+          "accepted": 36,
+          "targetInputTokens": 305
+        },
+        "1280": {
+          "targetCalls": 31,
+          "proposed": 68,
+          "accepted": 19,
+          "targetInputTokens": 99
+        }
+      }
+    },
+    {
+      "case": "meeting-60s-786480-0",
+      "privateLogSha256": "7e732a076de578e4442afefe0538919b7f17fa4d248b875bf5ad2ae8a6949611",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 512,
+        "draftedCalls": 214,
+        "proposed": 856,
+        "accepted": 161,
+        "targetInputTokens": 1368,
+        "rewinds": 203
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.008386294,
+        "rewindSeconds": 8.301e-06
+      },
+      "replay": {
+        "tokensIncludingEos": 674,
+        "sequentialTargetCalls": 673,
+        "oracleReplayTargetCalls": 512,
+        "callsWithDraft": 214,
+        "proposedTokens": 856,
+        "acceptedDraftTokens": 161,
+        "proposalAcceptanceFraction": 0.18808411214953272,
+        "targetInputTokenWork": 1368,
+        "targetInputWorkRatio": 2.0326894502228825,
+        "callReductionFactor": 1.314453125,
+        "committedTokensPerCallHistogram": {
+          "1": 416,
+          "2": 61,
+          "3": 16,
+          "5": 11,
+          "4": 8
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 214,
+          "verified": 214,
+          "accepted": 96
+        },
+        "2": {
+          "dispatched": 214,
+          "verified": 96,
+          "accepted": 35
+        },
+        "3": {
+          "dispatched": 214,
+          "verified": 35,
+          "accepted": 19
+        },
+        "4": {
+          "dispatched": 214,
+          "verified": 19,
+          "accepted": 11
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 107,
+          "proposed": 96,
+          "accepted": 21,
+          "targetInputTokens": 203
+        },
+        "128": {
+          "targetCalls": 90,
+          "proposed": 200,
+          "accepted": 39,
+          "targetInputTokens": 290
+        },
+        "256": {
+          "targetCalls": 96,
+          "proposed": 172,
+          "accepted": 31,
+          "targetInputTokens": 268
+        },
+        "384": {
+          "targetCalls": 89,
+          "proposed": 196,
+          "accepted": 39,
+          "targetInputTokens": 285
+        },
+        "512": {
+          "targetCalls": 104,
+          "proposed": 156,
+          "accepted": 26,
+          "targetInputTokens": 260
+        },
+        "640": {
+          "targetCalls": 26,
+          "proposed": 36,
+          "accepted": 5,
+          "targetInputTokens": 62
+        }
+      }
+    },
+    {
+      "case": "meeting-60s-786480-1",
+      "privateLogSha256": "0fb857126554ba1d69a4f7848bc604bdedddcf275d27c0b925b859cf4e8de9b6",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 512,
+        "draftedCalls": 214,
+        "proposed": 856,
+        "accepted": 161,
+        "targetInputTokens": 1368,
+        "rewinds": 203
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.008381672,
+        "rewindSeconds": 8.333e-06
+      },
+      "replay": {
+        "tokensIncludingEos": 674,
+        "sequentialTargetCalls": 673,
+        "oracleReplayTargetCalls": 512,
+        "callsWithDraft": 214,
+        "proposedTokens": 856,
+        "acceptedDraftTokens": 161,
+        "proposalAcceptanceFraction": 0.18808411214953272,
+        "targetInputTokenWork": 1368,
+        "targetInputWorkRatio": 2.0326894502228825,
+        "callReductionFactor": 1.314453125,
+        "committedTokensPerCallHistogram": {
+          "1": 416,
+          "2": 61,
+          "3": 16,
+          "5": 11,
+          "4": 8
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 214,
+          "verified": 214,
+          "accepted": 96
+        },
+        "2": {
+          "dispatched": 214,
+          "verified": 96,
+          "accepted": 35
+        },
+        "3": {
+          "dispatched": 214,
+          "verified": 35,
+          "accepted": 19
+        },
+        "4": {
+          "dispatched": 214,
+          "verified": 19,
+          "accepted": 11
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 107,
+          "proposed": 96,
+          "accepted": 21,
+          "targetInputTokens": 203
+        },
+        "128": {
+          "targetCalls": 90,
+          "proposed": 200,
+          "accepted": 39,
+          "targetInputTokens": 290
+        },
+        "256": {
+          "targetCalls": 96,
+          "proposed": 172,
+          "accepted": 31,
+          "targetInputTokens": 268
+        },
+        "384": {
+          "targetCalls": 89,
+          "proposed": 196,
+          "accepted": 39,
+          "targetInputTokens": 285
+        },
+        "512": {
+          "targetCalls": 104,
+          "proposed": 156,
+          "accepted": 26,
+          "targetInputTokens": 260
+        },
+        "640": {
+          "targetCalls": 26,
+          "proposed": 36,
+          "accepted": 5,
+          "targetInputTokens": 62
+        }
+      }
+    },
+    {
+      "case": "silence-60s-786480-0",
+      "privateLogSha256": "961de1bdff4096a75c2b177e626679db280a045be63a2e56b18856f9568c8c9e",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 12,
+        "draftedCalls": 0,
+        "proposed": 0,
+        "accepted": 0,
+        "targetInputTokens": 12,
+        "rewinds": 0
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 5.869e-06,
+        "rewindSeconds": 0.0
+      },
+      "replay": {
+        "tokensIncludingEos": 13,
+        "sequentialTargetCalls": 12,
+        "oracleReplayTargetCalls": 12,
+        "callsWithDraft": 0,
+        "proposedTokens": 0,
+        "acceptedDraftTokens": 0,
+        "proposalAcceptanceFraction": 0,
+        "targetInputTokenWork": 12,
+        "targetInputWorkRatio": 1.0,
+        "callReductionFactor": 1.0,
+        "committedTokensPerCallHistogram": {
+          "1": 12
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "2": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "3": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "4": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 12,
+          "proposed": 0,
+          "accepted": 0,
+          "targetInputTokens": 12
+        }
+      }
+    },
+    {
+      "case": "silence-60s-786480-1",
+      "privateLogSha256": "58503c1d08b8e0b417019651f6c8e07e8836d1ad96c625845ffa48af363969db",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 12,
+        "draftedCalls": 0,
+        "proposed": 0,
+        "accepted": 0,
+        "targetInputTokens": 12,
+        "rewinds": 0
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 5.023e-06,
+        "rewindSeconds": 0.0
+      },
+      "replay": {
+        "tokensIncludingEos": 13,
+        "sequentialTargetCalls": 12,
+        "oracleReplayTargetCalls": 12,
+        "callsWithDraft": 0,
+        "proposedTokens": 0,
+        "acceptedDraftTokens": 0,
+        "proposalAcceptanceFraction": 0,
+        "targetInputTokenWork": 12,
+        "targetInputWorkRatio": 1.0,
+        "callReductionFactor": 1.0,
+        "committedTokensPerCallHistogram": {
+          "1": 12
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "2": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "3": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        },
+        "4": {
+          "dispatched": 0,
+          "verified": 0,
+          "accepted": 0
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 12,
+          "proposed": 0,
+          "accepted": 0,
+          "targetInputTokens": 12
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s-786480-0",
+      "privateLogSha256": "68e7fd4218997c46d1445fcaf2ae3fa0abe90f409398ee51dfdc81f4ca506cb6",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 398,
+        "draftedCalls": 96,
+        "proposed": 384,
+        "accepted": 91,
+        "targetInputTokens": 782,
+        "rewinds": 95
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.004803334,
+        "rewindSeconds": 4.532e-06
+      },
+      "replay": {
+        "tokensIncludingEos": 490,
+        "sequentialTargetCalls": 489,
+        "oracleReplayTargetCalls": 398,
+        "callsWithDraft": 96,
+        "proposedTokens": 384,
+        "acceptedDraftTokens": 91,
+        "proposalAcceptanceFraction": 0.23697916666666666,
+        "targetInputTokenWork": 782,
+        "targetInputWorkRatio": 1.5991820040899796,
+        "callReductionFactor": 1.228643216080402,
+        "committedTokensPerCallHistogram": {
+          "1": 359,
+          "3": 7,
+          "4": 21,
+          "2": 10,
+          "5": 1
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 96,
+          "verified": 96,
+          "accepted": 39
+        },
+        "2": {
+          "dispatched": 96,
+          "verified": 39,
+          "accepted": 29
+        },
+        "3": {
+          "dispatched": 96,
+          "verified": 29,
+          "accepted": 22
+        },
+        "4": {
+          "dispatched": 96,
+          "verified": 22,
+          "accepted": 1
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 109,
+          "proposed": 60,
+          "accepted": 19,
+          "targetInputTokens": 169
+        },
+        "128": {
+          "targetCalls": 107,
+          "proposed": 108,
+          "accepted": 21,
+          "targetInputTokens": 215
+        },
+        "256": {
+          "targetCalls": 102,
+          "proposed": 108,
+          "accepted": 27,
+          "targetInputTokens": 210
+        },
+        "384": {
+          "targetCalls": 80,
+          "proposed": 108,
+          "accepted": 24,
+          "targetInputTokens": 188
+        }
+      }
+    },
+    {
+      "case": "vox-vmaiq-60s-786480-1",
+      "privateLogSha256": "89c0b6728a0903045aff07b106ad51d7f0e33bc308fa54c561232f3a2afca167",
+      "maximumDraft": 4,
+      "actualCounters": {
+        "targetCalls": 398,
+        "draftedCalls": 96,
+        "proposed": 384,
+        "accepted": 91,
+        "targetInputTokens": 782,
+        "rewinds": 95
+      },
+      "counterReplayExact": true,
+      "costs": {
+        "draftSeconds": 0.004764233,
+        "rewindSeconds": 4.013e-06
+      },
+      "replay": {
+        "tokensIncludingEos": 490,
+        "sequentialTargetCalls": 489,
+        "oracleReplayTargetCalls": 398,
+        "callsWithDraft": 96,
+        "proposedTokens": 384,
+        "acceptedDraftTokens": 91,
+        "proposalAcceptanceFraction": 0.23697916666666666,
+        "targetInputTokenWork": 782,
+        "targetInputWorkRatio": 1.5991820040899796,
+        "callReductionFactor": 1.228643216080402,
+        "committedTokensPerCallHistogram": {
+          "1": 359,
+          "3": 7,
+          "4": 21,
+          "2": 10,
+          "5": 1
+        },
+        "reachedEos": true
+      },
+      "proposalRanks": {
+        "1": {
+          "dispatched": 96,
+          "verified": 96,
+          "accepted": 39
+        },
+        "2": {
+          "dispatched": 96,
+          "verified": 39,
+          "accepted": 29
+        },
+        "3": {
+          "dispatched": 96,
+          "verified": 29,
+          "accepted": 22
+        },
+        "4": {
+          "dispatched": 96,
+          "verified": 22,
+          "accepted": 1
+        }
+      },
+      "seedPositionBuckets": {
+        "0": {
+          "targetCalls": 109,
+          "proposed": 60,
+          "accepted": 19,
+          "targetInputTokens": 169
+        },
+        "128": {
+          "targetCalls": 107,
+          "proposed": 108,
+          "accepted": 21,
+          "targetInputTokens": 215
+        },
+        "256": {
+          "targetCalls": 102,
+          "proposed": 108,
+          "accepted": 27,
+          "targetInputTokens": 210
+        },
+        "384": {
+          "targetCalls": 80,
+          "proposed": 108,
+          "accepted": 24,
+          "targetInputTokens": 188
+        }
+      }
+    }
+  ]
+}
